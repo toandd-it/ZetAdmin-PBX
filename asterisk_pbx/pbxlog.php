@@ -37,25 +37,33 @@ else
 		}
 		else
 		{
-			//update call log
 			if(isset($res['Event']) && in_array($res['Event'], $eventsAllow))
 			{
 				$_mgid = (string)new \MongoDB\BSON\ObjectID;
 				$dataFind = ['_id' => $res['Channel']];
-				$insertChannel = $mgdb->insert($db_collection, ['_id' => (string)$res['Channel'], 'id' => $_mgid, 'tcreate' => time(), 'ring' => 0, 'up' => 0]);
+
+				$dataInsert = $res;
+				$dataInsert['_id'] = (string)$dataInsert['Channel'];
+				$dataInsert['id'] = $_mgid;
+				$dataInsert['t_create'] = time();
+				$dataInsert['t_ring'] = 0;
+				$dataInsert['t_up'] = 0;
+				$dataInsert['t_hangup'] = 0;
+
+				$insertChannel = $mgdb->insert($db_collection, $dataInsert);
 				if($insertChannel['status'] == false)
 				{
 					if($res['Event'] == 'Newstate' && $res['ChannelStateDesc'] == 'Ring')
 					{
-						$mgdb->update($db_collection, $dataFind, ['ring' => (int)time()], []);
+						$mgdb->update($db_collection, $dataFind, ['t_ring' => (int)time()], []);
 					}
 					elseif($res['Event'] == 'Newstate' && $res['ChannelStateDesc'] == 'Up')
 					{
-						$mgdb->update($db_collection, $dataFind, ['up' => (int)time()], []);
+						$mgdb->update($db_collection, $dataFind, ['t_up' => (int)time()], []);
 					}
 					elseif($res['Event'] == 'Hangup')
 					{
-						$mgdb->update($db_collection, $dataFind, ['hangup' => (int)time()], []);
+						$mgdb->update($db_collection, $dataFind, ['t_hangup' => (int)time()], []);
 					}
 				}
 				//save to log file when mongodb disconnect
