@@ -335,12 +335,10 @@ echo "|   Create Cloud PBX API                    |"
 echo "+-------------------------------------------+"
 echo " "
 
-cd $webroot/
-sudo wget https://download.zetadmin.com/pbx.api.1.0.1.zip
-sudo unzip pbx.api.1.0.1.zip
-sudo cp -R pbx.api.1.0.1/api/ $webroot/
-sudo rm -rf pbx.api.1.0.1.zip
-sudo rm -rf pbx.api.1.0.1/
+sudo mkdir $webroot/api/
+cat > $webroot/api/index.html
+echo 'pageok!' >> $webroot/api/index.html
+sudo cp -R asterisk_pbx/ $webroot/api/
 
 echo -e "\033[32mDownload and export API source code successful!\033[m"
 echo " "
@@ -432,7 +430,7 @@ echo 'Description=PBX log service' >> $system_dir/pbxlog.service
 echo 'After=network.target' >> $system_dir/pbxlog.service
 echo '' >> $system_dir/pbxlog.service
 echo '[Service]' >> $system_dir/pbxlog.service
-echo 'ExecStart=/usr/local/lsws/lsphp73/bin/php '$webroot'/api/pbxlog.php' >> $system_dir/pbxlog.service
+echo 'ExecStart=/usr/local/lsws/lsphp73/bin/php '$webroot'/api/asterisk_pbx/pbxlog.php' >> $system_dir/pbxlog.service
 echo 'Restart=always' >> $system_dir/pbxlog.service
 echo 'User=nobody' >> $system_dir/pbxlog.service
 echo '' >> $system_dir/pbxlog.service
