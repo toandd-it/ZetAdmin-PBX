@@ -23,31 +23,44 @@ if(isset($action) && isset($mgdb))
     
     if($action == 'deleteMultiCallLog')
 	{
-        $ids = json_decode($_POST['_id'], true);
-        foreach($ids as $id)
+        $ids = (array)json_decode($_POST['_id'], true);
+        if(!empty($ids))
         {
-            $idFind = array('_id' => $id);
-            $checkLog = $mgdb->select($calllog_colection, $idFind);
-            if(!empty($checkLog['data']['_id']))
+            foreach($ids as $id)
             {
-                $deleteStatus = $mgdb->delete($calllog_colection, $idFind);
-                $status = $deleteStatus['status'];
-                if($status == true)
+                $idFind = array('_id' => $id);
+                $checkLog = $mgdb->select($calllog_colection, $idFind);
+                if(!empty($checkLog['data']['_id']))
                 {
-                    $msg = 'Xóa lịch sử cuộc gọi <strong>'.$checkLog['data']['channel'].'</strong> thành công!';
+                    $deleteStatus = $mgdb->delete($calllog_colection, $idFind);
+                    $status = $deleteStatus['status'];
+                    if($status == true)
+                    {
+                        $deleteSuccess = $deleteSuccess + 1;
+                        //$msg = sprintf($app->_lang('msg_014'), $checkLog['data']['channel']);
+                    } 
+                    else 
+                    {
+                        $deleteError = $deleteError + 1;
+                        //$msg = sprintf($app->_lang('msg_015'), $deleteStatus['data']['msg']);
+                    }
                 } 
                 else 
                 {
-                    $msg = 'Máy chủ đang bận vui lòng thử lại sau! '.$deleteStatus['data']['msg'];
+                    $status = false;
+                    //$msg = $app->_lang('msg_013');
+                    $deleteNull = $deleteNull + 1;
                 }
-            } 
-            else 
-            {
-                $status = false;
-                $msg = 'Không tồn tại dữ liệu trên hệ thống!';
             }
+            $status = true;
+            $msg = sprintf($app->_lang('msg_016'), $deleteSuccess, $deleteError, $deleteNull, count($ids));
         }
-        
+        else
+        {
+            $status = false;
+			$msg = $app->_lang('msg_017');
+        }
+
         $insertLogs = array(
 			'id' => (array)$ids,
 			'tcreate' => time(),
@@ -86,17 +99,17 @@ if(isset($action) && isset($mgdb))
             $status = $deleteStatus['status'];
             if($status == true)
             {
-                $msg = 'Xóa lịch sử cuộc gọi <strong>'.$checkLog['data']['channel'].'</strong> thành công!';
+                $msg = sprintf($app->_lang('msg_014'), $checkLog['data']['channel']);
             } 
             else 
             {
-                $msg 	= 'Máy chủ đang bận vui lòng thử lại sau! '.$deleteStatus['data']['msg'];
+                $msg = sprintf($app->_lang('msg_015'), $deleteStatus['data']['msg']);
             }
         } 
         else 
         {
             $status = false;
-            $msg 	= 'Không tồn tại dữ liệu trên hệ thống!';
+            $msg 	= $app->_lang('msg_013');
         }
 
         $insertLogs = array(

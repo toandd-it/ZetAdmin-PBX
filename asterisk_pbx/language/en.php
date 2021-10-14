@@ -14,4 +14,9 @@ $_text['msg_009'] = 'queue remove member SIP/%s queue %s successfully!';
 $_text['msg_010'] = 'queue add member SIP/%s queue %s successfully!';
 $_text['msg_011'] = 'Extension %s should be calling %s.';
 $_text['msg_012'] = 'Call number not empty!';
+$_text['msg_013'] = 'Data not exist on system!';
+$_text['msg_014'] = 'Xóa lịch sử cuộc gọi %s thành công!';
+$_text['msg_015'] = 'Máy chủ đang bận vui lòng thử lại sau! %s';
+$_text['msg_016'] = 'Delete successfully: %s. Error: %s. Does not exist: %s. Total: %s';
+$_text['msg_017'] = 'No log id have been selected yet!';
 ?>
