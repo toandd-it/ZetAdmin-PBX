@@ -46,7 +46,7 @@ else
 				$dataInsert = $res;
 				$dataInsert['_id'] = (string)$dataInsert['Channel'];
 				$dataInsert['id'] = $_mgid;
-				$dataInsert['t_create'] = time();
+				$dataInsert['t_create'] = microtime(true);
 				$dataInsert['t_ring'] = 0;
 				$dataInsert['t_up'] = 0;
 				$dataInsert['t_hangup'] = 0;
@@ -56,7 +56,7 @@ else
 				{
 					if($res['Event'] == 'Newstate' && $res['ChannelStateDesc'] == 'Ring')
 					{
-						$update = $mgdb->update($db_collection, $dataFind, ['t_ring' => (int)time()], []);
+						$update = $mgdb->update($db_collection, $dataFind, ['t_ring' => microtime(true)], []);
 						if($update['status'] == false)
 						{
 							$app->cdrSave($res);
@@ -64,7 +64,7 @@ else
 					}
 					elseif($res['Event'] == 'Newstate' && $res['ChannelStateDesc'] == 'Up')
 					{
-						$update = $mgdb->update($db_collection, $dataFind, ['t_up' => (int)time()], []);
+						$update = $mgdb->update($db_collection, $dataFind, ['t_up' => microtime(true)], []);
 						if($update['status'] == false)
 						{
 							$app->cdrSave($res);
@@ -72,7 +72,7 @@ else
 					}
 					elseif($res['Event'] == 'Hangup')
 					{
-						$update = $mgdb->update($db_collection, $dataFind, ['t_hangup' => (int)time()], []);
+						$update = $mgdb->update($db_collection, $dataFind, ['t_hangup' => microtime(true)], []);
 						if($update['status'] == false)
 						{
 							$app->cdrSave($res);

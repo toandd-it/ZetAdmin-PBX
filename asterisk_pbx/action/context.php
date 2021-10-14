@@ -1024,13 +1024,13 @@ if(isset($action))
             } 
             else 
             { 
-                $msg = 'Máy chủ đang bận vui lòng thử lại sau!<br>'.$statusUpdate['data']['msg'];
+                $msg = sprintf($app->_lang('msg_015'), $deleteStatus['data']['msg']);
             }
         } 
         else 
         { 
             $status = $checkStatus;
-            $msg = 'Phần mở rộng <strong>'.$updateData['name'].'</strong> đã tồn tại trên hệ thống!';
+            $msg = sprintf($app->_lang('msg_020'), $updateData['name']);
         }
         
 		$insertLogs = array(
