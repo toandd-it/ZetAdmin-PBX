@@ -23,4 +23,8 @@ $_text['msg_018'] = 'Xóa kịch bản %s thành công!';
 $_text['msg_019'] = 'Cập nhật kịch bản %s thành công!';
 $_text['msg_020'] = 'Kịch bản %s đã tồn tại trên hệ thống!';
 $_text['msg_021'] = 'Thêm kịch bản %s thành công!';
+$_text['msg_022'] = 'Xóa hàng đợi %s thành công!';
+$_text['msg_023'] = 'Cập nhật hàng đợi %s thành công!';
+$_text['msg_024'] = 'Hàng đợi %s đã tồn tại trên hệ thống!';
+$_text['msg_025'] = 'Thêm mới hàng đợi %s thành công!';
 ?>

@@ -26,31 +26,39 @@ if(isset($action))
     
     if($action == 'deleteMultiQueue')
 	{
-        $ids = json_decode($_POST['_id'], true);
-        foreach($ids as $id)
+        $ids = (array)json_decode($_POST['_id'], true);
+        if(!empty($ids))
         {
-            $idFind = array('_id' => $id);
-            $checkQueue = $mgdb->select($queue_colection, $idFind);
-            if(!empty($checkQueue['data']['_id']))
+            foreach($ids as $id)
             {
-                $deleteStatus = $mgdb->delete($queue_colection, $idFind);
-                $status = $deleteStatus['status'];
-                if($status == true)
+                $idFind = array('_id' => $id);
+                $checkQueue = $mgdb->select($queue_colection, $idFind);
+                if(!empty($checkQueue['data']['_id']))
                 {
-                    $msg = 'Xóa hàng đợi <strong>'.$checkQueue['name'].'</strong> thành công!';
+                    $deleteStatus = $mgdb->delete($queue_colection, $idFind);
+                    $status = $deleteStatus['status'];
+                    if($status == true)
+                    {
+                        $deleteSuccess = $deleteSuccess + 1;
+                    } 
+                    else 
+                    {
+                        $deleteError = $deleteError + 1;
+                    }
                 } 
                 else 
                 {
-                    $status = false;
-                    $msg = 'Máy chủ đang bận vui lòng thử lại sau!<br>'.$deleteStatus['data']['msg'];
+                    $deleteNull = $deleteNull + 1;
                 }
-            } 
-            else 
-            {
-                $status = false;
-                $msg = 'Không tồn tại dữ liệu trên hệ thống!';
             }
+            $status = true;
+            $msg = sprintf($app->_lang('msg_016'), $deleteSuccess, $deleteError, $deleteNull, count($ids));
         }
+		else
+		{
+			$status = false;
+			$msg = $app->_lang('msg_017');
+		}
         
         $queues = $mgdb->selects($queue_colection, array('status' => 'Enable'));
         $lineData = '';
@@ -110,7 +118,7 @@ if(isset($action))
             $status = $deleteStatus['status'];
             if($status == true)
             {
-                $msg = 'Xóa hàng đợi <strong>'.$checkQueue['name'].'</strong> thành công!';
+                $msg = sprintf($app->_lang('msg_022'), $checkQueue['name']);
                 $queues = $mgdb->selects($queue_colection, array('status' => 'Enable'));
                 
                 $lineData = '';
@@ -135,13 +143,13 @@ if(isset($action))
             else 
             {
                 $status = false;
-                $msg = 'Máy chủ đang bận vui lòng thử lại sau!<br>'.$deleteStatus['data']['msg'];
+                $msg = sprintf($app->_lang('msg_015'), $deleteStatus['data']['msg']);
             }
         } 
         else 
         {
             $status = false;
-            $msg = 'Không tồn tại dữ liệu trên hệ thống!';
+            $msg = $app->_lang('msg_013');
         }
         $insertLogs = array(
 			'id' => (array)$id,
@@ -205,7 +213,7 @@ if(isset($action))
             $status = $statusUpdate['status'];
             if($status == true)
             { 
-                $msg = 'Cập nhật hàng đợi <strong>'.$dataUpdate['name'].'</strong> thành công!';
+                $msg = sprintf($app->_lang('023'), $dataUpdate['name']);
                 $queues = $mgdb->selects($queue_colection, array('status' => 'Enable'));
                 $lineData = '';
                 foreach($queues['data'] as $queue)
@@ -228,13 +236,13 @@ if(isset($action))
             } 
             else 
             { 
-                $msg = 'Máy chủ đang bận vui lòng thử lại sau!<br>'.$statusUpdate['data']['msg'];
+                $msg = sprintf($app->_lang('msg_015'), $statusUpdate['data']['msg']);
             }
         } 
         else 
         { 
             $status = false;
-            $msg = 'Không tồn tại dữ liệu trên hệ thống!';
+            $msg = $app->_lang('msg_013');
         }
         $insertLogs = array(
 			'id' => (array)$id,
@@ -283,7 +291,7 @@ if(isset($action))
         if(!empty($checkQueue['data']['_id']))
         { 
             $status = false;
-            $msg = 'Hàng đợi <strong>'.$dataInsert['name'].'</strong> đã tồn tại trên hệ thống!';
+            $msg = sprintf($app->_lang('msg_024'), $dataInsert['name']);
         } 
         else 
         { 
@@ -310,11 +318,11 @@ if(isset($action))
                     }
                 }
                 $app->updateFile($lineData, $queue_conf);
-                $msg = 'Thêm mới hàng đợi <strong>'.$dataInsert['name'].'</strong> thành công!';
+                $msg = sprintf($app->_lang('msg_025'), $dataInsert['name']);
             } 
             else 
             {
-                $msg = 'Máy chủ đang bận vui lòng thử lại sau!<br>'.$statusInsert['data']['msg'];
+                $msg = sprintf($app->_lang('msg_015'), $statusInsert['data']['msg']);
             }
         }
 
