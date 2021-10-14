@@ -1024,7 +1024,7 @@ if(isset($action))
             } 
             else 
             { 
-                $msg = sprintf($app->_lang('msg_015'), $deleteStatus['data']['msg']);
+                $msg = sprintf($app->_lang('msg_015'), $statusUpdate['data']['msg']);
             }
         } 
         else 
@@ -1104,7 +1104,7 @@ if(isset($action))
         if(!empty($checkExtension['data']['_id']))
         { 
             $status = false;
-            $msg = 'Phần mở rộng có tên <strong>'.$dataInsert['context'].'</strong> đã tồn tại trên hệ thống!';
+			$msg = sprintf($app->_lang('msg_020'), $dataInsert['context']);
         } 
         else 
         { 
@@ -1384,11 +1384,11 @@ if(isset($action))
                 }
                 $app->updateFile($lineData, $ext_conf);
 
-                $msg = 'Thêm phần mở rộng <strong>'.$dataInsert['context'].'</strong> thành công!';
+                $msg = sprintf($app->_lang('msg_021'), $dataInsert['context']);
             } 
             else 
             {
-                $msg = 'Máy chủ đang bận vui lòng thử lại sau!<br>'.$statusInsert['data']['msg'];
+				$msg = sprintf($app->_lang('msg_015'), $statusInsert['data']['msg']);
             }
         }
 

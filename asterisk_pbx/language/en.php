@@ -22,4 +22,5 @@ $_text['msg_017'] = 'No log id have been selected yet!';
 $_text['msg_018'] = 'Xóa kịch bản %s thành công!';
 $_text['msg_019'] = 'Cập nhật kịch bản %s thành công!';
 $_text['msg_020'] = 'Kịch bản %s đã tồn tại trên hệ thống!';
+$_text['msg_021'] = 'Thêm kịch bản %s thành công!';
 ?>
