@@ -10,6 +10,7 @@ include_once($dir_root."/config.php");
 include_once($dir_root."/lib/class.action.php");
 include_once($dir_root."/lib/class.mongodb.php");
 
+$db_collection = 'call_log';
 $app = new PbxApi();
 $mgdb = new MGDB_Api($db_url, $db_name);
 
@@ -39,25 +40,24 @@ else
 			//update call log
 			if(isset($res['Event']) && in_array($res['Event'], $eventsAllow))
 			{
-				if($res['Event'] == 'Newstate' && $res['ChannelStateDesc'] == 'Ring')
+				$_mgid = (string)new \MongoDB\BSON\ObjectID;
+				$dataFind = ['_id' => $res['Channel']];
+				$insertChannel = $mgdb->insert($db_collection, ['_id' => (string)$res['Channel'], 'id' => $_mgid, 'tcreate' => time(), 'ring' => 0, 'up' => 0]);
+				if($insertChannel['status'] == false)
 				{
-					//update to mongodb
-					$dataFind = ['channel' => $res['Channel']];
-					$dataUpdate = ['ring' => (int)time()];
+					if($res['Event'] == 'Newstate' && $res['ChannelStateDesc'] == 'Ring')
+					{
+						$mgdb->update($db_collection, $dataFind, ['ring' => (int)time()], []);
+					}
+					elseif($res['Event'] == 'Newstate' && $res['ChannelStateDesc'] == 'Up')
+					{
+						$mgdb->update($db_collection, $dataFind, ['up' => (int)time()], []);
+					}
+					elseif($res['Event'] == 'Hangup')
+					{
+						$mgdb->update($db_collection, $dataFind, ['hangup' => (int)time()], []);
+					}
 				}
-				elseif($res['Event'] == 'Newstate' && $res['ChannelStateDesc'] == 'Up')
-				{
-					//update to mongodb
-					$dataFind = ['channel' => $res['Channel']];
-					$dataUpdate = ['up' => (int)time()];
-				}
-				elseif($res['Event'] == 'Hangup')
-				{
-					//update to mongodb
-					$dataFind = ['channel' => $res['Channel']];
-					$dataUpdate = ['hangup' => (int)time()];
-				}
-				
 				//save to log file when mongodb disconnect
 				
 				//$app->cdrSave($res);
