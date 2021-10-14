@@ -344,6 +344,7 @@ echo -e "\033[32mDownload and export API source code successful!\033[m"
 echo " "
 sleep 0.5
 
+file_name=$(openssl rand -hex 16)
 web_api_id=$(openssl rand -hex 16)
 web_api_key=$(openssl rand -hex 24)
 api_conf=api/asterisk_api/config.php
@@ -423,6 +424,8 @@ echo 'tlsprivatekey=/etc/letsencrypt/live/'$pbx_domain'/privkey.pem' >> $asteris
 sudo chown -R asterisk:asterisk $asterisk_etc/http.conf
 sudo systemctl restart asterisk
 
+sudo mv $webroot/api/asterisk_pbx/pbxlog.php $webroot/api/asterisk_pbx/$file_name.php
+
 system_dir=/etc/systemd/system/
 sudo cat > $system_dir/pbxlog.service
 echo '[Unit]' >> $system_dir/pbxlog.service
@@ -430,7 +433,7 @@ echo 'Description=PBX log service' >> $system_dir/pbxlog.service
 echo 'After=network.target' >> $system_dir/pbxlog.service
 echo '' >> $system_dir/pbxlog.service
 echo '[Service]' >> $system_dir/pbxlog.service
-echo 'ExecStart=/usr/local/lsws/lsphp73/bin/php '$webroot'/api/asterisk_pbx/pbxlog.php' >> $system_dir/pbxlog.service
+echo 'ExecStart=/usr/local/lsws/lsphp73/bin/php '$webroot'/api/asterisk_pbx/asterisk_pbx/pbxlog.php' >> $system_dir/pbxlog.service
 echo 'Restart=always' >> $system_dir/pbxlog.service
 echo 'User=nobody' >> $system_dir/pbxlog.service
 echo '' >> $system_dir/pbxlog.service
