@@ -433,7 +433,7 @@ echo 'Description=PBX log service' >> $system_dir/pbxlog.service
 echo 'After=network.target' >> $system_dir/pbxlog.service
 echo '' >> $system_dir/pbxlog.service
 echo '[Service]' >> $system_dir/pbxlog.service
-echo 'ExecStart=/usr/local/lsws/lsphp73/bin/php '$webroot'/api/asterisk_pbx/asterisk_pbx/pbxlog.php' >> $system_dir/pbxlog.service
+echo 'ExecStart=/usr/local/lsws/lsphp73/bin/php '$webroot'/api/asterisk_pbx/asterisk_pbx/'$file_name'.php' >> $system_dir/pbxlog.service
 echo 'Restart=always' >> $system_dir/pbxlog.service
 echo 'User=nobody' >> $system_dir/pbxlog.service
 echo '' >> $system_dir/pbxlog.service
