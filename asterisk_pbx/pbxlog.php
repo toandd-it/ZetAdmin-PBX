@@ -39,6 +39,7 @@ else
 		{
 			if(isset($res['Event']) && in_array($res['Event'], $eventsAllow))
 			{
+				/*call Event*/
 				$_mgid = (string)new \MongoDB\BSON\ObjectID;
 				$dataFind = ['_id' => $res['Channel']];
 
@@ -55,31 +56,36 @@ else
 				{
 					if($res['Event'] == 'Newstate' && $res['ChannelStateDesc'] == 'Ring')
 					{
-						$mgdb->update($db_collection, $dataFind, ['t_ring' => (int)time()], []);
+						$update = $mgdb->update($db_collection, $dataFind, ['t_ring' => (int)time()], []);
+						if($update['status'] == false)
+						{
+							$app->cdrSave($res);
+						}
 					}
 					elseif($res['Event'] == 'Newstate' && $res['ChannelStateDesc'] == 'Up')
 					{
-						$mgdb->update($db_collection, $dataFind, ['t_up' => (int)time()], []);
+						$update = $mgdb->update($db_collection, $dataFind, ['t_up' => (int)time()], []);
+						if($update['status'] == false)
+						{
+							$app->cdrSave($res);
+						}
 					}
 					elseif($res['Event'] == 'Hangup')
 					{
-						$mgdb->update($db_collection, $dataFind, ['t_hangup' => (int)time()], []);
+						$update = $mgdb->update($db_collection, $dataFind, ['t_hangup' => (int)time()], []);
+						if($update['status'] == false)
+						{
+							$app->cdrSave($res);
+						}
 					}
 				}
-				//save to log file when mongodb disconnect
-				
-				//$app->cdrSave($res);
-				echo "<pre>";
-				var_dump($res);
-				echo "</pre>";
-				
-				echo "------------------------------------------------------------------------------------------------\r\n";
 			}
 			else
 			{
-				echo "<pre>";
-				var_dump($res);
-				echo "</pre>";
+				/*other Event*/
+				// echo "<pre>";
+				// var_dump($res);
+				// echo "</pre>";
 			}
 			$res = array();
 		}
