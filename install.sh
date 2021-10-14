@@ -346,9 +346,9 @@ sleep 0.5
 
 web_api_id=$(openssl rand -hex 16)
 web_api_key=$(openssl rand -hex 24)
-api_conf=api/config.php
+api_conf=api/asterisk_api/config.php
 sudo cat > $api_conf
-echo '$api_url = "https://'$pbx_domain'/api/postback.php";' >> $api_conf
+echo '$api_url = "https://'$pbx_domain'/api/asterisk_api/postback.php";' >> $api_conf
 echo '$api_id = "'$web_api_id'";' >> $api_conf
 echo '$api_key = "'$web_api_key'";' >> $api_conf
 echo '$ipsAlow = []; /*exp ["ip 1", "ip 2", "ip n"]*/' >> $api_conf

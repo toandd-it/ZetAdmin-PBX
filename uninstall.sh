@@ -17,6 +17,7 @@ if [ "$q_install" != "y" ];then
 fi
 
 sudo systemctl stop pbxlog.service
+sudo rm -rf /etc/fail2ban/jail.d/asterisk.local
 
 sudo systemctl stop lsws.service
 sudo rm -rf /usr/local/lsws/
@@ -39,3 +40,4 @@ sudo rm -rf /var/spool/asterisk
 sudo rm -rf /usr/lib/asterisk
 echo -e "\033[32mRemove asterisk successful!\033[m"
 sleep 0.5
+echo -e "\033[32mUninstall successful!\033[m"
