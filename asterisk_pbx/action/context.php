@@ -27,30 +27,42 @@ if(isset($action))
     if($action == 'deleteMultiContext')
 	{
         $ids = json_decode($_POST['_id'], true);
-        foreach($ids as $id)
+		if(!empty($ids))
         {
-            $idFind = array('_id' => $id);
-            $checkExtension = $mgdb->selectById($context_colection, $idFind);
-            if(!empty($checkExtension['data']['_id']))
-            {
-                $deleteStatus = $mgdb->delete($context_colection, $idFind);
-                $status = $deleteStatus['status'];
-                if($status == true)
-                {
-                    $msg = sprintf($app->_lang('msg_018'), $checkExtension['name']);
-                } 
-                else 
-                {
-                    $status = false;
-                    $msg = sprintf($app->_lang('msg_015'), $deleteStatus['data']['msg']);
-                }
-            } 
-            else 
-            {
-                $status = false;
-                $msg = $app->_lang('msg_013');
-            }
-        }
+			foreach($ids as $id)
+			{
+				$idFind = array('_id' => $id);
+				$checkExtension = $mgdb->select($context_colection, $idFind);
+				if(!empty($checkExtension['data']['_id']))
+				{
+					$deleteStatus = $mgdb->delete($context_colection, $idFind);
+					$status = $deleteStatus['status'];
+					if($status == true)
+					{
+						//$msg = sprintf($app->_lang('msg_018'), $checkExtension['name']);
+						$deleteSuccess = $deleteSuccess + 1;
+					} 
+					else 
+					{
+						$deleteError = $deleteError + 1;
+						//$msg = sprintf($app->_lang('msg_015'), $deleteStatus['data']['msg']);
+					}
+				} 
+				else 
+				{
+					$status = false;
+					//$msg = $app->_lang('msg_013');
+					$deleteNull = $deleteNull + 1;
+				}
+			}
+			$status = true;
+            $msg = sprintf($app->_lang('msg_016'), $deleteSuccess, $deleteError, $deleteNull, count($ids));
+		}
+		else
+		{
+			$status = false;
+			$msg = $app->_lang('msg_017');
+		}
         
         $extensions = $mgdb->selects($context_colection, array('status' => 'Enable'));
 
@@ -355,14 +367,14 @@ if(isset($action))
 	{
         $id = $_POST['_id'];
         $idFind = array('_id' => $id);
-        $checkExtension = $mgdb->selectById($context_colection, $idFind);
+        $checkExtension = $mgdb->select($context_colection, $idFind);
         if(!empty($checkExtension['data']['_id']))
         {
             $deleteStatus = $mgdb->delete($context_colection, $idFind);
             $status = $deleteStatus['status'];
             if($status == true)
             {
-                $msg = 'Xóa kịch bản <strong>'.$checkExtension['name'].'</strong> thành công!';
+				$msg = sprintf($app->_lang('msg_018'), $checkExtension['name']);
                 
                 $extensions = $mgdb->selects($context_colection, array('status' => 'Enable'));
 
@@ -639,13 +651,13 @@ if(isset($action))
             else 
             {
                 $status = false;
-                $msg = 'Máy chủ đang bận vui lòng thử lại sau!<br>'.$deleteStatus['data']['msg'];
+				$msg = sprintf($app->_lang('msg_015'), $deleteStatus['data']['msg']);
             }
         } 
         else 
         {
             $status = false;
-            $msg = 'Không tồn tại dữ liệu trên hệ thống!';
+            $msg = $app->_lang('msg_013');
         }
 		$insertLogs = array(
 			'id' => (array)$id,
@@ -1008,7 +1020,7 @@ if(isset($action))
                     }
                 }
                 $app->updateFile($lineData, $ext_conf);
-                $msg = 'Cập nhật kịch bản <strong>'.$updateData['name'].'</strong> thành công!';
+                $msg = sprintf($app->_lang('msg_019'), $updateData['name']);
             } 
             else 
             { 
