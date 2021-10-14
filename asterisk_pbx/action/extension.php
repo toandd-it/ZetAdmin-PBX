@@ -37,18 +37,18 @@ if(isset($action))
                 $status = $deleteStatus['status'];
                 if($status == true)
                 {
-                    $msg = 'Xóa kịch bản <strong>'.$checkExtension['name'].'</strong> thành công!';
+                    $msg = sprintf($app->_lang('msg_018'), $checkExtension['name']);
                 } 
                 else 
                 {
                     $status = false;
-                    $msg = 'Máy chủ đang bận vui lòng thử lại sau!<br>'.$deleteStatus['data']['msg'];
+                    $msg = sprintf($app->_lang('msg_015'), $deleteStatus['data']['msg']);
                 }
             } 
             else 
             {
                 $status = false;
-                $msg = 'Không tồn tại dữ liệu trên hệ thống!';
+                $msg = $app->_lang('msg_013');
             }
         }
         
@@ -59,7 +59,7 @@ if(isset($action))
         {
             if(!empty($ext['context']))
             {
-				$_AGI_text = '/usr/bin/php,/var/lib/asterisk/agi-bin/callerid.php';
+				$_AGI_text = '/usr/local/lsws/lsphp73/bin/php,/var/lib/asterisk/agi-bin/callerid.php';
                 if(in_array('option', $ext['config']))
                 {
                     $lineData .= "[".$ext['context']."]\n";
@@ -132,7 +132,7 @@ if(isset($action))
 						$lineData .= "exten => CallInbound,1,NoOp()\n";
 						$lineData .= "    same => n,Set(CALLERID(num)=".$textPhone.")\n";
 						$lineData .= "    ;same => n,Read(keypad)\n";
-						$lineData .= "    ;same => n,Queue(".$queueData['_id'].",tT,,,".$queueData['timeout'].")\n";
+						$lineData .= "    ;same => n,Queue(".$queueData['data']['_id'].",tT,,,".$queueData['data']['timeout'].")\n";
 						$lineData .= "    ".$textRecording."same => n,Monitor(wav,".$textLog_id.",m)\n";
 						$lineData .= "    same => n,Dial(SIP/100)\n";
 						$lineData .= "    same => n,Goto(disconnect,1)\n\n";
@@ -163,7 +163,7 @@ if(isset($action))
 						$lineData .= "exten => CallInbound,1,NoOp()\n";
 						$lineData .= "    same => n,Set(CALLERID(num)=".$textPhone.")\n";
 						$lineData .= "    ;same => n,Read(keypad)\n";
-						$lineData .= "    ;same => n,Queue(".$queueData['_id'].",tT,,,".$queueData['timeout'].")\n";
+						$lineData .= "    ;same => n,Queue(".$queueData['data']['_id'].",tT,,,".$queueData['data']['timeout'].")\n";
 						$lineData .= "    ".$textRecording."same => n,Monitor(wav,".$textLog_id.",m)\n";
 						$lineData .= "    same => n,Dial(SIP/100)\n";
 						$lineData .= "    same => n,Goto(disconnect,1)\n\n";
@@ -220,7 +220,7 @@ if(isset($action))
 						$lineData .= "exten => CallInbound,1,NoOp()\n";
 						$lineData .= "    same => n,Set(CALLERID(num)=".$textPhone.")\n";
 						$lineData .= "    ;same => n,Read(keypad)\n";
-						$lineData .= "    ;same => n,Queue(".$queueData['_id'].",tT,,,".$queueData['timeout'].")\n";
+						$lineData .= "    ;same => n,Queue(".$queueData['data']['_id'].",tT,,,".$queueData['data']['timeout'].")\n";
 						$lineData .= "    ".$textRecording."same => n,Monitor(wav,".$textLog_id.",m)\n";
 						$lineData .= "    same => n,Dial(SIP/100)\n";
 						$lineData .= "    same => n,Goto(disconnect,1)\n\n";
@@ -251,7 +251,7 @@ if(isset($action))
 						$lineData .= "exten => CallInbound,1,NoOp()\n";
 						$lineData .= "    same => n,Set(CALLERID(num)=".$textPhone.")\n";
 						$lineData .= "    ;same => n,Read(keypad)\n";
-						$lineData .= "    ;same => n,Queue(".$queueData['_id'].",tT,,,".$queueData['timeout'].")\n";
+						$lineData .= "    ;same => n,Queue(".$queueData['data']['_id'].",tT,,,".$queueData['data']['timeout'].")\n";
 						$lineData .= "    ".$textRecording."same => n,Monitor(wav,".$textLog_id.",m)\n";
 						$lineData .= "    same => n,Dial(SIP/100)\n";
 						$lineData .= "    same => n,Goto(disconnect,1)\n\n";
@@ -371,7 +371,7 @@ if(isset($action))
                 {
                     if(!empty($ext['context']))
                     {
-						$_AGI_text = '/usr/bin/php,/var/lib/asterisk/agi-bin/callerid.php';
+						$_AGI_text = '/usr/local/lsws/lsphp73/bin/php,/var/lib/asterisk/agi-bin/callerid.php';
                         if(in_array('option', $ext['config']))
                         {
                             $lineData .= "[".$ext['context']."]\n";
@@ -444,7 +444,7 @@ if(isset($action))
 								$lineData .= "exten => CallInbound,1,NoOp()\n";
 								$lineData .= "    same => n,Set(CALLERID(num)=".$textPhone.")\n";
 								$lineData .= "    ;same => n,Read(keypad)\n";
-								$lineData .= "    ;same => n,Queue(".$queueData['_id'].",tT,,,".$queueData['timeout'].")\n";
+								$lineData .= "    ;same => n,Queue(".$queueData['data']['_id'].",tT,,,".$queueData['data']['timeout'].")\n";
 								$lineData .= "    ".$textRecording."same => n,Monitor(wav,".$textLog_id.",m)\n";
 								$lineData .= "    same => n,Dial(SIP/100)\n";
 								$lineData .= "    same => n,Goto(disconnect,1)\n\n";
@@ -532,7 +532,7 @@ if(isset($action))
 								$lineData .= "exten => CallInbound,1,NoOp()\n";
 								$lineData .= "    same => n,Set(CALLERID(num)=".$textPhone.")\n";
 								$lineData .= "    ;same => n,Read(keypad)\n";
-								$lineData .= "    ;same => n,Queue(".$queueData['_id'].",tT,,,".$queueData['timeout'].")\n";
+								$lineData .= "    ;same => n,Queue(".$queueData['data']['_id'].",tT,,,".$queueData['data']['timeout'].")\n";
 								$lineData .= "    ".$textRecording."same => n,Monitor(wav,".$textLog_id.",m)\n";
 								$lineData .= "    same => n,Dial(SIP/100)\n";
 								$lineData .= "    same => n,Goto(disconnect,1)\n\n";
@@ -563,7 +563,7 @@ if(isset($action))
 								$lineData .= "exten => CallInbound,1,NoOp()\n";
 								$lineData .= "    same => n,Set(CALLERID(num)=".$textPhone.")\n";
 								$lineData .= "    ;same => n,Read(keypad)\n";
-								$lineData .= "    ;same => n,Queue(".$queueData['_id'].",tT,,,".$queueData['timeout'].")\n";
+								$lineData .= "    ;same => n,Queue(".$queueData['data']['_id'].",tT,,,".$queueData['data']['timeout'].")\n";
 								$lineData .= "    ".$textRecording."same => n,Monitor(wav,".$textLog_id.",m)\n";
 								$lineData .= "    same => n,Dial(SIP/100)\n";
 								$lineData .= "    same => n,Goto(disconnect,1)\n\n";
@@ -743,7 +743,7 @@ if(isset($action))
                 {
                     if(!empty($ext['context']))
                     {
-						$_AGI_text = '/usr/bin/php,/var/lib/asterisk/agi-bin/callerid.php';
+						$_AGI_text = '/usr/local/lsws/lsphp73/bin/php,/var/lib/asterisk/agi-bin/callerid.php';
 						
                         if(in_array('option', $ext['config']))
                         {
@@ -817,7 +817,7 @@ if(isset($action))
 								$lineData .= "exten => CallInbound,1,NoOp()\n";
 								$lineData .= "    same => n,Set(CALLERID(num)=".$textPhone.")\n";
 								$lineData .= "    ;same => n,Read(keypad)\n";
-								$lineData .= "    ;same => n,Queue(".$queueData['_id'].",tT,,,".$queueData['timeout'].")\n";
+								$lineData .= "    ;same => n,Queue(".$queueData['data']['_id'].",tT,,,".$queueData['data']['timeout'].")\n";
 								$lineData .= "    ".$textRecording."same => n,Monitor(wav,".$textLog_id.",m)\n";
 								$lineData .= "    same => n,Dial(SIP/100)\n";
 								$lineData .= "    same => n,Goto(disconnect,1)\n\n";
@@ -848,7 +848,7 @@ if(isset($action))
 								$lineData .= "exten => CallInbound,1,NoOp()\n";
 								$lineData .= "    same => n,Set(CALLERID(num)=".$textPhone.")\n";
 								$lineData .= "    ;same => n,Read(keypad)\n";
-								$lineData .= "    ;same => n,Queue(".$queueData['_id'].",tT,,,".$queueData['timeout'].")\n";
+								$lineData .= "    ;same => n,Queue(".$queueData['data']['_id'].",tT,,,".$queueData['data']['timeout'].")\n";
 								$lineData .= "    ".$textRecording."same => n,Monitor(wav,".$textLog_id.",m)\n";
 								$lineData .= "    same => n,Dial(SIP/100)\n";
 								$lineData .= "    same => n,Goto(disconnect,1)\n\n";
@@ -905,7 +905,7 @@ if(isset($action))
 								$lineData .= "exten => CallInbound,1,NoOp()\n";
 								$lineData .= "    same => n,Set(CALLERID(num)=".$textPhone.")\n";
 								$lineData .= "    ;same => n,Read(keypad)\n";
-								$lineData .= "    ;same => n,Queue(".$queueData['_id'].",tT,,,".$queueData['timeout'].")\n";
+								$lineData .= "    ;same => n,Queue(".$queueData['data']['_id'].",tT,,,".$queueData['data']['timeout'].")\n";
 								$lineData .= "    ".$textRecording."same => n,Monitor(wav,".$textLog_id.",m)\n";
 								$lineData .= "    same => n,Dial(SIP/100)\n";
 								$lineData .= "    same => n,Goto(disconnect,1)\n\n";
@@ -936,7 +936,7 @@ if(isset($action))
 								$lineData .= "exten => CallInbound,1,NoOp()\n";
 								$lineData .= "    same => n,Set(CALLERID(num)=".$textPhone.")\n";
 								$lineData .= "    ;same => n,Read(keypad)\n";
-								$lineData .= "    ;same => n,Queue(".$queueData['_id'].",tT,,,".$queueData['timeout'].")\n";
+								$lineData .= "    ;same => n,Queue(".$queueData['data']['_id'].",tT,,,".$queueData['data']['timeout'].")\n";
 								$lineData .= "    ".$textRecording."same => n,Monitor(wav,".$textLog_id.",m)\n";
 								$lineData .= "    same => n,Dial(SIP/100)\n";
 								$lineData .= "    same => n,Goto(disconnect,1)\n\n";
@@ -1106,7 +1106,7 @@ if(isset($action))
                 {
                     if(!empty($ext['context']))
                     {
-						$_AGI_text = '/usr/bin/php,/var/lib/asterisk/agi-bin/callerid.php';
+						$_AGI_text = '/usr/local/lsws/lsphp73/bin/php,/var/lib/asterisk/agi-bin/callerid.php';
 						
                         if(in_array('option', $ext['config']))
                         {
@@ -1180,7 +1180,7 @@ if(isset($action))
 								$lineData .= "exten => CallInbound,1,NoOp()\n";
 								$lineData .= "    same => n,Set(CALLERID(num)=".$textPhone.")\n";
 								$lineData .= "    ;same => n,Read(keypad)\n";
-								$lineData .= "    ;same => n,Queue(".$queueData['_id'].",tT,,,".$queueData['timeout'].")\n";
+								$lineData .= "    ;same => n,Queue(".$queueData['data']['_id'].",tT,,,".$queueData['data']['timeout'].")\n";
 								$lineData .= "    ".$textRecording."same => n,Monitor(wav,".$textLog_id.",m)\n";
 								$lineData .= "    same => n,Dial(SIP/100)\n";
 								$lineData .= "    same => n,Goto(disconnect,1)\n\n";
@@ -1211,7 +1211,7 @@ if(isset($action))
 								$lineData .= "exten => CallInbound,1,NoOp()\n";
 								$lineData .= "    same => n,Set(CALLERID(num)=".$textPhone.")\n";
 								$lineData .= "    ;same => n,Read(keypad)\n";
-								$lineData .= "    ;same => n,Queue(".$queueData['_id'].",tT,,,".$queueData['timeout'].")\n";
+								$lineData .= "    ;same => n,Queue(".$queueData['data']['_id'].",tT,,,".$queueData['data']['timeout'].")\n";
 								$lineData .= "    ".$textRecording."same => n,Monitor(wav,".$textLog_id.",m)\n";
 								$lineData .= "    same => n,Dial(SIP/100)\n";
 								$lineData .= "    same => n,Goto(disconnect,1)\n\n";
@@ -1268,7 +1268,7 @@ if(isset($action))
 								$lineData .= "exten => CallInbound,1,NoOp()\n";
 								$lineData .= "    same => n,Set(CALLERID(num)=".$textPhone.")\n";
 								$lineData .= "    ;same => n,Read(keypad)\n";
-								$lineData .= "    ;same => n,Queue(".$queueData['_id'].",tT,,,".$queueData['timeout'].")\n";
+								$lineData .= "    ;same => n,Queue(".$queueData['data']['_id'].",tT,,,".$queueData['data']['timeout'].")\n";
 								$lineData .= "    ".$textRecording."same => n,Monitor(wav,".$textLog_id.",m)\n";
 								$lineData .= "    same => n,Dial(SIP/100)\n";
 								$lineData .= "    same => n,Goto(disconnect,1)\n\n";
@@ -1299,7 +1299,7 @@ if(isset($action))
 								$lineData .= "exten => CallInbound,1,NoOp()\n";
 								$lineData .= "    same => n,Set(CALLERID(num)=".$textPhone.")\n";
 								$lineData .= "    ;same => n,Read(keypad)\n";
-								$lineData .= "    ;same => n,Queue(".$queueData['_id'].",tT,,,".$queueData['timeout'].")\n";
+								$lineData .= "    ;same => n,Queue(".$queueData['data']['_id'].",tT,,,".$queueData['data']['timeout'].")\n";
 								$lineData .= "    ".$textRecording."same => n,Monitor(wav,".$textLog_id.",m)\n";
 								$lineData .= "    same => n,Dial(SIP/100)\n";
 								$lineData .= "    same => n,Goto(disconnect,1)\n\n";

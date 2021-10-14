@@ -19,4 +19,5 @@ $_text['msg_014'] = 'Xóa lịch sử cuộc gọi %s thành công!';
 $_text['msg_015'] = 'Máy chủ đang bận vui lòng thử lại sau! %s';
 $_text['msg_016'] = 'Delete successfully: %s. Error: %s. Does not exist: %s. Total: %s';
 $_text['msg_017'] = 'No log id have been selected yet!';
+$_text['msg_018'] = 'Xóa kịch bản %s thành công!';
 ?>
