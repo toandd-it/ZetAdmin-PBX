@@ -318,7 +318,7 @@ echo ' ' >> $httpd_conf
 sudo chown -R lsadm:nobody $httpd_conf
 sudo chmod 750 $httpd_conf
 
-sudo sh /usr/local/lsws/admin/misc/admpass.sh
+#sudo sh /usr/local/lsws/admin/misc/admpass.sh
 cd $webroot/
 cat > index.html
 echo 'pageok!' >> index.html
