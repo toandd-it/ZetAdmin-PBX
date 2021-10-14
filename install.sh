@@ -424,6 +424,16 @@ echo 'tlsprivatekey=/etc/letsencrypt/live/'$pbx_domain'/privkey.pem' >> $asteris
 sudo chown -R asterisk:asterisk $asterisk_etc/http.conf
 sudo systemctl restart asterisk
 
+sudo cat > $asterisk_etc/pjsip_conference.conf
+echo ';pjsip_conference.conf' >> $asterisk_etc/pjsip_conference.conf
+echo '#include pjsip_conference.conf' >> $asterisk_etc/pjsip.conf
+sudo chmod 777 $asterisk_etc/pjsip_conference.conf
+
+sudo cat > $asterisk_etc/pjsip_account.conf
+echo ';pjsip_account.conf' >> $asterisk_etc/pjsip_account.conf
+echo '#include pjsip_account.conf' >> $asterisk_etc/pjsip.conf
+sudo chmod 777 $asterisk_etc/pjsip_account.conf
+
 sudo mv $webroot/api/asterisk_pbx/pbxlog.php $webroot/api/asterisk_pbx/$file_name.php
 
 system_dir=/etc/systemd/system/

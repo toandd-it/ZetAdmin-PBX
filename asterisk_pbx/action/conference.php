@@ -2,7 +2,7 @@
 if(isset($action))
 {
 	$_id = (string)new \MongoDB\BSON\ObjectID;
-    $ext_conf = '/etc/asterisk/extensions_api.conf';
+    $ext_conf = '/etc/asterisk/pjsip_conference.conf';
     $conference_colection = 'call_conference';
     
     if($action == 'getListConference')
