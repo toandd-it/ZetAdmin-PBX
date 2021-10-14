@@ -27,29 +27,37 @@ if(isset($action))
     if($action == 'deleteMultiSipTrunk')
 	{
         $ids = json_decode($_POST['_id'], true);
-        foreach($ids as $id)
+        if(!empty($ids))
         {
-            $idFind = array('_id' => $id);
-            $checkTrunk = $mgdb->select($trunk_colection, $idFind);
-            if(!empty($checkTrunk['data']['_id']))
+            foreach($ids as $id)
             {
-                $deleteStatus = $mgdb->delete($trunk_colection, $idFind);
-                $status = $deleteStatus['status'];
-                if($status == true)
+                $idFind = array('_id' => $id);
+                $checkTrunk = $mgdb->select($trunk_colection, $idFind);
+                if(!empty($checkTrunk['data']['_id']))
                 {
-                    $msg = 'Xóa SIP Trunk <strong>'.$checkTrunk['data']['callerid'].'</strong> thành công!';
+                    $deleteStatus = $mgdb->delete($trunk_colection, $idFind);
+                    $status = $deleteStatus['status'];
+                    if($status == true)
+                    {
+                        $deleteSuccess = $deleteSuccess + 1;
+                    } 
+                    else 
+                    {
+                        $deleteError = $deleteError + 1;
+                    }
                 } 
                 else 
                 {
-                    $status = false;
-                    $msg = 'Máy chủ đang bận vui lòng thử lại sau! '.$deleteStatus['data']['msg'];
+                    $deleteNull = $deleteNull + 1;
                 }
-            } 
-            else 
-            {
-                $status = false;
-                $msg = 'Không tồn tại dữ liệu trên hệ thống!';
             }
+            $status = true;
+            $msg = sprintf($app->_lang('msg_016'), $deleteSuccess, $deleteError, $deleteNull, count($ids));
+        }
+        else
+        {
+            $status = false;
+			$msg = $app->_lang('msg_017');
         }
         
         $trunks = $mgdb->selects($trunk_colection, array('status' => 'Enable'));
@@ -82,7 +90,7 @@ if(isset($action))
 			'ip' => $ip,
 			'uag' => $uag,
 			'detail' => $msg,
-			'uid' => '',
+			'uid' => $api_id,
 			'module' => '',
 			'route' => '',
 			'status' => $status
@@ -111,7 +119,7 @@ if(isset($action))
             $status = $deleteStatus['status'];
             if($status == true)
             {
-                $msg = 'Xóa SIP Trunk <strong>'.$checkTrunk['data']['callerid'].'</strong> thành công!';
+                $msg = sprintf($app->_lang('msg_026'), $checkTrunk['data']['callerid']);
                 $trunks = $mgdb->selects($trunk_colection, array('status' => 'Enable'));
 
                 $trunkData = '';
@@ -137,13 +145,13 @@ if(isset($action))
             else 
             {
                 $status = false;
-                $msg 	= 'Máy chủ đang bận vui lòng thử lại sau! '.$deleteStatus['data']['msg'];
+                $msg = sprintf($app->_lang('msg_015'), $deleteStatus['data']['msg']);
             }
         } 
         else 
         {
             $status = false;
-            $msg 	= 'Không tồn tại dữ liệu trên hệ thống!';
+            $msg = $app->_lang('msg_013');
         }
 
         $insertLogs = array(
@@ -155,7 +163,7 @@ if(isset($action))
 			'ip' => $ip,
 			'uag' => $uag,
 			'detail' => $msg,
-			'uid' => '',
+			'uid' => $api_id,
 			'module' => '',
 			'route' => '',
 			'status' => $status
@@ -192,15 +200,15 @@ if(isset($action))
                 'status' 	=> $dataUpdate['status']
             )
         );
-        $option = array();
-        $checkTrunk = $mgdb->select($trunk_colection, array('callerid' => $dataUpdate['callerid']));
+        $option = [];
+        $checkTrunk = $mgdb->select($trunk_colection, ['callerid' => $dataUpdate['callerid']]);
         if(!empty($checkTrunk['data']['_id']) && $checkTrunk['data']['_id'] == $id)
         {
             $statusUpdate = $mgdb->update($trunk_colection, array('_id' => $id), $dataSetUpdate, $option);
             $status = $statusUpdate['status'];
             if($status == true)
             { 
-                $msg = 'Cập nhật SIP Trunk <strong>'.$dataUpdate['callerid'].'</strong> thành công!';
+                $msg = sprintf($app->_lang('msg_027'), $dataUpdate['callerid']);
                 $trunks = $mgdb->selects($trunk_colection, array('status' => 'Enable'));
                 $trunkData = '';
                 foreach($trunks['data'] as $sip)
@@ -224,13 +232,13 @@ if(isset($action))
             } 
             else 
             { 
-                $msg = 'Máy chủ đang bận vui lòng thử lại sau!<br>'.$statusUpdate['data']['msg'];
+                $msg = sprintf($app->_lang('msg_015'), $statusUpdate['data']['msg']);
             }
         } 
         else 
         { 
             $status = false;
-            $msg = 'SIP trunk <strong>'.$updateData['name'].'</strong> chưa tồn tại trên hệ thống!';
+            $msg = $app->_lang('msg_013');
         }
 
         $insertLogs = array(
@@ -242,7 +250,7 @@ if(isset($action))
 			'ip' => $ip,
 			'uag' => $uag,
 			'detail' => $msg,
-			'uid' => '',
+			'uid' => $api_id,
 			'module' => '',
 			'route' => '',
 			'status' => $status
@@ -263,22 +271,23 @@ if(isset($action))
 	if($action == 'insertSipTrunk')
 	{
         $id = $_id;
+        $callerid = $app->formDataName($data, 'callerid');
         $dataInsert = array(
-            '_id' => $id,
+            '_id' => (string)$callerid,
             'name' => $app->formDataName($data, 'name'),
             'context' => $app->formDataName($data, 'context'),
             'secret' => '',
-            'callerid' => $app->formDataName($data, 'callerid'),
+            'callerid' => $callerid,
             'type' => 'peer',
             'host' => $app->formDataName($data, 'host'),
             'tcreate' => (int)time(),
             'status' => $app->formDataName($data, 'status')
         );
-        $checkTrunk = $mgdb->select($trunk_colection, array('callerid' => $dataInsert['callerid']));
+        $checkTrunk = $mgdb->select($trunk_colection, array('_id' => $callerid));
         if(!empty($checkTrunk['data']['_id']))
         { 
             $status = false;
-            $msg = 'SIP trunk <strong>'.$dataInsert['callerid'].'</strong> đã tồn tại trên hệ thống!';
+            $msg = sprintf($app->_lang('msg_032'), $dataInsert['callerid']);
         } 
         else 
         { 
@@ -286,18 +295,18 @@ if(isset($action))
             $status = $statusInsert['status'];
             if($statusInsert['status'] == true)
             { 
-                $msg = 'Thêm SIP trunk <strong>'.$dataInsert['callerid'].'</strong> thành công!';
+                $msg = sprintf($app->_lang('msg_033'), $dataInsert['_id']);
                 $trunks = $mgdb->selects($trunk_colection, array('status' => 'Enable'));
                 $trunkData = '';
                 foreach($trunks['data'] as $sip)
                 {
-                    if(!empty($sip['callerid']))
+                    if(!empty($sip['_id']))
                     {
-                        $trunkData .= "[".$sip['callerid']."]\n";
+                        $trunkData .= "[".$sip['_id']."]\n";
                         $trunkData .= "canreinvite=no\n";
                         $trunkData .= "host=".$sip['host']."\n";
                         $trunkData .= "type=peer\n";
-                        $trunkData .= "callerid=".$sip['callerid']."\n";
+                        $trunkData .= "callerid=".$sip['_id']."\n";
                         $trunkData .= "dtmfmode=rfc2833\n";
                         $trunkData .= "qualify=yes\n";
                         $trunkData .= "nat=yes\n";
@@ -310,7 +319,7 @@ if(isset($action))
             } 
             else 
             {
-                $msg = 'Máy chủ đang bận vui lòng thử lại sau!<br>'.$statusInsert['data']['msg'];
+                $msg = sprintf($app->_lang('msg_015'), $statusInsert['data']['msg']);
             }
         }
 
@@ -323,7 +332,7 @@ if(isset($action))
 			'ip' => $ip,
 			'uag' => $uag,
 			'detail' => $msg,
-			'uid' => '',
+			'uid' => $api_id,
 			'module' => '',
 			'route' => '',
 			'status' => $status
@@ -365,51 +374,59 @@ if(isset($action))
     
     if($action == 'deleteMultiSipAccount')
 	{
-        $ids = json_decode($_POST['_id'], true);
-        foreach($ids as $id)
+        $ids = (array)son_decode($_POST['_id'], true);
+        if(!empty($ids))
         {
-            $idFind = ['_id' => $id];
-            $checkSip = $mgdb->select($sip_account_colection, $idFind);
-            if(!empty($checkSip['data']['_id']))
+            foreach($ids as $id)
             {
-                $deleteStatus = $mgdb->delete($sip_account_colection, $idFind);
-                $status = $deleteStatus['status'];
-                if($status == true)
+                $idFind = ['_id' => $id];
+                $checkSip = $mgdb->select($sip_account_colection, $idFind);
+                if(!empty($checkSip['data']['_id']))
                 {
-                    $msg = 'Xóa tài khoản SIP <strong>'.$checkSip['id'].'</strong> thành công!';
+                    $deleteStatus = $mgdb->delete($sip_account_colection, $idFind);
+                    $status = $deleteStatus['status'];
+                    if($status == true)
+                    {
+                        $deleteSuccess = $deleteSuccess + 1;
+                    } 
+                    else 
+                    {
+                        $deleteError = $deleteError + 1;
+                    }
                 } 
                 else 
                 {
-                    $status = false;
-                    $msg 	= 'Máy chủ đang bận vui lòng thử lại sau!<br>'.$deleteStatus['data']['msg'];
+                    $deleteNull = $deleteNull + 1;
                 }
-            } 
-            else 
-            {
-                $status = false;
-                $msg = 'Không tồn tại dữ liệu trên hệ thống!';
             }
+            $status = true;
+            $msg = sprintf($app->_lang('msg_016'), $deleteSuccess, $deleteError, $deleteNull, count($ids));
+        }
+        else
+        {
+            $status = false;
+			$msg = $app->_lang('msg_017');
         }
         $sips = $mgdb->selects($sip_account_colection, array('status' => 'Enable'));
 
         $lineData = '';
         foreach($sips['data'] as $sip)
         {
-            if(!empty($sip['id']))
+            if(!empty($sip['_id']))
             {
-                $lineData .= "[".$sip['id']."]\n";
+                $lineData .= "[".$sip['_id']."]\n";
                 $lineData .= "host=dynamic\n";
                 $lineData .= "type=peer\n";
                 $lineData .= "secret=".$sip['secret']."\n";
-                $lineData .= "username=".$sip['id']."\n";
+                $lineData .= "username=".$sip['_id']."\n";
                 $lineData .= "dtmfmode=rfc2833\n";
                 $lineData .= "canreinvite=no\n";
                 $lineData .= "context=".$sip['context']."\n";
                 $lineData .= "nat=force_rport,comedia\n";
                 $lineData .= "transport=".implode(',', $sip['transport'])."\n";
-                $lineData .= "dial=SIP/".$sip['id']."\n";
-                $lineData .= "mailbox=".$sip['id']."@device\n";
-                $lineData .= "callerid=".$sip['name']." <".$sip['id'].">\n";
+                $lineData .= "dial=SIP/".$sip['_id']."\n";
+                $lineData .= "mailbox=".$sip['_id']."@device\n";
+                $lineData .= "callerid=".$sip['name']." <".$sip['_id'].">\n";
                 $lineData .= "videosupport=".$sip['videosupport']."\n";
                 $lineData .= "disallow=all\n";
                 $lineData .= "allow=ulaw,alaw,g711\n\n";
@@ -426,7 +443,7 @@ if(isset($action))
 			'ip' => $ip,
 			'uag' => $uag,
 			'detail' => $msg,
-			'uid' => '',
+			'uid' => $api_id,
 			'module' => '',
 			'route' => '',
 			'status' => $status
@@ -455,27 +472,27 @@ if(isset($action))
             $status = $deleteStatus['status'];
             if($status == true)
             {
-                $msg = 'Xóa tài khoản SIP <strong>'.$checkSip['id'].'</strong> thành công!';
+                $msg = sprintf($app->_lang('msg_028'), $checkSip['_id']);
                 $sips = $mgdb->selects($sip_account_colection, array('status' => 'Enable'));
 
                 $lineData = '';
                 foreach($sips['data'] as $sip)
                 {
-                    if(!empty($sip['id']))
+                    if(!empty($sip['_id']))
                     {
-                        $lineData .= "[".$sip['id']."]\n";
+                        $lineData .= "[".$sip['_id']."]\n";
                         $lineData .= "host=dynamic\n";
                         $lineData .= "type=peer\n";
                         $lineData .= "secret=".$sip['secret']."\n";
-                        $lineData .= "username=".$sip['id']."\n";
+                        $lineData .= "username=".$sip['_id']."\n";
                         $lineData .= "dtmfmode=rfc2833\n";
                         $lineData .= "canreinvite=no\n";
                         $lineData .= "context=".$sip['context']."\n";
                         $lineData .= "nat=force_rport,comedia\n";
                         $lineData .= "transport=".implode(',', $sip['transport'])."\n";
-                        $lineData .= "dial=SIP/".$sip['id']."\n";
-                        $lineData .= "mailbox=".$sip['id']."@device\n";
-                        $lineData .= "callerid=".$sip['name']." <".$sip['id'].">\n";
+                        $lineData .= "dial=SIP/".$sip['_id']."\n";
+                        $lineData .= "mailbox=".$sip['_id']."@device\n";
+                        $lineData .= "callerid=".$sip['name']." <".$sip['_id'].">\n";
                         $lineData .= "videosupport=".$sip['videosupport']."\n";
                         $lineData .= "disallow=all\n";
                         $lineData .= "allow=ulaw,alaw,g711\n\n";
@@ -486,13 +503,13 @@ if(isset($action))
             else 
             {
                 $status = false;
-                $msg 	= 'Máy chủ đang bận vui lòng thử lại sau!<br>'.$deleteStatus['data']['msg'];
+                $msg = sprintf($app->_lang('msg_015'), $deleteStatus['data']['msg']);
             }
         } 
         else 
         {
             $status = false;
-            $msg = 'Không tồn tại dữ liệu trên hệ thống!';
+            $msg = $app->_lang('msg_013');
         }
         
 		$insertLogs = array(
@@ -504,7 +521,7 @@ if(isset($action))
 			'ip' => $ip,
 			'uag' => $uag,
 			'detail' => $msg,
-			'uid' => '',
+			'uid' => $api_id,
 			'module' => '',
 			'route' => '',
 			'status' => $status
@@ -552,45 +569,49 @@ if(isset($action))
         );
         $option = array();
         $checkSip = $mgdb->select($sip_account_colection, array('_id' => $id));
-        if(!empty($checkSip['data']['_id']) && $checkSip['data']['id'] == $sipUsername)
+        if(!empty($checkSip['data']['_id']) && $checkSip['data']['_id'] == $sipUsername)
         {
             $statusUpdate = $mgdb->update($sip_account_colection, array('_id' => $id), $dataUpdate, $option);
             $status = $statusUpdate['status'];
             if($status == true)
             { 
-                $msg = 'Cập nhật tài khoản SIP <strong>'.$sipUsername.'</strong> thành công!';
+                $msg = sprintf($app->_lang('msg_029'), $id);
 
                 $sips = $mgdb->selects($sip_account_colection, array('status' => 'Enable'));
                 $lineData = '';
                 foreach($sips['data'] as $sip)
                 {
-                    if(!empty($sip['id']))
+                    if(!empty($sip['_id']))
                     {
-                        $lineData .= "[".$sip['id']."]\n";
+                        $lineData .= "[".$sip['_id']."]\n";
                         $lineData .= "host=dynamic\n";
                         $lineData .= "type=peer\n";
                         $lineData .= "secret=".$sip['secret']."\n";
-                        $lineData .= "username=".$sip['id']."\n";
+                        $lineData .= "username=".$sip['_id']."\n";
                         $lineData .= "dtmfmode=rfc2833\n";
                         $lineData .= "canreinvite=no\n";
                         $lineData .= "context=".$sip['context']."\n";
                         $lineData .= "nat=force_rport,comedia\n";
                         $lineData .= "transport=".implode(',', $sip['transport'])."\n";
-                        $lineData .= "dial=SIP/".$sip['id']."\n";
+                        $lineData .= "dial=SIP/".$sip['_id']."\n";
                         $lineData .= "mailbox=".$sip['id']."@device\n";
-                        $lineData .= "callerid=".$sip['name']." <".$sip['id'].">\n";
+                        $lineData .= "callerid=".$sip['name']." <".$sip['_id'].">\n";
                         $lineData .= "videosupport=".$sip['videosupport']."\n";
                         $lineData .= "disallow=all\n";
                         $lineData .= "allow=ulaw,alaw,g711\n\n";
                     }
                 }
                 $app->updateFile($lineData, $sip_account_conf);
-            } else { 
-                $msg = 'Máy chủ đang bận vui lòng thử lại sau!<br>'.$statusUpdate['data']['msg'];
+            } 
+            else 
+            { 
+                $msg = sprintf($app->_lang('msg_015'), $statusUpdate['data']['msg']);
             }
-        } else { 
+        } 
+        else 
+        { 
             $status = $checkStatus;
-            $msg = 'Tài khoản SIP <strong>'.$sipUsername.'</strong> đã tồn tại trên hệ thống!';
+            $msg = sprintf($app->_lang('msg_030'), $id);
         }
 
         $insertLogs = array(
@@ -602,7 +623,7 @@ if(isset($action))
 			'ip' => $ip,
 			'uag' => $uag,
 			'detail' => $msg,
-			'uid' => '',
+			'uid' => $api_id,
 			'module' => '',
 			'route' => '',
 			'status' => $status
@@ -632,8 +653,7 @@ if(isset($action))
         $sipStatus		= $app->formDataName($data, 'status');
 
         $dataInsert = array(
-            '_id' 			=> $_id, 
-            'id' 			=> (string)$sipUsername, 
+            '_id' 			=> (string)$sipUsername, 
             'name' 			=> trim($sipName), 
             "type" 			=> 'peer', 
             'host' 			=> 'dynamic', 
@@ -654,11 +674,11 @@ if(isset($action))
             'tupdate'		=> (int)0, 
             'status' 		=> $sipStatus
         );
-        $checkSipAccount = $mgdb->select($sip_account_colection, array('id' => $dataInsert['id']));
-        if(!empty($checkSipAccount['data']['id']))
+        $checkSipAccount = $mgdb->select($sip_account_colection, ['_id' => $dataInsert['_id']]);
+        if(!empty($checkSipAccount['data']['_id']))
         { 
             $status = false;
-            $msg = 'Tài khoản SIP <strong>'.$dataInsert['id'].'</strong> đã tồn tại trên hệ thống!';
+            $msg = sprintf($app->_lang('msg_030'), $dataInsert['_id']);
         } 
         else 
         { 
@@ -666,26 +686,26 @@ if(isset($action))
             $status = $statusInsert['status'];
             if($status == true)
             { 
-                $msg = 'Tạo tài khoản SIP <strong>'.$dataInsert['id'].'</strong> thành công!';
+                $msg = sprintf($app->_lang('msg_031'), $dataInsert['_id']);
                 $sips = $mgdb->selects($sip_account_colection, array('status' => 'Enable'));
                 $lineData = '';
                 foreach($sips['data'] as $sip)
                 {
-                    if(!empty($sip['id']))
+                    if(!empty($sip['_id']))
                     {
-                        $lineData .= "[".$sip['id']."]\n";
+                        $lineData .= "[".$sip['_id']."]\n";
                         $lineData .= "host=dynamic\n";
                         $lineData .= "type=peer\n";
                         $lineData .= "secret=".$sip['secret']."\n";
-                        $lineData .= "username=".$sip['id']."\n";
+                        $lineData .= "username=".$sip['_id']."\n";
                         $lineData .= "dtmfmode=rfc2833\n";
                         $lineData .= "canreinvite=no\n";
                         $lineData .= "context=".$sip['context']."\n";
                         $lineData .= "nat=force_rport,comedia\n";
                         $lineData .= "transport=".implode(',', $sip['transport'])."\n";
-                        $lineData .= "dial=SIP/".$sip['id']."\n";
-                        $lineData .= "mailbox=".$sip['id']."@device\n";
-                        $lineData .= "callerid=".$sip['name']." <".$sip['id'].">\n";
+                        $lineData .= "dial=SIP/".$sip['_id']."\n";
+                        $lineData .= "mailbox=".$sip['_id']."@device\n";
+                        $lineData .= "callerid=".$sip['name']." <".$sip['_id'].">\n";
                         $lineData .= "videosupport=".$sip['videosupport']."\n";
                         $lineData .= "disallow=all\n";
                         $lineData .= "allow=ulaw,alaw,g711\n\n";
@@ -695,7 +715,7 @@ if(isset($action))
             } 
             else 
             { 
-                $msg = 'Máy chủ đang bận vui lòng thử lại sau!<br>'.$statusInsert['data']['msg'];
+                $msg = sprintf($app->_lang('msg_015'), $statusInsert['data']['msg']);
             }
         }
         
@@ -708,7 +728,7 @@ if(isset($action))
 			'ip' => $ip,
 			'uag' => $uag,
 			'detail' => $msg,
-			'uid' => '',
+			'uid' => $api_id,
 			'module' => '',
 			'route' => '',
 			'status' => $status
