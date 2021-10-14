@@ -1,4 +1,4 @@
-#!/usr/bin/php -q
+#!/usr/local/lsws/lsphp73/bin/php -q
 <?php
  /**
   * phpagi-fastagi.php : PHP FastAGI bootstrap
