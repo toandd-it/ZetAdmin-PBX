@@ -151,7 +151,7 @@ ldconfig
 
 sudo mkdir /etc/asterisk/keys
 cd /usr/src/asterisk-18*/
-contrib/scripts/ast_tls_cert -C $pbx_domain -O $pbx_name -d /etc/asterisk/keys
+contrib/scripts/ast_tls_cert -C $pbx_domain -O "$pbx_name" -d /etc/asterisk/keys
 rm -rf /usr/src/asterisk-18-current.tar.gz
 cd ~
 
