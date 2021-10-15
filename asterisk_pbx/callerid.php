@@ -5,4 +5,8 @@ ini_set('display_errors', 'Off');
 
 include('phpagi.php');
 $agi = new AGI();
+$data = $agi->get_variable();
+
+//get_variable
+//set_variable
 ?>
