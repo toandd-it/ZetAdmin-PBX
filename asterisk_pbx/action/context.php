@@ -762,7 +762,7 @@ if(isset($action))
                             $lineData .= "[".$ext['context']."]\n";
 							if(!empty($ext['ext_code']))
 							{
-								$lineData .= $ext['ext_code'];
+								$lineData .= $ext['ext_code']."\n\n";
 							}
                         } 
                         else 
@@ -1129,7 +1129,7 @@ if(isset($action))
                             $lineData .= "[".$ext['context']."]\n";
 							if(!empty($ext['ext_code']))
 							{
-								$lineData .= $ext['ext_code'];
+								$lineData .= $ext['ext_code']."\n\n";
 							}
                         } 
                         else 
