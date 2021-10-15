@@ -360,7 +360,7 @@ echo ' ' >> $api_conf
 
 sleep 0.5
 
-asterisk_etc=/etc/asterisk/
+asterisk_etc=/etc/asterisk
 
 sudo cat > $asterisk_etc/manager_api.conf
 echo '[zetadmin_api]' >> $asterisk_etc/manager_api.conf
@@ -434,8 +434,16 @@ echo ';pjsip_account.conf' >> $asterisk_etc/pjsip_account.conf
 echo '#include pjsip_account.conf' >> $asterisk_etc/pjsip.conf
 sudo chmod 777 $asterisk_etc/pjsip_account.conf
 
+sudo mv $webroot/api/asterisk_pbx/phpagi.conf $asterisk_etc/phpagi.conf
 sudo mv $webroot/api/asterisk_pbx/pbxlog.php $webroot/api/asterisk_pbx/$file_name.php
 sudo mv $webroot/api/asterisk_pbx/callerid.php /var/lib/asterisk/agi-bin/callerid.php
+sudo cp -pf $webroot/api/asterisk_pbx/phpagi.php /var/lib/asterisk/agi-bin/phpagi.php
+sudo cp -pf $webroot/api/asterisk_pbx/phpagi-asmanager.php /var/lib/asterisk/agi-bin/phpagi-asmanager.php
+sudo cp -pf $webroot/api/asterisk_pbx/phpagi-fastagi.php /var/lib/asterisk/agi-bin/phpagi-fastagi.php
+
+sudo chmod 755 /var/lib/asterisk/agi-bin/*.php
+sudo chown -R asterisk:asterisk $asterisk_etc/phpagi.conf
+sudo systemctl restart asterisk
 
 system_dir=/etc/systemd/system/
 sudo cat > $system_dir/pbxlog.service
