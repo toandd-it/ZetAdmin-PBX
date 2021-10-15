@@ -3,9 +3,10 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 'Off');
 
-include('config.php');
-include('class.mongodb.php');
-include('phpagi.php');
+require_once 'config.php';
+require_once 'class.mongodb.php';
+require_once 'phpagi.php';
+
 $mgdb = new MGDB_Api($db_url, $db_name);
 $agi = new AGI();
 $data = $agi->get_variable();
