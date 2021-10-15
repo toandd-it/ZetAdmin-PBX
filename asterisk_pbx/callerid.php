@@ -3,17 +3,19 @@
 error_reporting(E_ALL);
 ini_set('display_errors', 'Off');
 
+include('config.php');
+include('class.mongodb.php');
 include('phpagi.php');
+$mgdb = new MGDB_Api($db_url, $db_name);
 $agi = new AGI();
 $data = $agi->get_variable();
-
 
 //Start debug
 $debugFile = '/var/lib/asterisk/agi-bin/debug.txt';
 $msgDebug = "";
 foreach($data as $name => $value)
 {
-    $msgDebug .= ucfirst($name).": ".$value." | ";
+    $msgDebug .= $name.": ".$value." | ";
 }
 $maxSize = 10485760; //10M
 if(file_exists($debugFile))

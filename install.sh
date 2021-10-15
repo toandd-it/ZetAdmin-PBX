@@ -348,15 +348,15 @@ file_name=$(openssl rand -hex 16)
 web_api_id=$(openssl rand -hex 16)
 web_api_key=$(openssl rand -hex 24)
 api_conf=api/asterisk_api/config.php
-sudo cat > $api_conf
-echo '$api_url = "https://'$pbx_domain'/api/asterisk_api/postback.php";' >> $api_conf
-echo '$api_id = "'$web_api_id'";' >> $api_conf
-echo '$api_key = "'$web_api_key'";' >> $api_conf
-echo '$ipsAlow = []; /*exp ["ip 1", "ip 2", "ip n"]*/' >> $api_conf
-echo ' ' >> $api_conf
+sudo cat > $webroot/$api_conf
+echo '$api_url = "https://'$pbx_domain'/api/asterisk_api/postback.php";' >> $webroot/$api_conf
+echo '$api_id = "'$web_api_id'";' >> $webroot/$api_conf
+echo '$api_key = "'$web_api_key'";' >> $webroot/$api_conf
+echo '$ipsAlow = []; /*exp ["ip 1", "ip 2", "ip n"]*/' >> $webroot/$api_conf
+echo ' ' >> $webroot/$api_conf
 echo '$db_url = "mongodb://'$mongodb_dbuser':'$mongodb_dbpwd'@127.0.0.1:27017/'$mongodb_dbname'";' >> $api_conf
-echo '$db_name = "'$mongodb_dbname'";' >> $api_conf
-echo ' ' >> $api_conf
+echo '$db_name = "'$mongodb_dbname'";' >> $webroot/$api_conf
+echo ' ' >> $webroot/$api_conf
 
 sleep 0.5
 
@@ -440,6 +440,8 @@ sudo mv $webroot/api/asterisk_pbx/callerid.php /var/lib/asterisk/agi-bin/calleri
 sudo cp -pf $webroot/api/asterisk_pbx/phpagi.php /var/lib/asterisk/agi-bin/phpagi.php
 sudo cp -pf $webroot/api/asterisk_pbx/phpagi-asmanager.php /var/lib/asterisk/agi-bin/phpagi-asmanager.php
 sudo cp -pf $webroot/api/asterisk_pbx/phpagi-fastagi.php /var/lib/asterisk/agi-bin/phpagi-fastagi.php
+sudo cp -pf $webroot/api/asterisk_pbx/lib/class.mongodb.php /var/lib/asterisk/agi-bin/class.mongodb.php
+sudo cp -pf $webroot/api/asterisk_pbx/config.php /var/lib/asterisk/agi-bin/config.php
 
 sudo chmod 755 /var/lib/asterisk/agi-bin/*.php
 sudo chown -R asterisk:asterisk $asterisk_etc/phpagi.conf
