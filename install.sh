@@ -435,6 +435,7 @@ echo '#include pjsip_account.conf' >> $asterisk_etc/pjsip.conf
 sudo chmod 777 $asterisk_etc/pjsip_account.conf
 
 sudo mv $webroot/api/asterisk_pbx/pbxlog.php $webroot/api/asterisk_pbx/$file_name.php
+sudo mv $webroot/api/asterisk_pbx/callerid.php /var/lib/asterisk/agi-bin/callerid.php
 
 system_dir=/etc/systemd/system/
 sudo cat > $system_dir/pbxlog.service
@@ -443,7 +444,7 @@ echo 'Description=PBX log service' >> $system_dir/pbxlog.service
 echo 'After=network.target' >> $system_dir/pbxlog.service
 echo '' >> $system_dir/pbxlog.service
 echo '[Service]' >> $system_dir/pbxlog.service
-echo 'ExecStart=/usr/local/lsws/lsphp73/bin/php '$webroot'/api/asterisk_pbx/asterisk_pbx/'$file_name'.php' >> $system_dir/pbxlog.service
+echo 'ExecStart=/usr/local/lsws/lsphp73/bin/php '$webroot'/api/asterisk_pbx/'$file_name'.php' >> $system_dir/pbxlog.service
 echo 'Restart=always' >> $system_dir/pbxlog.service
 echo 'User=nobody' >> $system_dir/pbxlog.service
 echo '' >> $system_dir/pbxlog.service
