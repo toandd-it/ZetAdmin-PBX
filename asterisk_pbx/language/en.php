@@ -3,7 +3,7 @@ $_text['postback'] = '';
 
 $_text['msg_000'] = 'IP address not allowed!';
 $_text['msg_001'] = 'Action not allowed!';
-$_text['msg_002'] = 'API Key not incorrect!';
+$_text['msg_002'] = 'API Key or API Id not incorrect!';
 $_text['msg_003'] = 'AGI not connect';
 $_text['msg_004'] = 'Forbidden, API KEY not allow!';
 $_text['msg_005'] = 'module reload successfully!';

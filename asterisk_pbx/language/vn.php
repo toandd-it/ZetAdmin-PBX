@@ -3,7 +3,7 @@ $_text['postback'] = '';
 
 $_text['msg_000'] = 'Địa chỉ IP không được cấp phép!';
 $_text['msg_001'] = 'Hành động không được cấp phép!';
-$_text['msg_002'] = 'API Key không đúng!';
+$_text['msg_002'] = 'API Key hoặc API Id không đúng!';
 $_text['msg_003'] = 'AGI không thể kết nối';
 $_text['msg_004'] = 'Bị cấm, API KEY không được cấp phép!';
 $_text['msg_005'] = 'module reload thành công!';

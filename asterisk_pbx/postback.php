@@ -24,7 +24,6 @@ include_once("phpagi-asmanager.php");
 
 if(isset($_POST['action']) && !empty($_POST['action']) && !empty($_POST['api_id']) && !empty($_POST['api_key']))
 {
-    $api_id = $_POST['api_id'];
 	$action = $_POST['action'];
 	if(!empty($_POST['data']))
 	{
@@ -50,7 +49,7 @@ if(isset($_POST['action']) && !empty($_POST['action']) && !empty($_POST['api_id'
         include_once $filename;
     }
     
-    if($_POST['api_key'] == $api_key)
+    if($_POST['api_key'] == $api_key && $api_id == $_POST['api_id'])
     {
         $app = new PbxApi();
         $ip = $app->ip();
