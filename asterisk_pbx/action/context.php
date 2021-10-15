@@ -3,7 +3,7 @@ if(isset($action))
 {
 	$_id = (string)new \MongoDB\BSON\ObjectID;
     $ext_conf = '/etc/asterisk/extensions_api.conf';
-    $context_colection = 'call_extension';
+    $context_colection = 'call_context';
     
     if($action == 'getListContext')
 	{
