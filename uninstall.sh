@@ -27,7 +27,7 @@ echo -e "\033[32mRemove OpenLiteSpeed successful!\033[m"
 
 sleep 0.5
 
-sudo systemctl mongod lsws.service
+sudo systemctl stop mongod.service
 sudo yum -y erase $(rpm -qa | grep mongodb-org)
 sudo rm -r /var/log/mongodb
 sudo rm -r /var/lib/mongo
