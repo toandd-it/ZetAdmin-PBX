@@ -650,11 +650,12 @@ if(isset($action))
         $sipContext		= $app->formDataName($data, 'context');
         $sipDevice		= $app->formDataName($data, 'device');
         $videosupport	= $app->formDataName($data, 'videosupport');
+        $sipServer		= $app->formDataName($data, 'sip_server');
         $sipStatus		= $app->formDataName($data, 'status');
 
         $dataInsert = array(
             '_id' 			=> (string)$sipUsername, 
-            'name' 			=> trim($sipName), 
+            'name' 			=> !empty($sipName) ? trim($sipName) : 'Noname', 
             "type" 			=> 'peer', 
             'host' 			=> 'dynamic', 
             'sip'			=> 'SIP/'.$sipUsername, 
@@ -670,6 +671,7 @@ if(isset($action))
             'device' 		=> $sipDevice, 
             'videosupport' 	=> $videosupport, 
             'mailbox'		=> $sipUsername.'@device', 
+            'sip_server'    => $sipServer,
             'tcreate'		=> (int)time(), 
             'tupdate'		=> (int)0, 
             'status' 		=> $sipStatus
