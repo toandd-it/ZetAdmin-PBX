@@ -43,6 +43,7 @@ else
 
 $callerid = $agi->get_variable("CALLERID(name)");
 
+//$agi->hangup();
 //get_variable
 //set_variable
 ?>
