@@ -24,6 +24,7 @@ sudo systemctl stop lsws.service
 sudo rm -rf /usr/local/lsws/
 sudo rm -rf /var/www/public_html/
 echo -e "\033[32mRemove OpenLiteSpeed successful!\033[m"
+
 sleep 0.5
 
 sudo systemctl mongod lsws.service
