@@ -354,7 +354,7 @@ echo '$api_id = "'$web_api_id'";' >> $webroot/$api_conf
 echo '$api_key = "'$web_api_key'";' >> $webroot/$api_conf
 echo '$ipsAlow = []; /*exp ["ip 1", "ip 2", "ip n"]*/' >> $webroot/$api_conf
 echo ' ' >> $webroot/$api_conf
-echo '$db_url = "mongodb://'$mongodb_dbuser':'$mongodb_dbpwd'@127.0.0.1:27017/'$mongodb_dbname'";' >> $api_conf
+echo '$db_url = "mongodb://'$mongodb_dbuser':'$mongodb_dbpwd'@127.0.0.1:27017/'$mongodb_dbname'";' >> $webroot/$api_conf
 echo '$db_name = "'$mongodb_dbname'";' >> $webroot/$api_conf
 echo ' ' >> $webroot/$api_conf
 
