@@ -434,16 +434,17 @@ echo ';pjsip_account.conf' >> $asterisk_etc/pjsip_account.conf
 echo '#include pjsip_account.conf' >> $asterisk_etc/pjsip.conf
 sudo chmod 777 $asterisk_etc/pjsip_account.conf
 
+agibin_dir=/var/lib/asterisk/agi-bin
 sudo mv $webroot/api/asterisk_pbx/phpagi.conf $asterisk_etc/phpagi.conf
 sudo mv $webroot/api/asterisk_pbx/pbxlog.php $webroot/api/asterisk_pbx/$file_name.php
-sudo mv $webroot/api/asterisk_pbx/callerid.php /var/lib/asterisk/agi-bin/callerid.php
-sudo cp -pf $webroot/api/asterisk_pbx/phpagi.php /var/lib/asterisk/agi-bin/phpagi.php
-sudo cp -pf $webroot/api/asterisk_pbx/phpagi-asmanager.php /var/lib/asterisk/agi-bin/phpagi-asmanager.php
-sudo cp -pf $webroot/api/asterisk_pbx/phpagi-fastagi.php /var/lib/asterisk/agi-bin/phpagi-fastagi.php
-sudo cp -pf $webroot/api/asterisk_pbx/lib/class.mongodb.php /var/lib/asterisk/agi-bin/class.mongodb.php
-sudo cp -pf $webroot/api/asterisk_pbx/config.php /var/lib/asterisk/agi-bin/config.php
+sudo mv $webroot/api/asterisk_pbx/callerid.php $agibin_dir/callerid.php
+sudo cp -pf $webroot/api/asterisk_pbx/phpagi.php $agibin_dir/phpagi.php
+sudo cp -pf $webroot/api/asterisk_pbx/phpagi-asmanager.php $agibin_dir/phpagi-asmanager.php
+sudo cp -pf $webroot/api/asterisk_pbx/phpagi-fastagi.php $agibin_dir/phpagi-fastagi.php
+sudo cp -pf $webroot/api/asterisk_pbx/lib/class.mongodb.php $agibin_dir/class.mongodb.php
+sudo cp -pf $webroot/api/asterisk_pbx/config.php $agibin_dir/config.php
 
-sudo chmod 755 /var/lib/asterisk/agi-bin/*.php
+sudo chmod 755 $agibin_dir/*.php
 sudo chown -R asterisk:asterisk $asterisk_etc/phpagi.conf
 sudo systemctl restart asterisk
 
