@@ -16,11 +16,11 @@ while [ "$q_install" != "y" ] && [ "$q_install" != "n" ] ;do
 	echo -n "Press y to start installation, n to cancel ? [y/n]: "
 	read q_install
 done
-
 if [ "$q_install" != "y" ];then 
 	echo
 	exit
 fi
+
 ###################################
 #         Configuration           #
 ###################################

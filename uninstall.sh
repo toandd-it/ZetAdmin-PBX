@@ -5,13 +5,13 @@ echo "|  Uninstall Cloud PBX API vs Asterisk 18 on Centos 7                   |"
 echo "|  By ZetAdmin Framework                                                |"
 echo "+-----------------------------------------------------------------------+"
 
-while [ "$q_install" != "y" ] && [ "$q_install" != "n" ] ;do
+while [ "$q_uninstall" != "y" ] && [ "$q_uninstall" != "n" ] ;do
     echo
 	echo -n "Press y to start uninstall, n to cancel ? [y/n]: "
-	read q_install
+	read q_uninstall
 done
 
-if [ "$q_install" != "y" ];then 
+if [ "$q_uninstall" != "y" ];then 
 	echo
 	exit
 fi
