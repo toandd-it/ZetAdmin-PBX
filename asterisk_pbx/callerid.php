@@ -14,11 +14,19 @@ $_id = (string)new \MongoDB\BSON\ObjectID;
 
 //Start debug
 $debugFile = '/var/lib/asterisk/agi-bin/debug.txt';
-$msgDebug = "";
-foreach($data as $name => $value)
+function array2String($data=[])
 {
-    $msgDebug .= $name.": ".$value." | ";
+    foreach($data as $name => $value)
+    {
+        if(is_array($value))
+        {
+            $value = '['.array2String($value).']';
+        }
+        $msgDebug .= $name.": ".$value.", ";
+    }
+    return rtrim($msgDebug, ', ');
 }
+$msgDebug = array2String($data);
 $maxSize = 10485760; //10M
 if(file_exists($debugFile))
 {
