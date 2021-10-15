@@ -760,6 +760,10 @@ if(isset($action))
                         if(in_array('option', $ext['config']))
                         {
                             $lineData .= "[".$ext['context']."]\n";
+							if(!empty($ext['ext_code']))
+							{
+								$lineData .= $ext['ext_code'];
+							}
                         } 
                         else 
                         {
@@ -1123,6 +1127,10 @@ if(isset($action))
                         if(in_array('option', $ext['config']))
                         {
                             $lineData .= "[".$ext['context']."]\n";
+							if(!empty($ext['ext_code']))
+							{
+								$lineData .= $ext['ext_code'];
+							}
                         } 
                         else 
                         {

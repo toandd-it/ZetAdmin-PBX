@@ -49,9 +49,18 @@ else
 }
 //End debug
 
-$callerid = $agi->get_variable("CALLERID(name)");
+//$callerid = $agi->get_variable("CALLERID(name)");
+$callerid = preg_replace("#[^0-9]#", "", $agi->request[agi_callerid]);
+$timenow = strtotime('now');
 
+//type: internal / outbound / inbound
+$agi->set_variable('type', '');
+$agi->set_variable('lookup-phone', '');
+$agi->set_variable('call-to', '');
+$agi->set_variable('phone', '');
+$agi->set_variable('log-id', $_id);
 //$agi->hangup();
+//request
 //get_variable
 //set_variable
 ?>
