@@ -422,7 +422,7 @@ echo 'tlsbindaddr=0.0.0.0:8089' >> $asterisk_etc/http.conf
 echo 'tlscertfile=/etc/letsencrypt/live/'$pbx_domain'/fullchain.pem' >> $asterisk_etc/http.conf
 echo 'tlsprivatekey=/etc/letsencrypt/live/'$pbx_domain'/privkey.pem' >> $asterisk_etc/http.conf
 sudo chown -R asterisk:asterisk $asterisk_etc/http.conf
-sudo systemctl restart asterisk
+#sudo systemctl restart asterisk
 
 sudo cat > $asterisk_etc/pjsip_conference.conf
 echo ';pjsip_conference.conf' >> $asterisk_etc/pjsip_conference.conf

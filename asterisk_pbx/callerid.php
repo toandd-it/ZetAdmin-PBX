@@ -10,6 +10,7 @@ require_once 'phpagi.php';
 $mgdb = new MGDB_Api($db_url, $db_name);
 $agi = new AGI();
 $data = $agi->get_variable();
+$_id = (string)new \MongoDB\BSON\ObjectID;
 
 //Start debug
 $debugFile = '/var/lib/asterisk/agi-bin/debug.txt';
