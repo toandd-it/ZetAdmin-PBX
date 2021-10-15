@@ -41,6 +41,7 @@ else
 }
 //End debug
 
+$callerid = $agi->get_variable("CALLERID(name)");
 
 //get_variable
 //set_variable
