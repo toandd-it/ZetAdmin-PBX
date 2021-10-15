@@ -5,5 +5,5 @@ Build a simple Cloud PBX server, manage and use via API. Easily integrate into y
 **Using:**
   - CentOS 7
   - PHP 7.3 & OpenLiteSpeed
-  - MongoDB 4.2
+  - MongoDB 4.4
   - Asterisk 18
