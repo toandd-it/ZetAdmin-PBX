@@ -453,20 +453,26 @@ sudo chmod 755 $agibin_dir/*.php
 sudo chown -R asterisk:asterisk $asterisk_etc/phpagi.conf
 sudo systemctl restart asterisk
 
-system_dir=/etc/systemd/system/
-sudo touch $system_dir/pbxlog.service
-echo '[Unit]' >> $system_dir/pbxlog.service
-echo 'Description=PBX log service' >> $system_dir/pbxlog.service
-echo 'After=network.target' >> $system_dir/pbxlog.service
-echo '' >> $system_dir/pbxlog.service
-echo '[Service]' >> $system_dir/pbxlog.service
-echo 'ExecStart=/usr/local/lsws/lsphp73/bin/php '$webroot'/api/asterisk_pbx/'$file_name'.php' >> $system_dir/pbxlog.service
-echo 'Restart=always' >> $system_dir/pbxlog.service
-echo 'User=nobody' >> $system_dir/pbxlog.service
-echo '' >> $system_dir/pbxlog.service
-echo '[Install]' >> $system_dir/pbxlog.service
-echo 'WantedBy=multi-user.target' >> $system_dir/pbxlog.service
-sudo chmod 777 $system_dir/pbxlog.service
+system_dir=/etc/systemd/system
+usr_dir=/usr/lib/systemd/system
+sudo touch $usr_dir/pbxlog.service
+echo '[Unit]' >> $usr_dir/pbxlog.service
+echo 'Description=PBX log service' >> $usr_dir/pbxlog.service
+echo 'After=network.target' >> $usr_dir/pbxlog.service
+echo '' >> $usr_dir/pbxlog.service
+echo '[Service]' >> $usr_dir/pbxlog.service
+echo 'ExecStart=/usr/local/lsws/lsphp73/bin/php '$webroot'/api/asterisk_pbx/'$file_name'.php' >> $usr_dir/pbxlog.service
+echo 'Restart=always' >> $usr_dir/pbxlog.service
+echo 'User=nobody' >> $usr_dir/pbxlog.service
+echo '' >> $usr_dir/pbxlog.service
+echo '[Install]' >> $usr_dir/pbxlog.service
+echo 'WantedBy=multi-user.target' >> $usr_dir/pbxlog.service
+sudo chmod 644 $usr_dir/pbxlog.service
+
+sudo ln -s $usr_dir/pbxlog.service $system_dir/
+sudo ls -l $usr_dir/pbxlog.service
+
+sudo systemd-analyze verify pbxlog.service 
 
 sudo systemctl daemon-reload
 sudo systemctl start pbxlog.service

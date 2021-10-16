@@ -4,11 +4,14 @@ ini_set('display_errors', 'Off');
 
 $timeStart = microtime(true);
 
-$dir_root = explode($_SERVER['SCRIPT_NAME'], $_SERVER['SCRIPT_FILENAME'])[0];
+ob_start();
+session_start();
 
-include_once($dir_root."/config.php");
-include_once($dir_root."/lib/class.action.php");
-include_once($dir_root."/lib/class.mongodb.php");
+$dir_root = explode('/'.basename($_SERVER['SCRIPT_FILENAME']), $_SERVER['SCRIPT_NAME'])[0];
+
+include 'config.php';
+include 'lib/class.action.php';
+include 'lib/class.mongodb.php';
 
 $db_collection = 'call_log';
 $app = new PbxApi();
@@ -33,7 +36,10 @@ else
 		if(!empty(trim($buffer)))
 		{
 			$bufferData = explode(': ', str_replace("\r\n", "", $buffer));
-			$res[$bufferData[0]] = $bufferData[1];
+			if(!empty($bufferData[1]))
+			{
+				$res[$bufferData[0]] = $bufferData[1];
+			}
 		}
 		else
 		{

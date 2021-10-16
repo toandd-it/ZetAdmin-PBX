@@ -9,7 +9,7 @@ session_start();
 
 $session_id = session_id();
 
-$dir_root = explode($_SERVER['SCRIPT_NAME'], $_SERVER['SCRIPT_FILENAME'])[0];
+$dir_root = explode('/'.basename($_SERVER['SCRIPT_FILENAME']), $_SERVER['SCRIPT_NAME'])[0];
 
 $host_name = $_SERVER['HTTP_HOST'];
 $uag = '';
