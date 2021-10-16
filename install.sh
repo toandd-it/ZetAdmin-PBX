@@ -49,7 +49,7 @@ sudo setenforce 0
 sudo sed -i 's/\(^SELINUX=\).*/\SELINUX=permissive/' /etc/selinux/config
 sudo yum -y groupinstall "Development Tools"
 sudo yum -y install epel-release
-sudo yum -y install gcc make gcc-c++ cpp git wget openssl-devel m4 autoconf automake vim net-tools sqlite-devel psmisc ncurses-devel libtermcap-devel newt-devel libxml2-devel libtiff-devel gtk2-devel libtool libuuid-devel subversion kernel-devel kernel-devel-$(uname -r) crontabs cronie-anacron libedit libedit-devel libsrtp libsrtp-devel
+sudo yum -y install gcc make gcc-c++ cpp git openssl-devel m4 autoconf automake vim net-tools sqlite-devel psmisc ncurses-devel libtermcap-devel newt-devel libxml2-devel libtiff-devel gtk2-devel libtool libuuid-devel subversion kernel-devel kernel-devel-$(uname -r) crontabs cronie-anacron libedit libedit-devel libsrtp libsrtp-devel
 
 sleep 0.5
 
