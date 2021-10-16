@@ -7,7 +7,7 @@ Build a simple Cloud PBX server, manage and use via API. Easily integrate into y
   - PHP 7.3 & OpenLiteSpeed
   - MongoDB 4.4
   - Asterisk 18
-  - API source code by ZetAdmin Framework
+  - API source code AND documents using API by ZetAdmin Framework
 
 **Install:**
 ```
