@@ -1,5 +1,5 @@
 #!/bin/sh
-
+echo ""
 echo "+-----------------------------------------------------------------------+"
 echo "|  Uninstall Cloud PBX API vs Asterisk 18 on Centos 7                   |"
 echo "|  By ZetAdmin Framework                                                |"
