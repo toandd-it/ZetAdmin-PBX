@@ -24,8 +24,8 @@ sudo systemctl stop lsws.service
 sudo systemctl disable lsws.service
 sudo systemctl stop lshttpd.service
 sudo systemctl disable lshttpd.service
-
 sudo rm -rf /usr/lib/systemd/system/lshttpd.service
+sudo yum -y erase $(rpm -qa | grep lsphp73)
 sudo rm -rf /usr/local/lsws/
 sudo rm -rf /var/www/public_html/
 echo -e "\033[32mRemove OpenLiteSpeed successful!\033[m"
