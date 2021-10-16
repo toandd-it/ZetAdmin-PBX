@@ -43,14 +43,14 @@ else
 		}
 		else
 		{
-			if(isset($res['Event']) && in_array($res['Event'], $eventsAllow))
+			if(isset($res['Event']) && in_array($res['Event'], $eventsAllow) && !empty($res['Channel']))
 			{
 				/*call Event*/
 				$_mgid = (string)new \MongoDB\BSON\ObjectID;
 				$dataFind = ['_id' => $res['Channel']];
 
 				$dataInsert = $res;
-				$dataInsert['_id'] = (string)$dataInsert['Channel'];
+				$dataInsert['_id'] = (string)$res['Channel'];
 				$dataInsert['id'] = $_mgid;
 				$dataInsert['t_create'] = microtime(true);
 				$dataInsert['t_ring'] = 0;
