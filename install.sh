@@ -342,7 +342,9 @@ echo " "
 sudo mkdir $webroot/api/
 touch $webroot/api/index.html
 echo 'pageok!' >> $webroot/api/index.html
-sudo cp -R asterisk_pbx/ $webroot/api/
+
+asterisk_pbx_dir=$(find ~ -type d -name "asterisk_pbx")
+cp -R $asterisk_pbx_dir $webroot/api/
 
 echo -e "\033[32mDownload and export API source code successful!\033[m"
 echo " "
@@ -351,10 +353,10 @@ sleep 0.5
 file_name=$(openssl rand -hex 16)
 web_api_id=$(openssl rand -hex 16)
 web_api_key=$(openssl rand -hex 24)
-api_conf=api/asterisk_api/config.php
+api_conf=api/asterisk_pbx/config.php
 sudo touch $webroot/$api_conf
 echo '<?php'
-echo '$api_url = "https://'$pbx_domain'/api/asterisk_api/postback.php";' >> $webroot/$api_conf
+echo '$api_url = "https://'$pbx_domain'/api/asterisk_pbx/postback.php";' >> $webroot/$api_conf
 echo '$api_id = "'$web_api_id'";' >> $webroot/$api_conf
 echo '$api_key = "'$web_api_key'";' >> $webroot/$api_conf
 echo '$ipsAlow = []; /*exp ["ip 1", "ip 2", "ip n"]*/' >> $webroot/$api_conf
