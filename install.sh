@@ -264,6 +264,7 @@ echo "|   Create OpenLiteSpeed VirtualHost        |"
 echo "+-------------------------------------------+"
 echo " "
 
+sudo mkdir /var/www/
 sudo mkdir /var/www/public_html/
 sudo mkdir /var/www/public_html/$pbx_domain/
 sudo chown -R nobody:nobody /var/www/public_html/
