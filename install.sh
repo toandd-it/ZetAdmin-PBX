@@ -354,6 +354,7 @@ web_api_id=$(openssl rand -hex 16)
 web_api_key=$(openssl rand -hex 24)
 api_conf=api/asterisk_api/config.php
 sudo touch $webroot/$api_conf
+echo '<?php'
 echo '$api_url = "https://'$pbx_domain'/api/asterisk_api/postback.php";' >> $webroot/$api_conf
 echo '$api_id = "'$web_api_id'";' >> $webroot/$api_conf
 echo '$api_key = "'$web_api_key'";' >> $webroot/$api_conf
@@ -361,7 +362,7 @@ echo '$ipsAlow = []; /*exp ["ip 1", "ip 2", "ip n"]*/' >> $webroot/$api_conf
 echo ' ' >> $webroot/$api_conf
 echo '$db_url = "mongodb://'$mongodb_dbuser':'$mongodb_dbpwd'@127.0.0.1:27017/'$mongodb_dbname'";' >> $webroot/$api_conf
 echo '$db_name = "'$mongodb_dbname'";' >> $webroot/$api_conf
-echo ' ' >> $webroot/$api_conf
+echo '?>' >> $webroot/$api_conf
 
 sleep 0.5
 
