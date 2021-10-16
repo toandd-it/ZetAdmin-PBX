@@ -10,7 +10,6 @@ while [ "$q_uninstall" != "y" ] && [ "$q_uninstall" != "n" ] ;do
 	echo -n "Press y to start uninstall, n to cancel ? [y/n]: "
 	read q_uninstall
 done
-
 if [ "$q_uninstall" != "y" ];then 
 	echo
 	exit
