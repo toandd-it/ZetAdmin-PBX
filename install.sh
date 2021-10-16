@@ -207,7 +207,7 @@ if [ ! -d "/etc/yum.repos.d/mongodb.repo" ]
 then
     mongodb_repo=/etc/yum.repos.d/mongodb.repo
 	#rm -rf $mongodb_repo
-	cat > $mongodb_repo
+	touch $mongodb_repo
 	echo '[MongoDB]' >> $mongodb_repo
 	echo 'name=MongoDB Repository' >> $mongodb_repo
 	echo 'baseurl=https://repo.mongodb.org/yum/redhat/$releasever/mongodb-org/4.4/x86_64/' >> $mongodb_repo
@@ -271,7 +271,7 @@ webroot=/var/www/public_html/$pbx_domain
 
 sudo mkdir /usr/local/lsws/conf/vhosts/$pbx_domain/
 vh_conf=/usr/local/lsws/conf/vhosts/$pbx_domain/$pbx_domain.conf
-cat > $vh_conf
+touch $vh_conf
 echo 'docRoot                   $VH_ROOT/' >> $vh_conf
 echo 'vhDomain                  '$pbx_domain'' >> $vh_conf
 echo 'enableGzip                1' >> $vh_conf
@@ -323,7 +323,7 @@ sudo chmod 750 $httpd_conf
 
 #sudo sh /usr/local/lsws/admin/misc/admpass.sh
 cd $webroot/
-cat > index.html
+touch index.html
 echo 'pageok!' >> index.html
 cd ~
 sudo systemctl restart lsws.service
@@ -339,7 +339,7 @@ echo "+-------------------------------------------+"
 echo " "
 
 sudo mkdir $webroot/api/
-cat > $webroot/api/index.html
+touch $webroot/api/index.html
 echo 'pageok!' >> $webroot/api/index.html
 sudo cp -R asterisk_pbx/ $webroot/api/
 
@@ -351,7 +351,7 @@ file_name=$(openssl rand -hex 16)
 web_api_id=$(openssl rand -hex 16)
 web_api_key=$(openssl rand -hex 24)
 api_conf=api/asterisk_api/config.php
-sudo cat > $webroot/$api_conf
+sudo touch $webroot/$api_conf
 echo '$api_url = "https://'$pbx_domain'/api/asterisk_api/postback.php";' >> $webroot/$api_conf
 echo '$api_id = "'$web_api_id'";' >> $webroot/$api_conf
 echo '$api_key = "'$web_api_key'";' >> $webroot/$api_conf
@@ -365,7 +365,7 @@ sleep 0.5
 
 asterisk_etc=/etc/asterisk
 
-sudo cat > $asterisk_etc/manager_api.conf
+sudo touch $asterisk_etc/manager_api.conf
 echo '[zetadmin_api]' >> $asterisk_etc/manager_api.conf
 echo 'secret = zetadmin_api' >> $asterisk_etc/manager_api.conf
 echo 'deny=0.0.0.0/0.0.0.0' >> $asterisk_etc/manager_api.conf
@@ -377,7 +377,7 @@ sudo chmod 777 $asterisk_etc/manager_api.conf
 sleep 0.5
 
 rm -rf $asterisk_etc/manager.conf
-sudo cat > $asterisk_etc/manager.conf
+sudo touch $asterisk_etc/manager.conf
 echo '[general]' >> $asterisk_etc/manager.conf
 echo 'enabled = yes' >> $asterisk_etc/manager.conf
 echo 'port = 5038' >> $asterisk_etc/manager.conf
@@ -385,38 +385,38 @@ echo 'bindaddr = 127.0.0.1' >> $asterisk_etc/manager.conf
 echo '#include manager_api.conf' >> $asterisk_etc/manager.conf
 sudo chown -R asterisk:asterisk $asterisk_etc/manager.conf
 
-sudo cat > $asterisk_etc/extensions_api.conf
+sudo touch $asterisk_etc/extensions_api.conf
 echo ';extensions_api.conf' >> $asterisk_etc/extensions_api.conf
 echo '#include extensions_api.conf' >> $asterisk_etc/extensions.conf
 sudo chmod 777 $asterisk_etc/extensions_api.conf
 
-sudo cat > $asterisk_etc/pjsip_api.conf
+sudo touch $asterisk_etc/pjsip_api.conf
 echo ';pjsip_api.conf' >> $asterisk_etc/pjsip_api.conf
 echo '#include pjsip_api.conf' >> $asterisk_etc/pjsip.conf
 sudo chmod 777 $asterisk_etc/pjsip_api.conf
 
-sudo cat > $asterisk_etc/sip_trunk_api.conf
+sudo touch $asterisk_etc/sip_trunk_api.conf
 echo ';sip_trunk_api.conf' >> $asterisk_etc/sip_trunk_api.conf
 echo '#include sip_trunk_api.conf' >> $asterisk_etc/sip.conf
 sudo chmod 777 $asterisk_etc/sip_trunk_api.conf
 
-sudo cat > $asterisk_etc/sip_account_api.conf
+sudo touch $asterisk_etc/sip_account_api.conf
 echo ';sip_account_api.conf' >> $asterisk_etc/sip_account_api.conf
 echo '#include sip_account_api.conf' >> $asterisk_etc/sip.conf
 sudo chmod 777 $asterisk_etc/sip_account_api.conf
 
-sudo cat > $asterisk_etc/queues_api.conf
+sudo touch $asterisk_etc/queues_api.conf
 echo ';queues_api.conf' >> $asterisk_etc/queues_api.conf
 echo '#include queues_api.conf' >> $asterisk_etc/queues.conf
 sudo chmod 777 $asterisk_etc/queues_api.conf
 
-sudo cat > $asterisk_etc/voicemail_api.conf
+sudo touch $asterisk_etc/voicemail_api.conf
 echo ';voicemail_api.conf' >> $asterisk_etc/voicemail_api.conf
 echo '#include voicemail_api.conf' >> $asterisk_etc/voicemail.conf
 sudo chmod 777 $asterisk_etc/voicemail_api.conf
 
 rm -rf $asterisk_etc/http.conf
-sudo cat > $asterisk_etc/http.conf
+sudo touch $asterisk_etc/http.conf
 echo '[general]' >> $asterisk_etc/http.conf
 echo 'servername='$pbx_domain'' >> $asterisk_etc/http.conf
 echo 'enabled=yes' >> $asterisk_etc/http.conf
@@ -427,12 +427,12 @@ echo 'tlsprivatekey=/etc/letsencrypt/live/'$pbx_domain'/privkey.pem' >> $asteris
 sudo chown -R asterisk:asterisk $asterisk_etc/http.conf
 #sudo systemctl restart asterisk
 
-sudo cat > $asterisk_etc/pjsip_conference.conf
+sudo touch $asterisk_etc/pjsip_conference.conf
 echo ';pjsip_conference.conf' >> $asterisk_etc/pjsip_conference.conf
 echo '#include pjsip_conference.conf' >> $asterisk_etc/pjsip.conf
 sudo chmod 777 $asterisk_etc/pjsip_conference.conf
 
-sudo cat > $asterisk_etc/pjsip_account.conf
+sudo touch $asterisk_etc/pjsip_account.conf
 echo ';pjsip_account.conf' >> $asterisk_etc/pjsip_account.conf
 echo '#include pjsip_account.conf' >> $asterisk_etc/pjsip.conf
 sudo chmod 777 $asterisk_etc/pjsip_account.conf
@@ -452,7 +452,7 @@ sudo chown -R asterisk:asterisk $asterisk_etc/phpagi.conf
 sudo systemctl restart asterisk
 
 system_dir=/etc/systemd/system/
-sudo cat > $system_dir/pbxlog.service
+sudo touch $system_dir/pbxlog.service
 echo '[Unit]' >> $system_dir/pbxlog.service
 echo 'Description=PBX log service' >> $system_dir/pbxlog.service
 echo 'After=network.target' >> $system_dir/pbxlog.service
