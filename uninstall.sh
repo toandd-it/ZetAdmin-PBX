@@ -22,6 +22,8 @@ sudo rm -rf /etc/fail2ban/jail.d/asterisk.local
 
 sudo systemctl stop lsws.service
 sudo systemctl disable lsws.service
+sudo systemctl stop lshttpd.service
+sudo systemctl disable lshttpd.service
 sudo rm -rf /usr/local/lsws/
 sudo rm -rf /var/www/public_html/
 echo -e "\033[32mRemove OpenLiteSpeed successful!\033[m"
