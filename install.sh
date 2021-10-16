@@ -345,7 +345,7 @@ touch $webroot/api/index.html
 echo 'pageok!' >> $webroot/api/index.html
 
 asterisk_pbx_dir=$(find ~ -type d -name "asterisk_pbx")
-cp -R $asterisk_pbx_dir $webroot/api/
+sudo cp -R $asterisk_pbx_dir $webroot/api/
 
 echo -e "\033[32mDownload and export API source code successful!\033[m"
 echo " "
