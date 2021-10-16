@@ -263,11 +263,6 @@ echo "|   Create OpenLiteSpeed VirtualHost        |"
 echo "+-------------------------------------------+"
 echo " "
 
-sudo mkdir /var/www/
-sudo mkdir /var/www/public_html/
-sudo mkdir /var/www/public_html/$pbx_domain/
-sudo chown -R nobody:nobody /var/www/public_html/
-
 webroot=/var/www/public_html/$pbx_domain
 
 sudo mkdir /usr/local/lsws/conf/vhosts/$pbx_domain/
@@ -323,6 +318,12 @@ sudo chown -R lsadm:nobody $httpd_conf
 sudo chmod 750 $httpd_conf
 
 #sudo sh /usr/local/lsws/admin/misc/admpass.sh
+
+sudo mkdir /var/www/
+sudo mkdir /var/www/public_html/
+sudo mkdir /var/www/public_html/$pbx_domain/
+sudo chown -R nobody:nobody /var/www/public_html/
+
 cd $webroot/
 touch index.html
 echo 'pageok!' >> index.html
