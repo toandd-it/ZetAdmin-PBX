@@ -16,7 +16,8 @@ if [ "$q_uninstall" != "y" ];then
 fi
 
 sudo systemctl stop pbxlog.service
-sudo rm -rf /etc/systemd/system/pbxlog.service
+sudo systemctl disable pbxlog.service
+sudo rm -rf /usr/lib/systemd/system/pbxlog.service
 sudo rm -rf /etc/fail2ban/jail.d/asterisk.local
 
 sudo systemctl stop lsws.service
