@@ -9,9 +9,9 @@ session_start();
 
 $dir_root = explode('/'.basename($_SERVER['SCRIPT_FILENAME']), $_SERVER['SCRIPT_NAME'])[0];
 
-include 'config.php';
-include 'lib/class.action.php';
-include 'lib/class.mongodb.php';
+include $dir_root.'/config.php';
+include $dir_root.'/lib/class.action.php';
+include $dir_root.'/lib/class.mongodb.php';
 
 $db_collection = 'call_log';
 $app = new PbxApi();

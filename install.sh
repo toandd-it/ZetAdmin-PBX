@@ -510,6 +510,8 @@ sudo systemctl start firewalld
 sudo systemctl enable fail2ban
 sudo systemctl start fail2ban
 
+sudo chown -R nobody:nobody $webroot/
+
 echo -e "\033[32mCreate Cloud PBX API successful!\033[m"
 echo " "
 
