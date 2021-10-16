@@ -1,5 +1,5 @@
 #!/bin/sh
-
+echo ""
 echo "+-----------------------------------------------------------------------+"
 echo "|  Install Cloud PBX API vs Asterisk 18 on Centos 7                     |"
 echo "|  Database: MongoDB 4.4                                                |"
