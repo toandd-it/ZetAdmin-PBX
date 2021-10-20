@@ -453,37 +453,6 @@ sudo systemctl start pbxlog.service
 
 sleep 0.5
 
-sudo yum -y install fail2ban fail2ban-systemd
-sudo cp -pf /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
-
-sudo touch /etc/fail2ban/jail.d/sshd.local && chmod +x /etc/fail2ban/jail.d/sshd.local
-
-sshd_file=/etc/fail2ban/jail.d/sshd.local
-echo '[sshd]' >> $sshd_file
-echo 'enabled = true' >> $sshd_file
-echo 'port = ssh' >> $sshd_file
-echo '#action = firewallcmd-ipset' >> $sshd_file
-echo 'logpath = %(sshd_log)s' >> $sshd_file
-echo 'maxretry = 5' >> $sshd_file
-echo 'bantime = 86400' >> $sshd_file
-
-sudo touch /etc/fail2ban/jail.d/asterisk.local && chmod +x /etc/fail2ban/jail.d/asterisk.local
-
-asterisk_file=/etc/fail2ban/jail.d/asterisk.local
-echo '[asterisk]' >> $asterisk_file
-echo 'enabled = true' >> $asterisk_file
-echo 'filter = asterisk' >> $asterisk_file
-echo 'action = iptables-allports[name=ASTERISK, protocol=all]' >> $asterisk_file
-echo '#sendmail-whois[name=Asterisk, dest=you@example.com, sender=fail2ban@example.com]' >> $asterisk_file
-echo 'logpath = /var/log/asterisk/messages' >> $asterisk_file
-echo 'maxretry = 5' >> $asterisk_file
-echo 'bantime = 86400' >> $asterisk_file
-
-sudo systemctl enable firewalld
-sudo systemctl start firewalld
-sudo systemctl enable fail2ban
-sudo systemctl start fail2ban
-
 sudo chown -R nobody:nobody $webroot/
 
 echo -e "\033[32mCreate Cloud PBX API successful!\033[m"
