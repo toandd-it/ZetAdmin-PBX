@@ -35,7 +35,7 @@ if(file_exists($debugFile))
     {
         if(rename($debugFile, '/var/lib/asterisk/agi-bin/debug-'.date('Y_m_d_H_i_s', filemtime($debugFile)).'-to-'.date('Y_m_d_H_i_s', time()).'.txt'))
         {
-	    file_put_contents($debugFile, $msgDebug, FILE_APPEND | LOCK_EX);
+	        file_put_contents($debugFile, $msgDebug, FILE_APPEND | LOCK_EX);
         }
     }
     else
