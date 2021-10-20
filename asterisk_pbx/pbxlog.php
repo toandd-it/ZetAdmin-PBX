@@ -43,6 +43,7 @@ else
 		}
 		else
 		{
+			$app->cdrSave($res);
 			if(isset($res['Event']) && in_array($res['Event'], $eventsAllow) && !empty($res['Channel']))
 			{
 				/*call Event*/
