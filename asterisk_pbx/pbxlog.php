@@ -50,13 +50,8 @@ else
 				$_mgid = (string)new \MongoDB\BSON\ObjectID;
 				$dataFind = ['_id' => $res['Channel']];
 
-				$dataInsert = $res;
-				$dataInsert['_id'] = (string)$res['Channel'];
-				$dataInsert['id'] = $_mgid;
-				$dataInsert['t_create'] = microtime(true);
-				$dataInsert['t_ring'] = 0;
-				$dataInsert['t_up'] = 0;
-				$dataInsert['t_hangup'] = 0;
+				//$dataInsert = $res;
+				$dataInsert = array('_id' => (string)$res['Channel'], 't_create' => microtime(true), 't_ring' => 0, 't_up' => 0, 't_hangup' => 0);
 
 				$insertChannel = $mgdb->insert($db_collection, $dataInsert);
 				if($insertChannel['status'] == false)
