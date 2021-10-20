@@ -48,10 +48,9 @@ if(isset($_POST['action']) && !empty($_POST['action']) && !empty($_POST['api_id'
     {
         include_once $filename;
     }
-    
+    $app = new PbxApi();
     if($_POST['api_key'] == $api_key && $api_id == $_POST['api_id'])
     {
-        $app = new PbxApi();
         $ip = $app->ip();
         $_langLoad = $app->_langLoad();
         
@@ -110,6 +109,6 @@ else
 		'msg' => 'Forbidden, API Action does not exist!',
 		'time' => time()
 	);
-	$app->returnDataJson( $returnData );
+	return json_encode($returnData);
 }
 ?>
