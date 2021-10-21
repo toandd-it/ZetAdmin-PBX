@@ -7,7 +7,7 @@ $timeStart = microtime(true);
 ob_start();
 session_start();
 
-$dir_root = explode('/'.basename($_SERVER['SCRIPT_FILENAME']), $_SERVER['SCRIPT_NAME'])[0];
+$dir_root = explode('/'.basename($_SERVER['SCRIPT_FILENAME']), $_SERVER['SCRIPT_FILENAME'])[0];
 
 include $dir_root.'/config.php';
 include $dir_root.'/lib/class.action.php';

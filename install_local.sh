@@ -301,6 +301,7 @@ touch index.html
 echo 'pageok!' >> index.html
 cd ~
 sudo systemctl restart lsws.service
+ln -s /usr/local/lsws/lsphp73/bin/php /usr/bin/php
 echo -e "\033[32mCreate VirtualHost successful!\033[m"
 echo " "
 
@@ -429,9 +430,10 @@ sudo cp -pf $webroot/api/asterisk_pbx/phpagi.php $agibin_dir/phpagi.php
 sudo cp -pf $webroot/api/asterisk_pbx/phpagi-asmanager.php $agibin_dir/phpagi-asmanager.php
 sudo cp -pf $webroot/api/asterisk_pbx/phpagi-fastagi.php $agibin_dir/phpagi-fastagi.php
 sudo cp -pf $webroot/api/asterisk_pbx/lib/class.mongodb.php $agibin_dir/class.mongodb.php
+sudo cp -pf $webroot/api/asterisk_pbx/lib/class.action.php $agibin_dir/class.action.php
 sudo cp -pf $webroot/api/asterisk_pbx/config.php $agibin_dir/config.php
 
-sudo chmod 755 $agibin_dir/*.php
+sudo chmod 777 $agibin_dir/*.php
 sudo chown -R asterisk:asterisk $asterisk_etc/phpagi.conf
 sudo systemctl restart asterisk
 
