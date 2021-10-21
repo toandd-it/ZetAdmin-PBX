@@ -153,7 +153,7 @@ sudo systemctl start asterisk
 /sbin/chkconfig asterisk on
 
 sudo firewall-cmd --zone=public --permanent --add-service={sip,sips}
-sudo firewall-cmd --zone=public --permanent --add-service=8089
+sudo firewall-cmd --zone=public --permanent --add-service=8089/tcp
 sudo firewall-cmd --zone=public --permanent --add-port=10000-20000/udp
 sudo firewall-cmd --zone=public --permanent --add-service={http,https}
 sudo firewall-cmd --reload
