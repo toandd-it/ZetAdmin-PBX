@@ -1,5 +1,4 @@
 <?php
-
 /**
 * phpagi.php : PHP AGI Functions for Asterisk
 * Website: http://phpagi.sourceforge.net/
@@ -186,7 +185,7 @@ class AGI
 
         // read the request
         $str = fgets($this->in);
-        while($str != "\n")
+        while(!empty($str) && $str != "\n")
         {
           $this->request[substr($str, 0, strpos($str, ':'))] = trim(substr($str, strpos($str, ':') + 1));
           $str = fgets($this->in);
@@ -1690,15 +1689,21 @@ class AGI
     function which($cmd, $checkpath=NULL)
     {
         global $_ENV;
-        $chpath = is_null($checkpath) ? $_ENV['PATH'] : $checkpath;
+		if(isset($_ENV['PATH']))
+		{
+			$chpath = is_null($checkpath) ? $_ENV['PATH'] : $checkpath;
+		}
+		else
+		{
+			$chpath = $checkpath;
+		}
 
         foreach(explode(':', $chpath) as $path)
           if(is_executable("$path/$cmd"))
             return "$path/$cmd";
 
         if(is_null($checkpath))
-          return $this->which($cmd, '/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:'.
-                                            '/usr/X11R6/bin:/usr/local/apache/bin:/usr/local/mysql/bin');
+          return $this->which($cmd, '/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:'.'/usr/X11R6/bin:/usr/local/lsws/bin:/usr/local/mysql/bin');
         return false;
     }
 
