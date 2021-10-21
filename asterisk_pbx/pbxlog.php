@@ -55,7 +55,6 @@ else
 					
 					$dataInsert = array(
 						'_id' => (string)$res['Channel'], 
-						'id' => (string)$_mgid,
 						'CallerIDNum' => (string)$res['CallerIDNum'],
 						'Exten' => (string)$res['Exten'],
 						'Context' => (string)$res['Context'],
