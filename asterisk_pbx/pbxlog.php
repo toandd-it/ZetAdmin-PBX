@@ -45,7 +45,7 @@ else
 		{
 			//$res = json_decode(json_encode($res), true);
 			
-			if(isset($res['Event']) && isset($res['Exten']) && in_array($res['Event'], $eventsAllow) && !empty($res['Channel']) && $res['Exten'] != 's')
+			if(isset($res['Event']) && isset($res['Exten']) && in_array($res['Event'], $eventsAllow) && !empty($res['Channel']))
 			{
 				/*call Event*/
 				$dataFind = ['_id' => $res['Channel']];
@@ -70,7 +70,7 @@ else
 
 				if($res['Event'] == 'Newstate' && $res['ChannelStateDesc'] == 'Up')
 				{
-					$update = $mgdb->update($db_collection, $dataFind, ['$set' => ['t_up' => microtime(true)]], []);
+					$update = $mgdb->update($db_collection, $dataFind, ['$set' => ['t_up' => microtime(true), 'Exten' => $res['Exten']]], []);
 					if($update['status'] == false)
 					{
 						$res['t_up'] = microtime(true);
@@ -79,7 +79,7 @@ else
 				}
 				elseif($res['Event'] == 'Hangup')
 				{
-					$update = $mgdb->update($db_collection, $dataFind, ['$set' => ['t_hangup' => microtime(true)]], []);
+					$update = $mgdb->update($db_collection, $dataFind, ['$set' => ['t_hangup' => microtime(true), 'Exten' => $res['Exten']]], []);
 					if($update['status'] == false)
 					{
 						$res['t_hangup'] = microtime(true);

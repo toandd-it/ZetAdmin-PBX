@@ -4,8 +4,8 @@ if(isset($action) && isset($mgdb))
 	$_id = (string)new \MongoDB\BSON\ObjectID;
     if($action == 'Click2Call')
     {
-        $strUser = 'click2call_api';
-        $strSecret = 'click2call_api';
+        $strUser = 'zetadmin_api';
+        $strSecret = 'zetadmin_api';
         if(!empty($_POST['number']) && !empty($_POST['number']))
         {
             $ext = $_POST['exten'];
