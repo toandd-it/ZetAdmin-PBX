@@ -68,7 +68,10 @@ else
 						't_hangup' => 0
 					);
 					//$app->cdrSave($dataInsert);
-					$mgdb->insert($db_collection, $dataInsert);
+					if($res['CallerIDNum'] != $res['Exten'])
+					{
+						$mgdb->insert($db_collection, $dataInsert);
+					}
 				}
 
 				if($res['Event'] == 'Newstate' && $res['ChannelStateDesc'] == 'Up')
