@@ -20,7 +20,6 @@ if(isset($_SERVER['HTTP_USER_AGENT']))
 $_languageDefault = 'en';
 
 include("config.php");
-include_once("phpagi-asmanager.php");
 
 if(isset($_POST['action']) && !empty($_POST['action']) && !empty($_POST['api_id']) && !empty($_POST['api_key']))
 {
@@ -73,6 +72,8 @@ if(isset($_POST['action']) && !empty($_POST['action']) && !empty($_POST['api_id'
         {
             $mgdb = new MGDB_Api($db_url, $db_name);
         }
+
+        include("phpagi-asmanager.php");
 
         foreach (glob($dir_root."/action/*.php") as $actionfile)
         {
