@@ -52,7 +52,10 @@ else
 				if($res['Event'] == 'Newchannel')
 				{
 					$_mgid = (string)new \MongoDB\BSON\ObjectID;
-					
+					if(empty($res['CallerIDNum']) || $res['CallerIDNum'] == '<unknown>')
+					{
+						$res['CallerIDNum'] = explode('/', explode('-', $res['Channel'])[0])[0];
+					}
 					$dataInsert = array(
 						'_id' => (string)$res['Channel'], 
 						'CallerIDNum' => (string)$res['CallerIDNum'],
