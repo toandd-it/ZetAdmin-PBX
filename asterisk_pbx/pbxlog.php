@@ -61,7 +61,6 @@ else
 						'Context' => (string)$res['Context'],
 						'ConnectedLineNum' => (string)$res['ConnectedLineNum'],
 						'ConnectedLineName' => (string)$res['ConnectedLineName'],
-						'Language' => (string)$res['Language'],
 						't_create' => microtime(true),  
 						't_up' => 0, 
 						't_hangup' => 0
