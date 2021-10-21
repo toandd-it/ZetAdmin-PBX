@@ -377,6 +377,13 @@ echo 'deny=0.0.0.0/0.0.0.0' >> $asterisk_etc/manager_api.conf
 echo 'permit=127.0.0.1/255.255.255.0' >> $asterisk_etc/manager_api.conf
 echo 'read = system,call,log,verbose,agent,user,config,dtmf,reporting,cdr,dialplan' >> $asterisk_etc/manager_api.conf
 echo 'write = system,call,agent,user,config,command,reporting,originate,message' >> $asterisk_etc/manager_api.conf
+echo ''
+echo '[phpagi]' >> $asterisk_etc/manager_api.conf
+echo 'secret = phpagi' >> $asterisk_etc/manager_api.conf
+echo 'deny=0.0.0.0/0.0.0.0' >> $asterisk_etc/manager_api.conf
+echo 'permit=127.0.0.1/255.255.255.0' >> $asterisk_etc/manager_api.conf
+echo 'read = system,call,log,verbose,agent,user,config,dtmf,reporting,cdr,dialplan' >> $asterisk_etc/manager_api.conf
+echo 'write = system,call,agent,user,config,command,reporting,originate,message' >> $asterisk_etc/manager_api.conf
 sudo chmod 777 $asterisk_etc/manager_api.conf
 
 sleep 0.5

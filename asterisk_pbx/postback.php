@@ -109,6 +109,6 @@ else
 		'msg' => 'Forbidden, API Action does not exist!',
 		'time' => time()
 	);
-	return json_encode($returnData);
+	echo json_encode($returnData);
 }
 ?>
