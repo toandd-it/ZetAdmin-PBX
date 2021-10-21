@@ -4,12 +4,13 @@ error_reporting(E_ALL);
 ini_set('display_errors', 'Off');
 
 require_once 'config.php';
+require_once 'class.action.php';
 require_once 'class.mongodb.php';
 require_once 'phpagi.php';
-
+$app = new PbxApi();
 $mgdb = new MGDB_Api($db_url, $db_name);
 $agi = new AGI();
-$data = $agi->get_variable();
+//$data = $agi->get_variable();
 $_id = (string)new \MongoDB\BSON\ObjectID;
 
 //Start debug
@@ -26,7 +27,7 @@ function array2String($data=[])
     }
     return rtrim($msgDebug, ', ');
 }
-$msgDebug = array2String($data);
+$msgDebug = array2String($agi);
 $maxSize = 10485760; //10M
 if(file_exists($debugFile))
 {
@@ -51,12 +52,12 @@ else
 
 //$callerid = $agi->get_variable("CALLERID(name)");
 $timenow = strtotime('now');
-$agi_callerid = preg_replace("#[^0-9]#", "", $agi->request[agi_callerid]);
-$agi_calleridname = $agi->request[agi_calleridname];
-$agi_channel = $agi->request[agi_channel];
-$agi_context = $agi->request[agi_context];
-$agi_extension = $agi->request[agi_extension];
-$agi_uniqueid = $agi->request[agi_uniqueid]; 
+//$agi_callerid = preg_replace("#[^0-9]#", "", $agi->request[agi_callerid]);
+//$agi_calleridname = $agi->request[agi_calleridname];
+//$agi_channel = $agi->request[agi_channel];
+//$agi_context = $agi->request[agi_context];
+//$agi_extension = $agi->request[agi_extension];
+//$agi_uniqueid = $agi->request[agi_uniqueid]; 
 
 //type: internal / outbound / inbound
 $agi->set_variable('type', '');
@@ -71,4 +72,5 @@ $agi->set_variable('log-id', $_id);
 //request
 //get_variable
 //set_variable
+$app->errorSave();
 ?>
