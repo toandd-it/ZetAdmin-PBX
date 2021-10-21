@@ -45,17 +45,17 @@ else
 		{
 			//$res = json_decode(json_encode($res), true);
 			
-			if(isset($res['Event']) && isset($res['Exten']) && in_array($res['Event'], $eventsAllow) && !empty($res['Channel']))
+			if(isset($res['Event']) && isset($res['Exten']) && in_array($res['Event'], $eventsAllow) && !empty($res['Channel']) && $res['Exten'] != 's')
 			{
 				/*call Event*/
 				$dataFind = ['_id' => $res['Channel']];
 				if($res['Event'] == 'Newchannel')
 				{
 					$_mgid = (string)new \MongoDB\BSON\ObjectID;
-					if(empty($res['CallerIDNum']) || $res['CallerIDNum'] == '<unknown>')
-					{
-						$res['CallerIDNum'] = explode('/', explode('-', $res['Channel'])[0])[1];
-					}
+					//if(empty($res['CallerIDNum']) || $res['CallerIDNum'] == '<unknown>')
+					//{
+						//$res['CallerIDNum'] = explode('/', explode('-', $res['Channel'])[0])[1];
+					//}
 					$dataInsert = array(
 						'_id' => (string)$res['Channel'], 
 						'CallerIDNum' => (string)$res['CallerIDNum'],
