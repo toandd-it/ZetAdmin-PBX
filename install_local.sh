@@ -380,16 +380,6 @@ echo ';pjsip_api.conf' >> $asterisk_etc/pjsip_api.conf
 echo '#include pjsip_api.conf' >> $asterisk_etc/pjsip.conf
 sudo chmod 777 $asterisk_etc/pjsip_api.conf
 
-sudo touch $asterisk_etc/sip_trunk_api.conf
-echo ';sip_trunk_api.conf' >> $asterisk_etc/sip_trunk_api.conf
-echo '#include sip_trunk_api.conf' >> $asterisk_etc/sip.conf
-sudo chmod 777 $asterisk_etc/sip_trunk_api.conf
-
-sudo touch $asterisk_etc/sip_account_api.conf
-echo ';sip_account_api.conf' >> $asterisk_etc/sip_account_api.conf
-echo '#include sip_account_api.conf' >> $asterisk_etc/sip.conf
-sudo chmod 777 $asterisk_etc/sip_account_api.conf
-
 sudo touch $asterisk_etc/queues_api.conf
 echo ';queues_api.conf' >> $asterisk_etc/queues_api.conf
 echo '#include queues_api.conf' >> $asterisk_etc/queues.conf
@@ -422,6 +412,11 @@ sudo touch $asterisk_etc/pjsip_account.conf
 echo ';pjsip_account.conf' >> $asterisk_etc/pjsip_account.conf
 echo '#include pjsip_account.conf' >> $asterisk_etc/pjsip.conf
 sudo chmod 777 $asterisk_etc/pjsip_account.conf
+
+sudo touch $asterisk_etc/pjsip_trunk.conf
+echo ';pjsip_trunk.conf' >> $asterisk_etc/pjsip_trunk.conf
+echo '#include pjsip_trunk.conf' >> $asterisk_etc/pjsip.conf
+sudo chmod 777 $asterisk_etc/pjsip_trunk.conf
 
 agibin_dir=/var/lib/asterisk/agi-bin
 sudo mv $webroot/api/asterisk_pbx/phpagi.conf $asterisk_etc/phpagi.conf
