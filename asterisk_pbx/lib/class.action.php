@@ -815,6 +815,7 @@ class PbxApi
 			{
 				$msg .= "".ucfirst($name).": ".$value." | ";
 			}
+			$msg = rtrim($msg, ' | ');
 			$maxSize = 10485760; //10M
 			$logFile = $dir_root.'/logs/cdr.txt';
 			if(file_exists($logFile))
