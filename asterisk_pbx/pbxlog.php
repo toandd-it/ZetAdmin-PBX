@@ -29,7 +29,7 @@ else
 	fputs($socket, "Secret: zetadmin_api\r\n\r\n");
 	
 	$res = [];
-	$eventsAllow = ['Newstate', 'Hangup']; 
+	$eventsAllow = ['Newstate', 'Newchannel', 'Hangup']; 
 	$ChannelStateDescAllow = ['Ring', 'Up']; 
 	while(($buffer = fgets($socket, 4096)) !== false)
 	{ 
@@ -43,44 +43,53 @@ else
 		}
 		else
 		{
-			$app->cdrSave($res);
-			if(isset($res['Event']) && in_array($res['Event'], $eventsAllow) && !empty($res['Channel']))
+			//$res = json_decode(json_encode($res), true);
+			
+			if(isset($res['Event']) && isset($res['Exten']) && in_array($res['Event'], $eventsAllow) && !empty($res['Channel']) && $res['Exten'] != 's')
 			{
 				/*call Event*/
-				$_mgid = (string)new \MongoDB\BSON\ObjectID;
 				$dataFind = ['_id' => $res['Channel']];
-
-				//$dataInsert = $res;
-				$dataInsert = array('_id' => (string)$res['Channel'], 't_create' => microtime(true), 't_ring' => 0, 't_up' => 0, 't_hangup' => 0);
-
-				$insertChannel = $mgdb->insert($db_collection, $dataInsert);
-				if($insertChannel['status'] == false)
+				if($res['Event'] == 'Newchannel')
 				{
-					if($res['Event'] == 'Newstate' && $res['ChannelStateDesc'] == 'Ring')
+					$_mgid = (string)new \MongoDB\BSON\ObjectID;
+					
+					$dataInsert = array(
+						'_id' => (string)$res['Channel'], 
+						'id' => (string)$_mgid,
+						'CallerIDNum' => (string)$res['CallerIDNum'],
+						'Exten' => (string)$res['Exten'],
+						'Context' => (string)$res['Context'],
+						'ConnectedLineNum' => (string)$res['ConnectedLineNum'],
+						'ConnectedLineName' => (string)$res['ConnectedLineName'],
+						'Language' => (string)$res['Language'],
+						't_create' => microtime(true), 
+						't_ring' => 0, 
+						't_up' => 0, 
+						't_hangup' => 0
+					);
+					//$app->cdrSave($dataInsert);
+					$mgdb->insert($db_collection, $dataInsert);
+				}
+
+				if($res['Event'] == 'Newstate' && $res['ChannelStateDesc'] == 'Up')
+				{
+					$update = $mgdb->update($db_collection, $dataFind, ['$set' => ['t_up' => microtime(true)]], []);
+					if($update['status'] == false)
 					{
-						$update = $mgdb->update($db_collection, $dataFind, ['t_ring' => microtime(true)], []);
-						if($update['status'] == false)
-						{
-							$app->cdrSave($res);
-						}
-					}
-					elseif($res['Event'] == 'Newstate' && $res['ChannelStateDesc'] == 'Up')
-					{
-						$update = $mgdb->update($db_collection, $dataFind, ['t_up' => microtime(true)], []);
-						if($update['status'] == false)
-						{
-							$app->cdrSave($res);
-						}
-					}
-					elseif($res['Event'] == 'Hangup')
-					{
-						$update = $mgdb->update($db_collection, $dataFind, ['t_hangup' => microtime(true)], []);
-						if($update['status'] == false)
-						{
-							$app->cdrSave($res);
-						}
+						$res['t_up'] = microtime(true);
+						$app->cdrSave($res);
 					}
 				}
+				elseif($res['Event'] == 'Hangup')
+				{
+					$update = $mgdb->update($db_collection, $dataFind, ['$set' => ['t_hangup' => microtime(true)]], []);
+					if($update['status'] == false)
+					{
+						$res['t_hangup'] = microtime(true);
+						$app->cdrSave($res);
+					}
+				}
+				$app->cdrSave($res);
 			}
 			else
 			{

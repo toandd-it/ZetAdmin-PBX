@@ -19,6 +19,7 @@ sudo systemctl stop pbxlog.service
 sudo systemctl disable pbxlog.service
 sudo rm -rf /usr/lib/systemd/system/pbxlog.service
 sudo rm -rf /etc/fail2ban/jail.d/asterisk.local
+sudo yum -y remove fail2ban
 
 sudo systemctl stop lsws.service
 sudo systemctl disable lsws.service
