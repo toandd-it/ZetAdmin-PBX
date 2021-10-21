@@ -54,7 +54,7 @@ else
 					$_mgid = (string)new \MongoDB\BSON\ObjectID;
 					if(empty($res['CallerIDNum']) || $res['CallerIDNum'] == '<unknown>')
 					{
-						$res['CallerIDNum'] = explode('/', explode('-', $res['Channel'])[0])[0];
+						$res['CallerIDNum'] = explode('/', explode('-', $res['Channel'])[0])[1];
 					}
 					$dataInsert = array(
 						'_id' => (string)$res['Channel'], 
