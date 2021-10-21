@@ -13,7 +13,14 @@ class PbxApi
 		}
 		else
 		{
-			$ip_address = $_SERVER['REMOTE_ADDR'];
+			if(isset($_SERVER['REMOTE_ADDR']))
+			{
+				$ip_address = $_SERVER['REMOTE_ADDR'];
+			}
+			else
+			{
+				$ip_address = 'localhost';
+			}
 		}
 		return $ip_address;
 	}
