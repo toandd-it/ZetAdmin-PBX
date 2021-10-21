@@ -62,8 +62,7 @@ else
 						'ConnectedLineNum' => (string)$res['ConnectedLineNum'],
 						'ConnectedLineName' => (string)$res['ConnectedLineName'],
 						'Language' => (string)$res['Language'],
-						't_create' => microtime(true), 
-						't_ring' => 0, 
+						't_create' => microtime(true),  
 						't_up' => 0, 
 						't_hangup' => 0
 					);
