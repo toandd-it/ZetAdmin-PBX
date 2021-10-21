@@ -407,8 +407,9 @@ echo 'servername='$pbx_domain'' >> $asterisk_etc/http.conf
 echo 'enabled=yes' >> $asterisk_etc/http.conf
 echo 'tlsenable=yes' >> $asterisk_etc/http.conf
 echo 'tlsbindaddr=0.0.0.0:8089' >> $asterisk_etc/http.conf
-echo 'tlscertfile=/etc/letsencrypt/live/'$pbx_domain'/fullchain.pem' >> $asterisk_etc/http.conf
-echo 'tlsprivatekey=/etc/letsencrypt/live/'$pbx_domain'/privkey.pem' >> $asterisk_etc/http.conf
+echo 'tlscertfile=/etc/asterisk/keys/asterisk.pem' >> $asterisk_etc/http.conf
+echo ';tlscertfile=/etc/letsencrypt/live/'$pbx_domain'/fullchain.pem' >> $asterisk_etc/http.conf
+echo ';tlsprivatekey=/etc/letsencrypt/live/'$pbx_domain'/privkey.pem' >> $asterisk_etc/http.conf
 sudo chown -R asterisk:asterisk $asterisk_etc/http.conf
 #sudo systemctl restart asterisk
 
