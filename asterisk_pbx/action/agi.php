@@ -448,7 +448,7 @@ if(isset($action) && isset($mgdb))
 			$asm = new AGI_AsteriskManager();
 		  	if($asm->connect())
 			{
-				$result = $asm->Command("sip reload");
+				$result = $asm->Command("PJSIP reload");
 				$status = true;
 				$msg	= $app->_lang('msg_006');
 		  	} 
