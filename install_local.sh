@@ -1,7 +1,7 @@
 #!/bin/sh
 echo ""
 echo "+-----------------------------------------------------------------------+"
-echo "|  Install Cloud PBX API vs Asterisk 18 on Centos 7                     |"
+echo "|  Install Cloud PBX API vs Asterisk 13 on Centos 7                     |"
 echo "|  Database: MongoDB 4.4                                                |"
 echo "|  PHP: 7.3                                                             |"
 echo "|  By ZetAdmin Framework                                                |"
@@ -127,7 +127,7 @@ echo "+------------------------------------+"
 echo " "
 
 cd /usr/src/
-wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-18-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-13-current.tar.gz
 tar xvfz asterisk-18-current.tar.gz
 cd asterisk-18*/
 ./configure --libdir=/usr/lib64
@@ -358,6 +358,14 @@ echo 'permit=127.0.0.1/255.255.255.0' >> $asterisk_etc/manager_api.conf
 echo 'read = system,call,log,verbose,agent,user,config,dtmf,reporting,cdr,dialplan' >> $asterisk_etc/manager_api.conf
 echo 'write = system,call,agent,user,config,command,reporting,originate,message' >> $asterisk_etc/manager_api.conf
 sudo chmod 777 $asterisk_etc/manager_api.conf
+echo ''
+echo '[auto_call_api]' >> $asterisk_etc/manager_api.conf
+echo 'secret = auto_call_api' >> $asterisk_etc/manager_api.conf
+echo 'deny=0.0.0.0/0.0.0.0' >> $asterisk_etc/manager_api.conf
+echo 'permit=127.0.0.1/255.255.255.0' >> $asterisk_etc/manager_api.conf
+echo 'read = system,call,log,verbose,agent,user,config,dtmf,reporting,cdr,dialplan' >> $asterisk_etc/manager_api.conf
+echo 'write = system,call,agent,user,config,command,reporting,originate,message' >> $asterisk_etc/manager_api.conf
+sudo chmod 777 $asterisk_etc/manager_api.conf
 
 sleep 0.5
 
@@ -375,20 +383,20 @@ echo ';extensions_api.conf' >> $asterisk_etc/extensions_api.conf
 echo '#include extensions_api.conf' >> $asterisk_etc/extensions.conf
 sudo chmod 777 $asterisk_etc/extensions_api.conf
 
-sudo touch $asterisk_etc/pjsip_api.conf
-echo ';pjsip_api.conf' >> $asterisk_etc/pjsip_api.conf
-echo '#include pjsip_api.conf' >> $asterisk_etc/pjsip.conf
-sudo chmod 777 $asterisk_etc/pjsip_api.conf
+#sudo touch $asterisk_etc/pjsip_api.conf
+#echo ';pjsip_api.conf' >> $asterisk_etc/pjsip_api.conf
+#echo '#include pjsip_api.conf' >> $asterisk_etc/pjsip.conf
+#sudo chmod 777 $asterisk_etc/pjsip_api.conf
 
 sudo touch $asterisk_etc/queues_api.conf
 echo ';queues_api.conf' >> $asterisk_etc/queues_api.conf
 echo '#include queues_api.conf' >> $asterisk_etc/queues.conf
 sudo chmod 777 $asterisk_etc/queues_api.conf
 
-sudo touch $asterisk_etc/voicemail_api.conf
-echo ';voicemail_api.conf' >> $asterisk_etc/voicemail_api.conf
-echo '#include voicemail_api.conf' >> $asterisk_etc/voicemail.conf
-sudo chmod 777 $asterisk_etc/voicemail_api.conf
+#sudo touch $asterisk_etc/voicemail_api.conf
+#echo ';voicemail_api.conf' >> $asterisk_etc/voicemail_api.conf
+#echo '#include voicemail_api.conf' >> $asterisk_etc/voicemail.conf
+#sudo chmod 777 $asterisk_etc/voicemail_api.conf
 
 rm -rf $asterisk_etc/http.conf
 sudo touch $asterisk_etc/http.conf
@@ -403,20 +411,20 @@ echo ';tlsprivatekey=/etc/letsencrypt/live/'$pbx_domain'/privkey.pem' >> $asteri
 sudo chown -R asterisk:asterisk $asterisk_etc/http.conf
 #sudo systemctl restart asterisk
 
-sudo touch $asterisk_etc/pjsip_conference.conf
-echo ';pjsip_conference.conf' >> $asterisk_etc/pjsip_conference.conf
-echo '#include pjsip_conference.conf' >> $asterisk_etc/pjsip.conf
-sudo chmod 777 $asterisk_etc/pjsip_conference.conf
+#sudo touch $asterisk_etc/pjsip_conference.conf
+#echo ';pjsip_conference.conf' >> $asterisk_etc/pjsip_conference.conf
+#echo '#include pjsip_conference.conf' >> $asterisk_etc/pjsip.conf
+#sudo chmod 777 $asterisk_etc/pjsip_conference.conf
 
-sudo touch $asterisk_etc/pjsip_account.conf
-echo ';pjsip_account.conf' >> $asterisk_etc/pjsip_account.conf
-echo '#include pjsip_account.conf' >> $asterisk_etc/pjsip.conf
-sudo chmod 777 $asterisk_etc/pjsip_account.conf
+sudo touch $asterisk_etc/sip_account.conf
+echo ';sip_account.conf' >> $asterisk_etc/sip_account.conf
+echo '#include sip_account.conf' >> $asterisk_etc/sip.conf
+sudo chmod 777 $asterisk_etc/sip_account.conf
 
-sudo touch $asterisk_etc/pjsip_trunk.conf
-echo ';pjsip_trunk.conf' >> $asterisk_etc/pjsip_trunk.conf
-echo '#include pjsip_trunk.conf' >> $asterisk_etc/pjsip.conf
-sudo chmod 777 $asterisk_etc/pjsip_trunk.conf
+sudo touch $asterisk_etc/sip_trunk.conf
+echo ';sip_trunk.conf' >> $asterisk_etc/sip_trunk.conf
+echo '#include sip_trunk.conf' >> $asterisk_etc/sip.conf
+sudo chmod 777 $asterisk_etc/sip_trunk.conf
 
 agibin_dir=/var/lib/asterisk/agi-bin
 sudo mv $webroot/api/asterisk_pbx/phpagi.conf $asterisk_etc/phpagi.conf
