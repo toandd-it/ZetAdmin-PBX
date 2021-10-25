@@ -331,7 +331,6 @@ api_conf=api/asterisk_pbx/config.php
 sudo touch $webroot/$api_conf
 echo '<?php' >> $webroot/$api_conf
 echo '$api_url = "https://'$pbx_domain'/api/asterisk_pbx/postback.php";' >> $webroot/$api_conf
-echo '$api_id = "'$web_api_id'";' >> $webroot/$api_conf
 echo '$api_key = "'$web_api_key'";' >> $webroot/$api_conf
 echo '$ipsAlow = []; /*exp ["ip 1", "ip 2", "ip n"]*/' >> $webroot/$api_conf
 echo ' ' >> $webroot/$api_conf
@@ -479,7 +478,6 @@ echo " Info - Webserver OpenLiteSpeed AND Cloud PBX api"
 echo " "
 echo " Webroot   : "$webroot/""
 echo " API URL   : https://"$pbx_domain"/api/asterisk_pbx/postback.php"
-echo " API ID    : "$web_api_id""
 echo " API Key   : "$web_api_key""
 echo " "
 echo "+-------------------------------------------------------------------------------+"
