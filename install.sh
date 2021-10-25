@@ -1,7 +1,7 @@
 #!/bin/sh
 echo ""
 echo "+-----------------------------------------------------------------------+"
-echo "|  Install Cloud PBX API vs Asterisk 18 on Centos 7                     |"
+echo "|  Install Cloud PBX API vs Asterisk 13 on Centos 7                     |"
 echo "|  Database: MongoDB 4.4                                                |"
 echo "|  PHP: 7.3                                                             |"
 echo "|  By ZetAdmin Framework                                                |"
@@ -376,7 +376,7 @@ echo 'deny=0.0.0.0/0.0.0.0' >> $asterisk_etc/manager_api.conf
 echo 'permit=127.0.0.1/255.255.255.0' >> $asterisk_etc/manager_api.conf
 echo 'read = system,call,log,verbose,agent,user,config,dtmf,reporting,cdr,dialplan' >> $asterisk_etc/manager_api.conf
 echo 'write = system,call,agent,user,config,command,reporting,originate,message' >> $asterisk_etc/manager_api.conf
-echo ''
+echo '' >> $asterisk_etc/manager_api.conf
 echo '[phpagi]' >> $asterisk_etc/manager_api.conf
 echo 'secret = phpagi' >> $asterisk_etc/manager_api.conf
 echo 'deny=0.0.0.0/0.0.0.0' >> $asterisk_etc/manager_api.conf
