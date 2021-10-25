@@ -122,13 +122,13 @@ sleep 0.5
 
 echo " "
 echo "+------------------------------------+"
-echo "|      Install Asterisk-18           |"
+echo "|      Install Asterisk-13           |"
 echo "+------------------------------------+"
 echo " "
 
 cd /usr/src/
 wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-13-current.tar.gz
-tar xvfz asterisk-18-current.tar.gz
+tar xvfz asterisk-13-current.tar.gz
 cd asterisk-13*/
 ./configure --libdir=/usr/lib64
 ./configure --with-jansson-bundled
