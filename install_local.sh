@@ -129,7 +129,7 @@ echo " "
 cd /usr/src/
 wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-13-current.tar.gz
 tar xvfz asterisk-18-current.tar.gz
-cd asterisk-18*/
+cd asterisk-13*/
 ./configure --libdir=/usr/lib64
 ./configure --with-jansson-bundled
 make
@@ -139,7 +139,7 @@ make config
 ldconfig 
 
 sudo mkdir /etc/asterisk/keys
-cd /usr/src/asterisk-18*/
+cd /usr/src/asterisk-13*/
 contrib/scripts/ast_tls_cert -C $pbx_domain -O "$pbx_name" -d /etc/asterisk/keys
 rm -rf /usr/src/asterisk-18-current.tar.gz
 cd ~
