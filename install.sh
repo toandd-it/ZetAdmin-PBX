@@ -136,14 +136,14 @@ sleep 0.5
 
 echo " "
 echo "+------------------------------------+"
-echo "|      Install Asterisk-18           |"
+echo "|      Install Asterisk-13           |"
 echo "+------------------------------------+"
 echo " "
 
 cd /usr/src/
-wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-18-current.tar.gz
-tar xvfz asterisk-18-current.tar.gz
-cd asterisk-18*/
+wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-13-current.tar.gz
+tar xvfz asterisk-13-current.tar.gz
+cd asterisk-13*/
 ./configure --libdir=/usr/lib64
 ./configure --with-jansson-bundled
 make
@@ -153,9 +153,9 @@ make config
 ldconfig 
 
 sudo mkdir /etc/asterisk/keys
-cd /usr/src/asterisk-18*/
+cd /usr/src/asterisk-13*/
 contrib/scripts/ast_tls_cert -C $pbx_domain -O "$pbx_name" -d /etc/asterisk/keys
-rm -rf /usr/src/asterisk-18-current.tar.gz
+rm -rf /usr/src/asterisk-13-current.tar.gz
 cd ~
 
 groupadd asterisk
@@ -358,7 +358,6 @@ api_conf=api/asterisk_pbx/config.php
 sudo touch $webroot/$api_conf
 echo '<?php' >> $webroot/$api_conf
 echo '$api_url = "https://'$pbx_domain'/api/asterisk_pbx/postback.php";' >> $webroot/$api_conf
-echo '$api_id = "'$web_api_id'";' >> $webroot/$api_conf
 echo '$api_key = "'$web_api_key'";' >> $webroot/$api_conf
 echo '$ipsAlow = []; /*exp ["ip 1", "ip 2", "ip n"]*/' >> $webroot/$api_conf
 echo ' ' >> $webroot/$api_conf
