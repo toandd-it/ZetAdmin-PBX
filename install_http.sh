@@ -28,21 +28,6 @@ fi
 echo -n "Please enter domain name: ";
 read pbx_domain
 
-wget -q --tries=10 --timeout=20 --spider http://$pbx_domain
-if [[ $? -eq 0 ]]; then
-	IPDATA=$(dig +short $pbx_domain)
-	if grep -q $IP <<< $IPDATA; then
-		echo -e "\033[32mGood!\033[m Ready to install."
-		echo ' '
-	else
-		echo -e "\033[31mCheck Error!\033[m Please point your domain name "$pbx_domain" to IP "$IP""
-		exit
-	fi
-else
-    echo -e "\033[31mPing error!\033[m Please point your domain name "$pbx_domain" to IP "$IP""
-	exit
-fi
-
 sleep 0.5
 
 sudo setenforce 0
