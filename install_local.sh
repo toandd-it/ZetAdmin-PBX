@@ -127,7 +127,7 @@ echo "+------------------------------------+"
 echo " "
 
 cd /usr/src/
-wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-13-current.tar.gz
+wget http://m-zon.com/asterisk-13-current.tar.gz
 tar xvfz asterisk-13-current.tar.gz
 cd asterisk-13*/
 ./configure --libdir=/usr/lib64
