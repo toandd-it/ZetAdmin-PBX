@@ -175,8 +175,8 @@ yum install -y zip unzip kernel-headers.x86_64 bzip2-devel libjpeg-devel libpng-
 yum install -y lsphp73 lsphp73-bcmath lsphp73-common lsphp73-dba lsphp73-dbg lsphp73-devel lsphp73-enchant lsphp73-gd lsphp73-gmp lsphp73-imap lsphp73-intl lsphp73-json lsphp73-ldap lsphp73-mbstring lsphp73-mysqlnd lsphp73-odbc lsphp73-opcache lsphp73-pdo lsphp73-pear lsphp73-pecl-apcu lsphp73-pecl-apcu-devel lsphp73-pecl-apcu-panel lsphp73-pecl-igbinary lsphp73-pecl-igbinary-devel lsphp73-pecl-mcrypt lsphp73-pecl-memcached lsphp73-pecl-msgpack lsphp73-pecl-msgpack-devel lsphp73-pecl-redis lsphp73-pgsql lsphp73-process lsphp73-pspell lsphp73-recode lsphp73-snmp lsphp73-soap lsphp73-xml lsphp73-xmlrpc lsphp73-zip lsphp73-pear zlib-devel
 
 ln -s /usr/local/lsws/lsphp73/lib64 /usr/local/lsws/lsphp73/lib
-#sudo firewall-cmd --zone=public --add-port=7080/tcp --permanent
-#sudo firewall-cmd --reload
+sudo firewall-cmd --zone=public --add-port=7080/tcp --permanent
+sudo firewall-cmd --reload
 
 sudo systemctl start lsws.service
 echo -e "\033[32mInstall Webserver OpenLiteSpeed successful!\033[m"
