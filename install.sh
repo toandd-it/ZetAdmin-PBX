@@ -497,8 +497,6 @@ echo 'logpath = /var/log/asterisk/messages' >> $asterisk_file
 echo 'maxretry = 5' >> $asterisk_file
 echo 'bantime = 86400' >> $asterisk_file
 
-sudo systemctl enable firewalld
-sudo systemctl start firewalld
 sudo systemctl enable fail2ban
 sudo systemctl start fail2ban
 

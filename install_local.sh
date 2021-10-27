@@ -39,9 +39,6 @@ sudo yum -y install gcc make gcc-c++ cpp git openssl-devel m4 autoconf automake 
 
 sleep 0.5
 
-#sudo wget http://mirror.centos.org/centos/7/os/x86_64/Packages/sox-14.4.1-7.el7.x86_64.rpm
-#sudo yum  -y install sox-14.4.1-7.el7.x86_64.rpm
-
 echo " "
 echo "+------------------------------------+"
 echo "|      Install jansson               |"
