@@ -398,23 +398,19 @@ sudo chown -R asterisk:asterisk $asterisk_etc/manager.conf
 
 sudo touch $asterisk_etc/extensions_api.conf
 echo ';extensions_api.conf' >> $asterisk_etc/extensions_api.conf
+echo '[default_za]' >> $asterisk_etc/extensions.conf
+echo 'exten => _X.,1,Answer()' >> $asterisk_etc/extensions.conf
+echo '	same => n,Dial(SIP/${EXTEN})' >> $asterisk_etc/extensions.conf
+echo '	same => n,Hangup()' >> $asterisk_etc/extensions.conf
+echo '' >> $asterisk_etc/extensions.conf
 echo '#include extensions_api.conf' >> $asterisk_etc/extensions.conf
 sudo chmod 777 $asterisk_etc/extensions_api.conf
 
-sudo touch $asterisk_etc/pjsip_api.conf
-echo ';pjsip_api.conf' >> $asterisk_etc/pjsip_api.conf
-echo '#include pjsip_api.conf' >> $asterisk_etc/pjsip.conf
-sudo chmod 777 $asterisk_etc/pjsip_api.conf
 
 sudo touch $asterisk_etc/queues_api.conf
 echo ';queues_api.conf' >> $asterisk_etc/queues_api.conf
 echo '#include queues_api.conf' >> $asterisk_etc/queues.conf
 sudo chmod 777 $asterisk_etc/queues_api.conf
-
-sudo touch $asterisk_etc/voicemail_api.conf
-echo ';voicemail_api.conf' >> $asterisk_etc/voicemail_api.conf
-echo '#include voicemail_api.conf' >> $asterisk_etc/voicemail.conf
-sudo chmod 777 $asterisk_etc/voicemail_api.conf
 
 rm -rf $asterisk_etc/http.conf
 sudo touch $asterisk_etc/http.conf
@@ -429,20 +425,15 @@ echo ';tlsprivatekey=/etc/letsencrypt/live/'$pbx_domain'/privkey.pem' >> $asteri
 sudo chown -R asterisk:asterisk $asterisk_etc/http.conf
 #sudo systemctl restart asterisk
 
-sudo touch $asterisk_etc/pjsip_conference.conf
-echo ';pjsip_conference.conf' >> $asterisk_etc/pjsip_conference.conf
-echo '#include pjsip_conference.conf' >> $asterisk_etc/pjsip.conf
-sudo chmod 777 $asterisk_etc/pjsip_conference.conf
-
-sudo touch $asterisk_etc/pjsip_account.conf
-echo ';pjsip_account.conf' >> $asterisk_etc/pjsip_account.conf
-echo '#include pjsip_account.conf' >> $asterisk_etc/pjsip.conf
-sudo chmod 777 $asterisk_etc/pjsip_account.conf
+sudo touch $asterisk_etc/sip_account.conf
+echo ';sip_account.conf' >> $asterisk_etc/sip_account.conf
+echo '#include pjsip_account.conf' >> $asterisk_etc/sip.conf
+sudo chmod 777 $asterisk_etc/sip_account.conf
 
 sudo touch $asterisk_etc/pjsip_trunk.conf
-echo ';pjsip_trunk.conf' >> $asterisk_etc/pjsip_trunk.conf
-echo '#include pjsip_trunk.conf' >> $asterisk_etc/pjsip.conf
-sudo chmod 777 $asterisk_etc/pjsip_trunk.conf
+echo ';sip_trunk.conf' >> $asterisk_etc/sip_trunk.conf
+echo '#include sip_trunk.conf' >> $asterisk_etc/sip.conf
+sudo chmod 777 $asterisk_etc/sip_trunk.conf
 
 agibin_dir=/var/lib/asterisk/agi-bin
 sudo mv $webroot/api/asterisk_pbx/phpagi.conf $asterisk_etc/phpagi.conf
@@ -487,17 +478,6 @@ sleep 0.5
 sudo yum -y install fail2ban fail2ban-systemd
 sudo cp -pf /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
 
-sudo touch /etc/fail2ban/jail.d/sshd.local && chmod +x /etc/fail2ban/jail.d/sshd.local
-
-sshd_file=/etc/fail2ban/jail.d/sshd.local
-echo '[sshd]' >> $sshd_file
-echo 'enabled = true' >> $sshd_file
-echo 'port = ssh' >> $sshd_file
-echo '#action = firewallcmd-ipset' >> $sshd_file
-echo 'logpath = %(sshd_log)s' >> $sshd_file
-echo 'maxretry = 5' >> $sshd_file
-echo 'bantime = 86400' >> $sshd_file
-
 sudo touch /etc/fail2ban/jail.d/asterisk.local && chmod +x /etc/fail2ban/jail.d/asterisk.local
 
 asterisk_file=/etc/fail2ban/jail.d/asterisk.local
@@ -528,7 +508,6 @@ echo " Info - Webserver OpenLiteSpeed AND Cloud PBX api"
 echo " "
 echo " Webroot   : "$webroot/""
 echo " API URL   : https://"$pbx_domain"/api/asterisk_pbx/postback.php"
-echo " API ID    : "$web_api_id""
 echo " API Key   : "$web_api_key""
 echo " "
 echo "+-------------------------------------------------------------------------------+"

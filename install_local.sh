@@ -98,25 +98,6 @@ rm -rf /usr/local/libsrtp/
 
 echo -e "\033[32mInstall libsrtp successful!\033[m"
 echo " "
-sleep 0.5
-echo " "
-echo "+------------------------------------+"
-echo "|      Install mongo-c-driver        |"
-echo "+------------------------------------+"
-echo " "
-
-cd /usr/src/
-wget https://github.com/mongodb/mongo-c-driver/releases/download/1.6.2/mongo-c-driver-1.6.2.tar.gz
-tar xzf mongo-c-driver-1.6.2.tar.gz
-cd mongo-c-driver-1.6.2
-./configure --disable-automatic-init-and-cleanup
-make
-sudo make install
-cd ~
-rm -rf /usr/src/mongo-c-driver-1.6.2.tar.gz
-
-echo -e "\033[32mInstall mongo-c-driver successful!\033[m"
-echo " "
 
 sleep 0.5
 
@@ -127,7 +108,7 @@ echo "+------------------------------------+"
 echo " "
 
 cd /usr/src/
-wget http://m-zon.com/asterisk-13-current.tar.gz
+wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-13-current.tar.gz
 tar xvfz asterisk-13-current.tar.gz
 cd asterisk-13*/
 ./configure --libdir=/usr/lib64
@@ -153,7 +134,6 @@ sudo systemctl start asterisk
 /sbin/chkconfig asterisk on
 
 sudo firewall-cmd --zone=public --permanent --add-service={sip,sips}
-sudo firewall-cmd --zone=public --permanent --add-service=8089/tcp
 sudo firewall-cmd --zone=public --permanent --add-port=10000-20000/udp
 sudo firewall-cmd --zone=public --permanent --add-service={http,https}
 sudo firewall-cmd --reload
@@ -325,7 +305,6 @@ echo " "
 sleep 0.5
 
 file_name=$(openssl rand -hex 16)
-web_api_id=$(openssl rand -hex 16)
 web_api_key=$(openssl rand -hex 24)
 api_conf=api/asterisk_pbx/config.php
 sudo touch $webroot/$api_conf
@@ -379,23 +358,18 @@ sudo chown -R asterisk:asterisk $asterisk_etc/manager.conf
 
 sudo touch $asterisk_etc/extensions_api.conf
 echo ';extensions_api.conf' >> $asterisk_etc/extensions_api.conf
+echo '[default_za]' >> $asterisk_etc/extensions.conf
+echo 'exten => _X.,1,Answer()' >> $asterisk_etc/extensions.conf
+echo '	same => n,Dial(SIP/${EXTEN})' >> $asterisk_etc/extensions.conf
+echo '	same => n,Hangup()' >> $asterisk_etc/extensions.conf
+echo '' >> $asterisk_etc/extensions.conf
 echo '#include extensions_api.conf' >> $asterisk_etc/extensions.conf
 sudo chmod 777 $asterisk_etc/extensions_api.conf
-
-#sudo touch $asterisk_etc/pjsip_api.conf
-#echo ';pjsip_api.conf' >> $asterisk_etc/pjsip_api.conf
-#echo '#include pjsip_api.conf' >> $asterisk_etc/pjsip.conf
-#sudo chmod 777 $asterisk_etc/pjsip_api.conf
 
 sudo touch $asterisk_etc/queues_api.conf
 echo ';queues_api.conf' >> $asterisk_etc/queues_api.conf
 echo '#include queues_api.conf' >> $asterisk_etc/queues.conf
 sudo chmod 777 $asterisk_etc/queues_api.conf
-
-#sudo touch $asterisk_etc/voicemail_api.conf
-#echo ';voicemail_api.conf' >> $asterisk_etc/voicemail_api.conf
-#echo '#include voicemail_api.conf' >> $asterisk_etc/voicemail.conf
-#sudo chmod 777 $asterisk_etc/voicemail_api.conf
 
 rm -rf $asterisk_etc/http.conf
 sudo touch $asterisk_etc/http.conf
@@ -409,11 +383,6 @@ echo ';tlscertfile=/etc/letsencrypt/live/'$pbx_domain'/fullchain.pem' >> $asteri
 echo ';tlsprivatekey=/etc/letsencrypt/live/'$pbx_domain'/privkey.pem' >> $asterisk_etc/http.conf
 sudo chown -R asterisk:asterisk $asterisk_etc/http.conf
 #sudo systemctl restart asterisk
-
-#sudo touch $asterisk_etc/pjsip_conference.conf
-#echo ';pjsip_conference.conf' >> $asterisk_etc/pjsip_conference.conf
-#echo '#include pjsip_conference.conf' >> $asterisk_etc/pjsip.conf
-#sudo chmod 777 $asterisk_etc/pjsip_conference.conf
 
 sudo touch $asterisk_etc/sip_account.conf
 echo ';sip_account.conf' >> $asterisk_etc/sip_account.conf
