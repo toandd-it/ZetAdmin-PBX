@@ -5,8 +5,6 @@ ini_set('display_errors', 'Off');
 $timeStart = microtime(true);
 
 ob_start();
-session_start();
-
 $dir_root = explode('/'.basename($_SERVER['SCRIPT_FILENAME']), $_SERVER['SCRIPT_FILENAME'])[0];
 
 include $dir_root.'/config.php';
@@ -29,7 +27,7 @@ else
 	fputs($socket, "Secret: zetadmin_api\r\n\r\n");
 	
 	$res = [];
-	$eventsAllow = ['Newstate', 'Newchannel', 'Hangup']; 
+	$eventsAllow = ['DialBegin', 'DialEnd', 'Hangup']; 
 	$ChannelStateDescAllow = ['Ring', 'Up']; 
 	while(($buffer = fgets($socket, 4096)) !== false)
 	{ 
@@ -43,40 +41,37 @@ else
 		}
 		else
 		{
-			//$res = json_decode(json_encode($res), true);
-			
-			if(isset($res['Event']) && isset($res['Exten']) && in_array($res['Event'], $eventsAllow) && !empty($res['Channel']) && $res['Exten'] != 's')
+			if(empty($res['Channel'])) { $res['Channel'] = ''; }
+			$channel = isset($res['DestChannel']) ? $res['DestChannel'] : $res['Channel'];
+			$dataFind = ['_id' => $channel];
+			if(isset($res['Event']) && in_array($res['Event'], $eventsAllow) && !empty($channel))
 			{
 				/*call Event*/
-				$dataFind = ['_id' => $res['Channel']];
-				if($res['Event'] == 'Newchannel')
+				
+				if($res['Event'] == 'DialBegin')
 				{
 					$_mgid = (string)new \MongoDB\BSON\ObjectID;
-					//if(empty($res['CallerIDNum']) || $res['CallerIDNum'] == '<unknown>')
-					//{
-						//$res['CallerIDNum'] = explode('/', explode('-', $res['Channel'])[0])[1];
-					//}
+					$dialData = explode("/", $res['DialString']);
 					$dataInsert = array(
-						'_id' => (string)$res['Channel'], 
-						'CallerIDNum' => (string)$res['CallerIDNum'],
-						'Exten' => (string)$res['Exten'],
-						'Context' => (string)$res['Context'],
-						'ConnectedLineNum' => (string)$res['ConnectedLineNum'],
-						'ConnectedLineName' => (string)$res['ConnectedLineName'],
+						'_id' => (string)$channel, 
+						'CallerIDNum' => (string)$res['DestCallerIDNum'],
+						'Exten' => (string)isset($dialData[1]) ? $dialData[1] : $dialData[0],
+						'Context' => (string)$res['DestContext'],
+						'ConnectedLineNum' => (string)$res['DestConnectedLineNum'],
+						'ConnectedLineName' => (string)$res['DestConnectedLineName'],
+						'DialString' => $res['DialString'],
+						'Trunk' => (string)isset($dialData[1]) ? $dialData[0] : '',
 						't_create' => microtime(true),  
 						't_up' => 0, 
 						't_hangup' => 0
 					);
 					//$app->cdrSave($dataInsert);
-					if($res['CallerIDNum'] != $res['Exten'])
-					{
-						$mgdb->insert($db_collection, $dataInsert);
-					}
-				}
 
-				if($res['Event'] == 'Newstate' && $res['ChannelStateDesc'] == 'Up')
+					$mgdb->insert($db_collection, $dataInsert);
+				}
+				elseif($res['Event'] == 'DialEnd')
 				{
-					$update = $mgdb->update($db_collection, $dataFind, ['$set' => ['t_up' => microtime(true), 'Exten' => $res['Exten']]], []);
+					$update = $mgdb->update($db_collection, ['_id' => $channel], ['$set' => ['t_up' => microtime(true), 'DialStatus' => $res['DialStatus']]], []);
 					if($update['status'] == false)
 					{
 						$res['t_up'] = microtime(true);
@@ -85,17 +80,18 @@ else
 				}
 				elseif($res['Event'] == 'Hangup')
 				{
-					$update = $mgdb->update($db_collection, $dataFind, ['$set' => ['t_hangup' => microtime(true), 'Exten' => $res['Exten']]], []);
+					$update = $mgdb->update($db_collection, ['_id' => $channel], ['$set' => ['t_hangup' => microtime(true), 'cause_txt' => $res['Cause-txt']]], []);
 					if($update['status'] == false)
 					{
 						$res['t_hangup'] = microtime(true);
 						$app->cdrSave($res);
 					}
 				}
-				$app->cdrSave($res);
+				//$app->cdrSave($res);
 			}
 			else
 			{
+				//$app->cdrSave($res);
 				/*other Event*/
 				// echo "<pre>";
 				// var_dump($res);
