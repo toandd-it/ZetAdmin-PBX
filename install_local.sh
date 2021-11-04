@@ -105,8 +105,8 @@ echo "+------------------------------------+"
 echo " "
 
 cd /usr/src/
-wget http://downloads.asterisk.org/pub/telephony/asterisk/asterisk-13-current.tar.gz
-tar xvfz asterisk-13-current.tar.gz
+wget https://downloads.asterisk.org/pub/telephony/asterisk/releases/asterisk-13.38.3.tar.gz
+tar xvfz asterisk-13.38.3.tar.gz
 cd asterisk-13*/
 ./configure --libdir=/usr/lib64
 ./configure --with-jansson-bundled
@@ -119,7 +119,7 @@ ldconfig
 sudo mkdir /etc/asterisk/keys
 cd /usr/src/asterisk-13*/
 contrib/scripts/ast_tls_cert -C $pbx_domain -O "$pbx_name" -d /etc/asterisk/keys
-rm -rf /usr/src/asterisk-13-current.tar.gz
+rm -rf /usr/src/asterisk-13.38.3.tar.gz
 cd ~
 
 groupadd asterisk
