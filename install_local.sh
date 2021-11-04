@@ -105,16 +105,14 @@ echo "+------------------------------------+"
 echo " "
 
 cd /usr/src/
-wget https://downloads.asterisk.org/pub/telephony/asterisk/releases/asterisk-13.38.3.tar.gz
-tar xvfz asterisk-13.38.3.tar.gz
-cd asterisk-13*/
-./configure --libdir=/usr/lib64
-./configure --with-jansson-bundled
-make
-make install
-make samples
-make config
-ldconfig 
+wget https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-16-current.tar.gz
+tar xvfz asterisk-16-current.tar.gz
+cd asterisk-16*/
+sudo ./configure --libdir=/usr/lib64
+sudo ./configure --with-jansson-bundled
+sudo make
+sudo make install
+make samples && make config && ldconfig 
 
 sudo mkdir /etc/asterisk/keys
 cd /usr/src/asterisk-13*/
@@ -126,7 +124,7 @@ groupadd asterisk
 useradd -r -d /var/lib/asterisk -g asterisk asterisk
 usermod -aG audio,dialout asterisk
 chown -R asterisk.asterisk /etc/asterisk
-chown -R asterisk.asterisk /var/{lib,log,spool}/asterisk
+chown -R asterisk.asterisk /var/{lib,log,spool,run}/asterisk
 sudo systemctl start asterisk
 /sbin/chkconfig asterisk on
 
