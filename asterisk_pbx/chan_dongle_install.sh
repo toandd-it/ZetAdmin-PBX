@@ -12,3 +12,4 @@ make
 make install
 cp chan_dongle.so /usr/lib/asterisk/modules/
 cp etc/dongle.conf /etc/asterisk
+#
