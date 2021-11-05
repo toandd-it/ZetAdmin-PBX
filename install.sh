@@ -146,11 +146,8 @@ tar xvfz asterisk-13.38.3.tar.gz
 cd asterisk-13*/
 ./configure --libdir=/usr/lib64
 ./configure --with-jansson-bundled
-make
-make install
-make samples
-make config
-ldconfig 
+make && make install
+make samples && make config && ldconfig 
 
 sudo mkdir /etc/asterisk/keys
 cd /usr/src/asterisk-13*/
