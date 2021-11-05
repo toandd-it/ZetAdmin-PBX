@@ -159,7 +159,8 @@ groupadd asterisk
 useradd -r -d /var/lib/asterisk -g asterisk asterisk
 usermod -aG audio,dialout asterisk
 chown -R asterisk.asterisk /etc/asterisk
-chown -R asterisk.asterisk /var/{lib,log,spool,run}/asterisk
+chown -R asterisk.asterisk /var/{lib,log,spool}/asterisk
+chmod 777 /run/asterisk/
 sudo systemctl start asterisk
 /sbin/chkconfig asterisk on
 
