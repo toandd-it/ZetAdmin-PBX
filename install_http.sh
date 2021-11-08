@@ -35,7 +35,8 @@ sudo sed -i 's/\(^SELINUX=\).*/\SELINUX=permissive/' /etc/selinux/config
 sudo yum -y groupinstall "Development Tools"
 sudo yum -y install epel-release
 sudo yum -y install gcc make gcc-c++ cpp git openssl-devel m4 autoconf automake vim
-
+sudo firewall-cmd --zone=public --permanent --add-service={http,https}
+sudo firewall-cmd --reload
 sleep 0.5
 
 echo " "
