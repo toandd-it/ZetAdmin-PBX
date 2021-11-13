@@ -73,9 +73,8 @@ else
 					$dataInsert = $res;
 					$dataInsert['_id'] = (float)$_id;
 					$dataInsert['t_create'] = (float)$_id;
-					$dataInsert['t_call'] = 0;
-					$dataInsert['t_up'] = 0;
-					$dataInsert['t_end'] = 0;
+					$dataInsert['t_ring'] = 0;
+					$dataInsert['t_answer'] = 0;
 					$dataInsert['t_hangup'] = 0;
 					$dataInsert['Variable'] = [];
 
@@ -88,16 +87,10 @@ else
 					}
 				}
 				elseif($res['Event'] == 'DialBegin')
-				{
-					$dialData = explode("/", $res['DialString']);
-					$Caller = isset($res['CallerIDNum']) ? $res['CallerIDNum'] : $res['DestCallerIDNum'];
-					$Called = empty($dialData[1]) ? $dialData[0] : $dialData[1];
-					$t_up = microtime(true);
-					
+				{	
 					unset($res['Event']);
 					unset($res['Privilege']);
 					$updateData['$set'] = $res;
-					$updateData['$set']['t_up'] = $t_up;
 
 					$update = $mgdb->update($db_collection, ['_id' => (float)$_id], $updateData, []);
 					if($insert['status'] == false)
@@ -105,10 +98,6 @@ else
 						$res['Error'] = 'Update DialBegin';
 						$res['Msg'] = $insert['data']['msg'];
 						$app->cdrSave($res);
-					}
-					else
-					{
-						$resCache[$_id]['t_up'] = $t_up;
 					}
 				}
 				elseif($res['Event'] == 'AgentCalled')
@@ -135,7 +124,6 @@ else
 					unset($res['Event']);
 					unset($res['Privilege']);
 					$updateData['$set'] = $res;
-					$updateData['$set']['t_end'] = $t_end;
 					
 					$update = $mgdb->update($db_collection, ['_id' => (float)$_id], $updateData, []);
 					if($update['status'] == false)
@@ -144,10 +132,6 @@ else
 						$res['Error'] = 'Update DialEnd';
 						$res['Msg'] = $update['data']['msg'];
 						$app->cdrSave($res);
-					}
-					else
-					{
-						$resCache[$_id]['t_end'] = $t_end;
 					}
 				}
 				elseif($res['Event'] == 'AgentConnect')
@@ -190,16 +174,9 @@ else
 				elseif($res['Event'] == 'Hangup')
 				{
 					$t_hangup = microtime(true);
-					if(!empty($resCache[$_id]['t_up']))
+					if(!empty($resCache[$_id]['t_up_sub']))
 					{
-						if(!empty($resCache[$_id]['t_up_sub']))
-						{
-							$setHangup = ['$set' => ['t_hangup' => $t_hangup, 't_call' => ($t_hangup - $resCache[$_id]['t_up']), 't_call_sub' => ($t_hangup - $resCache[$_id]['t_up_sub']), 'cause_txt' => $res['Cause-txt']]];
-						}
-						else
-						{
-							$setHangup = ['$set' => ['t_hangup' => $t_hangup, 't_call' => ($t_hangup - $resCache[$_id]['t_up']), 'cause_txt' => $res['Cause-txt']]];
-						}
+						$setHangup = ['$set' => ['t_hangup' => $t_hangup, 't_call_sub' => ($t_hangup - $resCache[$_id]['t_up_sub']), 'cause_txt' => $res['Cause-txt']]];
 					}
 					else
 					{
@@ -230,6 +207,16 @@ else
 						'Value' => $res['Value'], 
 						'Time' => microtime(true)
 					];
+					
+					if($res['Variable'] == 'RINGTIME_MS')
+					{
+						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['t_ring' => (float)$res['Value']]], []);
+					}
+					
+					if($res['Variable'] == 'ANSWEREDTIME')
+					{
+						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['t_answer' => (float)$res['Value']]], []);
+					}
 
 					$update = $mgdb->update($db_collection, ['_id' => (float)$_id], $updateVariableData[$_id], []);
 					if($update['status'] == false)
