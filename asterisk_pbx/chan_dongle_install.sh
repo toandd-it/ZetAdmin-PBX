@@ -2,7 +2,7 @@
 wget http://mirror.centos.org/centos/7/os/x86_64/Packages/usb_modeswitch-2.5.1-1.el7.x86_64.rpm
 yum install -y usb_modeswitch-2.5.1-1.el7.x86_64.rpm
 
-#for asterisk 16.x
+#for asterisk 13.x
 wget https://github.com/oleg-krv/asterisk-chan-dongle/archive/asterisk13.zip
 unzip asterisk13.zip
 cd asterisk13
