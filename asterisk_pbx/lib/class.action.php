@@ -846,5 +846,40 @@ class PbxApi
 			}
 		}
 	}
+	public function callLogSave($data=[]) 
+	{
+		global $dir_root;
+
+		if(!empty($data))
+		{
+			$msg = "";
+			foreach($data as $name => $value)
+			{
+				$msg .= "".ucfirst($name).": ".$value." | ";
+			}
+			$msg = rtrim($msg, ' | ');
+			$maxSize = 10485760; //10M
+			$logFile = $dir_root.'/logs/call_log.txt';
+			if(file_exists($logFile))
+			{
+				$fileSize = filesize($logFile);
+				if($fileSize >= $maxSize)
+				{
+					if(rename($logFile, $dir_root.'/logs/call_log-'.date('Y_m_d_H_i_s', filemtime($logFile)).'-to-'.date('Y_m_d_H_i_s', time()).'.txt'))
+					{
+						file_put_contents($logFile, $msg, FILE_APPEND | LOCK_EX);
+					}
+				}
+				else
+				{
+					file_put_contents($logFile, "\n".$msg, FILE_APPEND | LOCK_EX);
+				}
+			}
+			else
+			{
+				file_put_contents($logFile, $msg, FILE_APPEND | LOCK_EX);
+			}
+		}
+	}
 }
 ?>

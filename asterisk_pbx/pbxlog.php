@@ -83,7 +83,7 @@ else
 					{
 						$res['Error'] = 'Insert Newchannel';
 						$res['Msg'] = $insert['data']['msg'];
-						$app->cdrSave($res);
+						$app->callLogSave($res);
 					}
 				}
 				elseif($res['Event'] == 'DialBegin')
@@ -97,7 +97,7 @@ else
 					{
 						$res['Error'] = 'Update DialBegin';
 						$res['Msg'] = $insert['data']['msg'];
-						$app->cdrSave($res);
+						$app->callLogSave($res);
 					}
 				}
 				elseif($res['Event'] == 'AgentCalled')
@@ -115,7 +115,7 @@ else
 						$res['t_create_sub'] = microtime(true);
 						$res['Error'] = 'Update AgentCalled';
 						$res['Msg'] = $update['data']['msg'];
-						$app->cdrSave($res);
+						$app->callLogSave($res);
 					}
 				}
 				elseif($res['Event'] == 'DialEnd')
@@ -131,7 +131,7 @@ else
 						$res['t_end'] = $t_end;
 						$res['Error'] = 'Update DialEnd';
 						$res['Msg'] = $update['data']['msg'];
-						$app->cdrSave($res);
+						$app->callLogSave($res);
 					}
 				}
 				elseif($res['Event'] == 'AgentConnect')
@@ -143,7 +143,7 @@ else
 						$res['t_up_sub'] = microtime(true);
 						$res['Error'] = 'Update AgentConnect';
 						$res['Msg'] = $update['data']['msg'];
-						$app->cdrSave($res);
+						$app->callLogSave($res);
 					}
 					else
 					{
@@ -164,7 +164,7 @@ else
 						$res['t_end_sub'] = $t_end_sub;
 						$res['Error'] = 'Update AgentComplete';
 						$res['Msg'] = $update['data']['msg'];
-						$app->cdrSave($res);
+						$app->callLogSave($res);
 					}
 					else
 					{
@@ -188,7 +188,7 @@ else
 						$res['t_hangup'] = microtime(true);
 						$res['Error'] = 'Update Hangup';
 						$res['Msg'] = $update['data']['msg'];
-						$app->cdrSave($res);
+						$app->callLogSave($res);
 					}
 					if(!empty($resCache[$_id]))
 					{
@@ -223,8 +223,15 @@ else
 					{
 						$res['Error'] = 'Update VarSet';
 						$res['Msg'] = $update['data']['msg'];
-						$app->cdrSave($res);
+						$app->callLogSave($res);
 					}
+				}
+				if(isset($res['Event']) && $res['Event'] == 'Cdr'){ 
+					$dataInsertCdr = $res;
+					$dataInsertCdr['_id'] = (float)$_id;
+					$mgdb->insert('call_cdr', $dataInsertCdr);
+					$app->cdrSave($res); 
+					$dataInsertCdr = [];
 				}
 				/* $app->cdrSave($res); */
 			}
