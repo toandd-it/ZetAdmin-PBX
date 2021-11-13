@@ -29,8 +29,9 @@ else
 	fputs($socket, "Secret: zetadmin_api\r\n\r\n");
 	
 	$res = [];
-	$eventsAllow = ['DialBegin', 'Hangup', 'DialEnd', 'QueueCallerLeave', 'AgentCalled', 'AgentConnect', 'AgentComplete']; 
+	$eventsAllow = ['Newchannel', 'DialBegin', 'Hangup', 'DialEnd', 'QueueCallerLeave', 'AgentCalled', 'AgentConnect', 'AgentComplete']; 
 	$ChannelStateDescAllow = ['Ring', 'Up']; 
+	$VariableAllow = ['SIPURI', 'SIPDOMAIN', 'SIPCALLID', 'RINGTIME_MS', 'DIALSTATUS', 'ANSWEREDTIME', 'ANSWEREDTIME_MS', 'DIALEDTIME', 'DIALEDTIME_MS', 'DIALSTATUS', 'KEYPAD'];
 	while(($buffer = fgets($socket, 4096)) !== false)
 	{ 
 		if(!empty(trim($buffer)))
@@ -65,28 +66,45 @@ else
 			if(isset($res['Event']) && in_array($res['Event'], $eventsAllow) && !empty($channel))
 			{
 				/*call Event*/
-				if($res['Event'] == 'DialBegin')
+				if($res['Event'] == 'Newchannel' && $res['Exten'] != 's')
 				{
-					$dialData = explode("/", $res['DialString']);
-					
-					$Caller = isset($res['CallerIDNum']) ? $res['CallerIDNum'] : $res['DestCallerIDNum'];
-					$Called = empty($dialData[1]) ? $dialData[0] : $dialData[1];
-					$t_up = microtime(true);
+					unset($res['Event']);
+					unset($res['Privilege']);
 					$dataInsert = $res;
 					$dataInsert['_id'] = (float)$_id;
-					$dataInsert['Caller'] = (string)$Caller;
-					$dataInsert['Called'] = (string)$Called;
-					$dataInsert['t_create'] = $_id;
+					$dataInsert['t_create'] = (float)$_id;
 					$dataInsert['t_call'] = 0;
 					$dataInsert['t_up'] = 0;
 					$dataInsert['t_end'] = 0;
 					$dataInsert['t_hangup'] = 0;
+					$dataInsert['Variable'] = [];
 
 					$insert = $mgdb->insert($db_collection, $dataInsert);
 					if($insert['status'] == false)
 					{
-						$res['Error'] = 'Insert DialBegin';
+						$res['Error'] = 'Insert Newchannel';
 						$res['Msg'] = $insert['data']['msg'];
+						$app->cdrSave($res);
+					}
+				}
+				elseif($res['Event'] == 'DialBegin')
+				{
+					$dialData = explode("/", $res['DialString']);
+					$Caller = isset($res['CallerIDNum']) ? $res['CallerIDNum'] : $res['DestCallerIDNum'];
+					$Called = empty($dialData[1]) ? $dialData[0] : $dialData[1];
+					$t_up = microtime(true);
+					
+					unset($res['Event']);
+					unset($res['Privilege']);
+					$updateData['$set'] = $res;
+					$updateData['$set']['t_up'] = $t_up;
+
+					$update = $mgdb->update($db_collection, ['_id' => (float)$_id], $updateData, []);
+					if($insert['status'] == false)
+					{
+						$res['Error'] = 'Update DialBegin';
+						$res['Msg'] = $insert['data']['msg'];
+						$app->cdrSave($res);
 					}
 					else
 					{
@@ -198,6 +216,7 @@ else
 					if(!empty($resCache[$_id]))
 					{
 						unset($resCache[$_id]);
+						unset($updateVariableData[$_id]);
 					}
 				}
 			}
@@ -205,10 +224,17 @@ else
 			{
 				if(isset($res['Event']) && isset($res['Variable']) && $res['Event'] == 'VarSet' && isset($res['Value']))
 				{
-					$update = $mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['Variable' => (string)$res['Variable'], 'Value' => (string)$res['Value']]], []);
+					$varNameUpdate = (string)$res['Variable'];
+					$updateVariableData[$_id]['$set']['Variable'][$varNameUpdate] = [
+						'Name' => $res['Variable'], 
+						'Value' => $res['Value'], 
+						'Time' => microtime(true)
+					];
+
+					$update = $mgdb->update($db_collection, ['_id' => (float)$_id], $updateVariableData[$_id], []);
 					if($update['status'] == false)
 					{
-						$res['Error'] = 'Update Keypad';
+						$res['Error'] = 'Update VarSet';
 						$res['Msg'] = $update['data']['msg'];
 						$app->cdrSave($res);
 					}
