@@ -65,9 +65,6 @@ else
 			if(isset($res['Event']) && in_array($res['Event'], $eventsAllow) && !empty($channel))
 			{
 				/*call Event*/
-				if($res(['Event'])
-				{
-				}
 				if($res['Event'] == 'DialBegin')
 				{
 					$dialData = explode("/", $res['DialString']);
