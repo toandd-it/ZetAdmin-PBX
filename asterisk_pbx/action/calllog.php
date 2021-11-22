@@ -109,7 +109,7 @@ if(isset($action) && isset($mgdb))
         else 
         {
             $status = false;
-            $msg 	= $app->_lang('msg_013');
+            $msg = $app->_lang('msg_013');
         }
 
         $insertLogs = array(

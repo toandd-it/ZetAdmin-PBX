@@ -24,21 +24,23 @@ include("config.php");
 if(isset($_POST['action']) && !empty($_POST['action']) && !empty($_POST['api_id']) && !empty($_POST['api_key']))
 {
 	$action = $_POST['action'];
+
+    $data = array();
 	if(!empty($_POST['data']))
 	{
 		$data = json_decode($_POST['data'], true);
 	}
-	else
-	{
-		$data = array();
-	}
+
+    $langCode = 'en';
     if(!empty($_POST['lang']))
     {
         $langCode = $_POST['lang'];
     }
-    else
+
+    $authorAdmin = array();
+    if(!empty($_POST['authorAdmin']))
     {
-        $langCode = 'en';
+        $authorAdmin = $_POST['authorAdmin'];
     }
     
 	$msgData = array();
