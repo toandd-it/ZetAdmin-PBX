@@ -551,7 +551,7 @@ if(isset($action) && isset($mgdb))
 	if($action == 'SipShowPeers')
 	{
 		if($api_key == $_POST['api_key'])
-		{
+		{ 
 			unset($_POST['action']);
 			unset($_POST['api_key']);
 			unset($_POST['api_id']);

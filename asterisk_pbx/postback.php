@@ -75,6 +75,18 @@ if(isset($_POST['action']) && !empty($_POST['action']) && !empty($_POST['api_id'
 
         include("phpagi-asmanager.php");
 
+        if($api_key != $_POST['api_key'])
+		{
+            $returnData = array(
+                'status' => false,
+                'action' => $action,
+                'data' => array(),
+                'msg' => $app->_lang('msg_004'),
+                'time' => time()
+            );
+            $app->returnDataJson( $returnData );
+        }
+
         foreach (glob($dir_root."/action/*.php") as $actionfile)
         {
             include $actionfile;
