@@ -2,18 +2,67 @@
 if(isset($action) && isset($mgdb))
 {
 	$_id = (string)new \MongoDB\BSON\ObjectID;
-    if($action == 'Click2Call')
+    if($action == 'AutoCalls')
     {
         $strUser = 'zetadmin_api';
         $strSecret = 'zetadmin_api';
-        if(!empty($_POST['number']) && !empty($_POST['number']))
+        if(!empty($_POST['campaign_id']) && !empty($_POST['campaign_id']))
         {
+            $ami_users = [
+                'auto_call_api', 
+                'auto_call_api_1', 
+                'auto_call_api_2', 
+                'auto_call_api_3', 
+                'auto_call_api_4', 
+                'auto_call_api_5', 
+                'auto_call_api_6', 
+                'auto_call_api_7', 
+                'auto_call_api_8', 
+                'auto_call_api_9', 
+                'auto_call_api_10', 
+                'auto_call_api_11', 
+                'auto_call_api_12', 
+                'auto_call_api_13', 
+                'auto_call_api_14',
+                'auto_call_api_15',
+                'auto_call_api_16',
+                'auto_call_api_17',
+                'auto_call_api_18',
+                'auto_call_api_19',
+                'auto_call_api_20',
+                'auto_call_api_21',
+                'auto_call_api_22',
+                'auto_call_api_23',
+                'auto_call_api_24',
+                'auto_call_api_25',
+                'auto_call_api_26',
+                'auto_call_api_27',
+                'auto_call_api_28',
+                'auto_call_api_29'
+            ];
+            $random_keyUser = array_rand($ami_users,1);
+            $strUser = $ami_users[$random_keyUser];
+            $strSecret = 'auto_call_api';
+
+            $campaign_id = $_POST['campaign_id'];
+
+            $results = $mgdb->select('call_campaigns', ['_id' => $campaign_id, 'uid' => $authorAdmin['id']]);
+            if($results['status'] == true)
+            {
+
+            }
+            else
+            {
+                $status = false;
+                $msg = '';
+            }
+
             $ext = $_POST['exten'];
             $ext = filter_var($ext, FILTER_SANITIZE_NUMBER_INT);
             $ext = preg_replace("/[^0-9,.]/", "", $ext);
 
             $strChannel = "SIP/".$ext;
-            $strContext = isset($_POST['context']) ? $_POST['context'] : "from-internal";
+            $strContext = isset($_POST['context']) ? $_POST['context'] : "az_default";
             #specify the amount of time you want to try calling the specified channel before hangin up
             $strWaitTime = 30;
             #specify the priority you wish to place on making this call

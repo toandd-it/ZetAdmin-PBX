@@ -48,7 +48,7 @@ if(isset($_POST['action']) && !empty($_POST['action']) && !empty($_POST['api_id'
         include_once $filename;
     }
     $app = new PbxApi();
-    if($_POST['api_key'] == $api_key && $api_id == $_POST['api_id'])
+    if($_POST['api_key'] == $api_key)
     {
         $ip = $app->ip();
         $_langLoad = $app->_langLoad();
@@ -74,18 +74,6 @@ if(isset($_POST['action']) && !empty($_POST['action']) && !empty($_POST['api_id'
         }
 
         include("phpagi-asmanager.php");
-
-        if($api_key != $_POST['api_key'])
-		{
-            $returnData = array(
-                'status' => false,
-                'action' => $action,
-                'data' => array(),
-                'msg' => $app->_lang('msg_004'),
-                'time' => time()
-            );
-            $app->returnDataJson( $returnData );
-        }
 
         foreach (glob($dir_root."/action/*.php") as $actionfile)
         {
