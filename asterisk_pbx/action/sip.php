@@ -76,7 +76,7 @@ if(isset($action))
                 $trunkData .= "nat=yes\n";
                 $trunkData .= "context=".$sip['context']."\n";
                 $trunkData .= "disallow=all\n";
-                $trunkData .= "allow=ulaw,alaw,g711\n\n";
+                $trunkData .= "allow=ulaw,alaw,".$sip['codec']."\n\n";
             }
         }
         $app->updateFile($trunkData, $trunk_conf);
@@ -86,11 +86,11 @@ if(isset($action))
 			'tcreate' => time(),
 			'account' => '',
 			'action' => $action,
-			'email' => '',
+			'email' => $authorAdmin['email'],
 			'ip' => $ip,
 			'uag' => $uag,
 			'detail' => $msg,
-			'uid' => $api_id,
+			'uid' => $authorAdmin['id'],
 			'module' => '',
 			'route' => '',
 			'status' => $status
@@ -137,7 +137,7 @@ if(isset($action))
                         $trunkData .= "nat=yes\n";
                         $trunkData .= "context=".$sip['context']."\n";
                         $trunkData .= "disallow=all\n";
-                        $trunkData .= "allow=ulaw,alaw,g711\n\n";
+                        $trunkData .= "allow=ulaw,alaw,".$sip['codec']."\n\n";
                     }
                 }
                 $app->updateFile($trunkData, $trunk_conf);
@@ -159,11 +159,11 @@ if(isset($action))
 			'tcreate' => time(),
 			'account' => '',
 			'action' => $action,
-			'email' => '',
+			'email' => $authorAdmin['email'],
 			'ip' => $ip,
 			'uag' => $uag,
 			'detail' => $msg,
-			'uid' => $api_id,
+			'uid' => $authorAdmin['id'],
 			'module' => '',
 			'route' => '',
 			'status' => $status
@@ -225,7 +225,7 @@ if(isset($action))
                         $trunkData .= "nat=yes\n";
                         $trunkData .= "context=".$sip['context']."\n";
                         $trunkData .= "disallow=all\n";
-                        $trunkData .= "allow=ulaw,alaw,g711\n\n";
+                        $trunkData .= "allow=ulaw,alaw,".$sip['codec']."\n\n";
                     }
                 }
                 $app->updateFile($trunkData, $trunk_conf);
@@ -246,11 +246,11 @@ if(isset($action))
 			'tcreate' => time(),
 			'account' => '',
 			'action' => $action,
-			'email' => '',
+			'email' => $authorAdmin['email'],
 			'ip' => $ip,
 			'uag' => $uag,
 			'detail' => $msg,
-			'uid' => $api_id,
+			'uid' => $authorAdmin['id'],
 			'module' => '',
 			'route' => '',
 			'status' => $status
@@ -312,7 +312,7 @@ if(isset($action))
                         $trunkData .= "nat=yes\n";
                         $trunkData .= "context=".$sip['context']."\n";
                         $trunkData .= "disallow=all\n";
-                        $trunkData .= "allow=ulaw,alaw,g711\n\n";
+                        $trunkData .= "allow=ulaw,alaw,".$sip['codec']."\n\n";
                     }
                 }
                 $app->updateFile($trunkData, $trunk_conf);
@@ -328,11 +328,11 @@ if(isset($action))
 			'tcreate' => time(),
 			'account' => '',
 			'action' => $action,
-			'email' => '',
+			'email' => $authorAdmin['email'],
 			'ip' => $ip,
 			'uag' => $uag,
 			'detail' => $msg,
-			'uid' => $api_id,
+			'uid' => $authorAdmin['id'],
 			'module' => '',
 			'route' => '',
 			'status' => $status
@@ -415,7 +415,7 @@ if(isset($action))
             if(!empty($sip['_id']))
             {
                 $lineData .= "[".$sip['_id']."]\n";
-                $lineData .= "host=dynamic\n";
+                $lineData .= "host=".$sip['host']."\n";
                 $lineData .= "type=peer\n";
                 $lineData .= "secret=".$sip['secret']."\n";
                 $lineData .= "username=".$sip['_id']."\n";
@@ -429,7 +429,7 @@ if(isset($action))
                 $lineData .= "callerid=".$sip['name']." <".$sip['_id'].">\n";
                 $lineData .= "videosupport=".$sip['videosupport']."\n";
                 $lineData .= "disallow=all\n";
-                $lineData .= "allow=ulaw,alaw,g711\n\n";
+                $lineData .= "allow=ulaw,alaw,".$sip['codec']."\n\n";
             }
         }
         $app->updateFile($lineData, $sip_account_conf);
@@ -439,11 +439,11 @@ if(isset($action))
 			'tcreate' => time(),
 			'account' => '',
 			'action' => $action,
-			'email' => '',
+			'email' => $authorAdmin['email'],
 			'ip' => $ip,
 			'uag' => $uag,
 			'detail' => $msg,
-			'uid' => $api_id,
+			'uid' => $authorAdmin['id'],
 			'module' => '',
 			'route' => '',
 			'status' => $status
@@ -481,7 +481,7 @@ if(isset($action))
                     if(!empty($sip['_id']))
                     {
                         $lineData .= "[".$sip['_id']."]\n";
-                        $lineData .= "host=dynamic\n";
+                        $lineData .= "host=".$sip['host']."\n";
                         $lineData .= "type=peer\n";
                         $lineData .= "secret=".$sip['secret']."\n";
                         $lineData .= "username=".$sip['_id']."\n";
@@ -495,7 +495,7 @@ if(isset($action))
                         $lineData .= "callerid=".$sip['name']." <".$sip['_id'].">\n";
                         $lineData .= "videosupport=".$sip['videosupport']."\n";
                         $lineData .= "disallow=all\n";
-                        $lineData .= "allow=ulaw,alaw,g711\n\n";
+                        $lineData .= "allow=ulaw,alaw,".$sip['codec']."\n\n";
                     }
                 }
                 $app->updateFile($lineData, $sip_account_conf);
@@ -517,11 +517,11 @@ if(isset($action))
 			'tcreate' => time(),
 			'account' => '',
 			'action' => $action,
-			'email' => '',
+			'email' => $authorAdmin['email'],
 			'ip' => $ip,
 			'uag' => $uag,
 			'detail' => $msg,
-			'uid' => $api_id,
+			'uid' => $authorAdmin['id'],
 			'module' => '',
 			'route' => '',
 			'status' => $status
@@ -543,6 +543,7 @@ if(isset($action))
 	{
         $id = $_POST['_id'];
         $sip_id 		= $app->formDataName($data, 'sip_id');
+        $sipHost		= $app->formDataName($data, 'host');
         $sipName		= $app->formDataName($data, 'name');
         $sipUsername	= $app->formDataName($data, 'username');
         $sipSecret 		= $app->formDataName($data, 'secret');
@@ -555,6 +556,7 @@ if(isset($action))
         $dataUpdate = array(
             '$set' => array(
                 'name' 			=> trim($sipName), 
+                'host'          => $sipHost,
                 'username'		=> $sipUsername,
                 'sip'			=> 'SIP/'.$sipUsername, 
                 'secret' 		=> $sipSecret, 
@@ -584,7 +586,7 @@ if(isset($action))
                     if(!empty($sip['_id']))
                     {
                         $lineData .= "[".$sip['_id']."]\n";
-                        $lineData .= "host=dynamic\n";
+                        $lineData .= "host=".$sip['host']."\n";
                         $lineData .= "type=peer\n";
                         $lineData .= "secret=".$sip['secret']."\n";
                         $lineData .= "username=".$sip['_id']."\n";
@@ -598,7 +600,7 @@ if(isset($action))
                         $lineData .= "callerid=".$sip['name']." <".$sip['_id'].">\n";
                         $lineData .= "videosupport=".$sip['videosupport']."\n";
                         $lineData .= "disallow=all\n";
-                        $lineData .= "allow=ulaw,alaw,g711\n\n";
+                        $lineData .= "allow=ulaw,alaw,".$sip['codec']."\n\n";
                     }
                 }
                 $app->updateFile($lineData, $sip_account_conf);
@@ -619,11 +621,11 @@ if(isset($action))
 			'tcreate' => time(),
 			'account' => '',
 			'action' => $action,
-			'email' => '',
+			'email' => $authorAdmin['email'],
 			'ip' => $ip,
 			'uag' => $uag,
 			'detail' => $msg,
-			'uid' => $api_id,
+			'uid' => $authorAdmin['id'],
 			'module' => '',
 			'route' => '',
 			'status' => $status
@@ -644,6 +646,7 @@ if(isset($action))
 	if($action == 'insertSipAccount')
 	{
         $sipName		= $app->formDataName($data, 'name');
+        $sipHost		= $app->formDataName($data, 'host');
         $sipUsername	= $app->formDataName($data, 'username');
         $sipSecret 		= $app->formDataName($data, 'secret');
         $sipTransport 	= $app->formDataArrayName($data, 'transport');
@@ -657,7 +660,7 @@ if(isset($action))
             '_id' 			=> (string)$sipUsername, 
             'name' 			=> !empty($sipName) ? trim($sipName) : 'Noname', 
             "type" 			=> 'peer', 
-            'host' 			=> 'dynamic', 
+            'host' 			=> $sipHost, 
             'sip'			=> 'SIP/'.$sipUsername, 
             'secret' 		=> $sipSecret, 
             'transport' 	=> $sipTransport, 
@@ -696,7 +699,7 @@ if(isset($action))
                     if(!empty($sip['_id']))
                     {
                         $lineData .= "[".$sip['_id']."]\n";
-                        $lineData .= "host=dynamic\n";
+                        $lineData .= "host=".$sip['host']."\n";
                         $lineData .= "type=peer\n";
                         $lineData .= "secret=".$sip['secret']."\n";
                         $lineData .= "username=".$sip['_id']."\n";
@@ -710,7 +713,7 @@ if(isset($action))
                         $lineData .= "callerid=".$sip['name']." <".$sip['_id'].">\n";
                         $lineData .= "videosupport=".$sip['videosupport']."\n";
                         $lineData .= "disallow=all\n";
-                        $lineData .= "allow=ulaw,alaw,g711\n\n";
+                        $lineData .= "allow=ulaw,alaw,".$sip['codec']."\n\n";
                     }
                 }
                 $app->updateFile($lineData, $sip_account_conf);
@@ -726,11 +729,11 @@ if(isset($action))
 			'tcreate' => time(),
 			'account' => '',
 			'action' => $action,
-			'email' => '',
+			'email' => $authorAdmin['email'],
 			'ip' => $ip,
 			'uag' => $uag,
 			'detail' => $msg,
-			'uid' => $api_id,
+			'uid' => $authorAdmin['id'],
 			'module' => '',
 			'route' => '',
 			'status' => $status
