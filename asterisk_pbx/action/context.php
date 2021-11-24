@@ -70,10 +70,116 @@ if(isset($action))
         foreach($extensions['data'] as $ext)
         {
             if(!empty($ext['context']))
-            {
-				$_AGI_text = 'callerid.php';
-                
-            }
+			{
+				if(in_array('option', $ext['config']))
+				{
+					$lineData .= "[".$ext['context']."]\n";
+					if(!empty($ext['ext_code']))
+					{
+						$lineData .= $ext['ext_code']."\n\n";
+					}
+				} 
+				else 
+				{
+					$ifInternal = '"${type}"="internal"';
+					$ifOutbound = '"${type}"="outbound"';
+					$ifInbound 	= '"${type}"="inbound"';
+					$textType 	= '${type}';
+					$textTo 	= '${to}';
+					$textLogid 	= '${logid}';
+
+					$textLookup_phone 	= '${lookup-phone}';
+					$textLog_id 		= '${log-id}';
+					$textCall_to 		= '${call-to}';
+					$textPhone 			= '${phone}';
+
+					$textExt 			= '${EXTEN}';
+					$textHead_from		= '${SIP_HEADER(From)}';
+					$textHead_cut_from	= '${CUT(CUT(SIP_HEADER(From),>,1),:,2)}';
+					$textSip_head_via 	= '${SIP_HEADER(Via)}';
+					$textExt_name 		= '${extName}';
+
+					$queueData = array();
+					if(!empty($ext['queue']))
+					{ 
+						$queueData = $mgdb->select('call_queues', array('_id' => $ext['queue']))['data'];
+					}
+
+					if(empty($ext['sip_trunk']))
+					{
+						$textSet_CallerId = 'CHANNEL(language)=en';
+						$trunkData = array();
+					} 
+					else 
+					{
+						$textSet_CallerId = 'Set(CALLERID(num)='.$ext['sip_trunk'].')';
+						$trunkData = $mgdb->select('call_sip_trunk', array('_id' => $ext['sip_trunk']));
+						$trunkData = $trunkData['data'];
+						if($trunkData['status'] == false)
+						{
+							$trunkData = array();
+						}
+					}
+
+					if(in_array('internal', $ext['config']) || in_array('inbound', $ext['config']) || in_array('outbound', $ext['config']))
+					{
+						$lineData .= "[".$ext['context']."]\n";
+						$lineData .= "exten => ".$ext['exten'].",1,".$textSet_CallerId."\n";
+						$lineData .= "    same => n,AGI(callerid.php, ".$textExt.", ".$textHead_from.", ".$textHead_cut_from.", ".$textSip_head_via.", ".$textExt_name.")\n";
+						$lineData .= "    same => n,Set(type-call=".$textType.")\n";
+						$lineData .= "    same => n,Set(call-to=".$textTo.")\n";
+						$lineData .= "    same => n,Set(log-id=".$textLogid.")\n";
+						$lineData .= "    same => n,Set(phone=".$textLookup_phone.")\n";
+						$lineData .= "    same => n,GotoIf($[".$ifInternal."]?CallInternal,1) else\n";
+						$lineData .= "    same => n,GotoIf($[".$ifOutbound."]?CallOutbound,1) else\n";
+						$lineData .= "    same => n,GotoIf($[".$ifInbound."]?CallInbound,1)\n";
+						$lineData .= "    same => n,Goto(disconnect,1)\n\n";
+
+						$lineData .= "exten => CallOutbound,1,NoOp()\n";
+						if(in_array('outbound', $ext['config']))
+						{
+							$lineData .= "    same => n,".$textSet_CallerId."\n";
+							$lineData .= "    same => n,Dial(SIP/".$textCall_to."@".$trunkData['host'].")\n";
+						}
+						$lineData .= "    same => n,Goto(disconnect,1)\n\n";
+
+						$lineData .= "exten => CallInbound,1,NoOp()\n";
+						if(in_array('inbound', $ext['config']))
+						{
+							$lineData .= "    same => n,Set(CALLERID(num)=".$textPhone.")\n";
+							if(!empty($keyPad))
+							{
+								$lineData .= "    same => n,Read(keypad,beep)\n";
+								$keypadValue = '${keypad}';
+							}
+							if(!empty($queueData))
+							{
+								$lineData .= "    same => n,Queue(".$queueData['data']['_id'].",tT,,,".$queueData['data']['timeout'].")\n";
+							}
+							if(isset($keypadValue))
+							{
+								$lineData .= "    same => n,Dial(SIP/".$keypadValue.")\n";
+							}
+							else
+							{
+								$lineData .= "    same => n,Dial(SIP/".$textCall_to.")\n";
+							}
+						}
+						$lineData .= "    same => n,Goto(disconnect,1)\n\n";
+
+						$lineData .= "exten => CallInternal,1,NoOp()\n";
+						if(in_array('internal', $ext['config']))
+						{
+							$lineData .= "    same => n,Set(CALLERID(num)=".$textPhone.")\n";
+							$lineData .= "    same => n,Dial(SIP/".$textCall_to.")\n";
+						}
+						$lineData .= "    same => n,Goto(disconnect,1)\n\n";
+
+						$lineData .= "exten => disconnect,1,NoOp()\n";
+						$lineData .= "    same => n,Hangup()\n\n"; 
+					}
+				}
+			}
         }
         $app->updateFile($lineData, $ext_conf);
         
@@ -124,7 +230,114 @@ if(isset($action))
                 {
                     if(!empty($ext['context']))
                     {
-						$_AGI_text = 'callerid.php';
+                        if(in_array('option', $ext['config']))
+                        {
+                            $lineData .= "[".$ext['context']."]\n";
+                            if(!empty($ext['ext_code']))
+                            {
+                                $lineData .= $ext['ext_code']."\n\n";
+                            }
+                        } 
+                        else 
+                        {
+                            $ifInternal = '"${type}"="internal"';
+                            $ifOutbound = '"${type}"="outbound"';
+                            $ifInbound 	= '"${type}"="inbound"';
+                            $textType 	= '${type}';
+                            $textTo 	= '${to}';
+                            $textLogid 	= '${logid}';
+
+                            $textLookup_phone 	= '${lookup-phone}';
+                            $textLog_id 		= '${log-id}';
+                            $textCall_to 		= '${call-to}';
+                            $textPhone 			= '${phone}';
+
+                            $textExt 			= '${EXTEN}';
+                            $textHead_from		= '${SIP_HEADER(From)}';
+                            $textHead_cut_from	= '${CUT(CUT(SIP_HEADER(From),>,1),:,2)}';
+                            $textSip_head_via 	= '${SIP_HEADER(Via)}';
+                            $textExt_name 		= '${extName}';
+
+                            $queueData = array();
+                            if(!empty($ext['queue']))
+                            { 
+                                $queueData = $mgdb->select('call_queues', array('_id' => $ext['queue']))['data'];
+                            }
+
+                            if(empty($ext['sip_trunk']))
+                            {
+                                $textSet_CallerId = 'CHANNEL(language)=en';
+                                $trunkData = array();
+                            } 
+                            else 
+                            {
+                                $textSet_CallerId = 'Set(CALLERID(num)='.$ext['sip_trunk'].')';
+                                $trunkData = $mgdb->select('call_sip_trunk', array('_id' => $ext['sip_trunk']));
+                                $trunkData = $trunkData['data'];
+                                if($trunkData['status'] == false)
+                                {
+                                    $trunkData = array();
+                                }
+                            }
+
+                            if(in_array('internal', $ext['config']) || in_array('inbound', $ext['config']) || in_array('outbound', $ext['config']))
+                            {
+                                $lineData .= "[".$ext['context']."]\n";
+                                $lineData .= "exten => ".$ext['exten'].",1,".$textSet_CallerId."\n";
+                                $lineData .= "    same => n,AGI(callerid.php, ".$textExt.", ".$textHead_from.", ".$textHead_cut_from.", ".$textSip_head_via.", ".$textExt_name.")\n";
+                                $lineData .= "    same => n,Set(type-call=".$textType.")\n";
+                                $lineData .= "    same => n,Set(call-to=".$textTo.")\n";
+                                $lineData .= "    same => n,Set(log-id=".$textLogid.")\n";
+                                $lineData .= "    same => n,Set(phone=".$textLookup_phone.")\n";
+                                $lineData .= "    same => n,GotoIf($[".$ifInternal."]?CallInternal,1) else\n";
+                                $lineData .= "    same => n,GotoIf($[".$ifOutbound."]?CallOutbound,1) else\n";
+                                $lineData .= "    same => n,GotoIf($[".$ifInbound."]?CallInbound,1)\n";
+                                $lineData .= "    same => n,Goto(disconnect,1)\n\n";
+
+                                $lineData .= "exten => CallOutbound,1,NoOp()\n";
+                                if(in_array('outbound', $ext['config']))
+                                {
+                                    $lineData .= "    same => n,".$textSet_CallerId."\n";
+                                    $lineData .= "    same => n,Dial(SIP/".$textCall_to."@".$trunkData['host'].")\n";
+                                }
+                                $lineData .= "    same => n,Goto(disconnect,1)\n\n";
+
+                                $lineData .= "exten => CallInbound,1,NoOp()\n";
+                                if(in_array('inbound', $ext['config']))
+                                {
+                                    $lineData .= "    same => n,Set(CALLERID(num)=".$textPhone.")\n";
+                                    if(!empty($keyPad))
+                                    {
+                                        $lineData .= "    same => n,Read(keypad,beep)\n";
+                                        $keypadValue = '${keypad}';
+                                    }
+                                    if(!empty($queueData))
+                                    {
+                                        $lineData .= "    same => n,Queue(".$queueData['data']['_id'].",tT,,,".$queueData['data']['timeout'].")\n";
+                                    }
+                                    if(isset($keypadValue))
+                                    {
+                                        $lineData .= "    same => n,Dial(SIP/".$keypadValue.")\n";
+                                    }
+                                    else
+                                    {
+                                        $lineData .= "    same => n,Dial(SIP/".$textCall_to.")\n";
+                                    }
+                                }
+                                $lineData .= "    same => n,Goto(disconnect,1)\n\n";
+
+                                $lineData .= "exten => CallInternal,1,NoOp()\n";
+                                if(in_array('internal', $ext['config']))
+                                {
+                                    $lineData .= "    same => n,Set(CALLERID(num)=".$textPhone.")\n";
+                                    $lineData .= "    same => n,Dial(SIP/".$textCall_to.")\n";
+                                }
+                                $lineData .= "    same => n,Goto(disconnect,1)\n\n";
+
+                                $lineData .= "exten => disconnect,1,NoOp()\n";
+                                $lineData .= "    same => n,Hangup()\n\n"; 
+                            }
+                        }
                     }
                 }
                 $app->updateFile($lineData, $ext_conf);
@@ -236,7 +449,114 @@ if(isset($action))
                 {
                     if(!empty($ext['context']))
                     {
-						$_AGI_text = 'callerid.php';
+                        if(in_array('option', $ext['config']))
+                        {
+                            $lineData .= "[".$ext['context']."]\n";
+                            if(!empty($ext['ext_code']))
+                            {
+                                $lineData .= $ext['ext_code']."\n\n";
+                            }
+                        } 
+                        else 
+                        {
+                            $ifInternal = '"${type}"="internal"';
+                            $ifOutbound = '"${type}"="outbound"';
+                            $ifInbound 	= '"${type}"="inbound"';
+                            $textType 	= '${type}';
+                            $textTo 	= '${to}';
+                            $textLogid 	= '${logid}';
+
+                            $textLookup_phone 	= '${lookup-phone}';
+                            $textLog_id 		= '${log-id}';
+                            $textCall_to 		= '${call-to}';
+                            $textPhone 			= '${phone}';
+
+                            $textExt 			= '${EXTEN}';
+                            $textHead_from		= '${SIP_HEADER(From)}';
+                            $textHead_cut_from	= '${CUT(CUT(SIP_HEADER(From),>,1),:,2)}';
+                            $textSip_head_via 	= '${SIP_HEADER(Via)}';
+                            $textExt_name 		= '${extName}';
+
+                            $queueData = array();
+                            if(!empty($ext['queue']))
+                            { 
+                                $queueData = $mgdb->select('call_queues', array('_id' => $ext['queue']))['data'];
+                            }
+
+                            if(empty($ext['sip_trunk']))
+                            {
+                                $textSet_CallerId = 'CHANNEL(language)=en';
+                                $trunkData = array();
+                            } 
+                            else 
+                            {
+                                $textSet_CallerId = 'Set(CALLERID(num)='.$ext['sip_trunk'].')';
+                                $trunkData = $mgdb->select('call_sip_trunk', array('_id' => $ext['sip_trunk']));
+                                $trunkData = $trunkData['data'];
+                                if($trunkData['status'] == false)
+                                {
+                                    $trunkData = array();
+                                }
+                            }
+
+                            if(in_array('internal', $ext['config']) || in_array('inbound', $ext['config']) || in_array('outbound', $ext['config']))
+                            {
+                                $lineData .= "[".$ext['context']."]\n";
+                                $lineData .= "exten => ".$ext['exten'].",1,".$textSet_CallerId."\n";
+                                $lineData .= "    same => n,AGI(callerid.php, ".$textExt.", ".$textHead_from.", ".$textHead_cut_from.", ".$textSip_head_via.", ".$textExt_name.")\n";
+                                $lineData .= "    same => n,Set(type-call=".$textType.")\n";
+                                $lineData .= "    same => n,Set(call-to=".$textTo.")\n";
+                                $lineData .= "    same => n,Set(log-id=".$textLogid.")\n";
+                                $lineData .= "    same => n,Set(phone=".$textLookup_phone.")\n";
+                                $lineData .= "    same => n,GotoIf($[".$ifInternal."]?CallInternal,1) else\n";
+                                $lineData .= "    same => n,GotoIf($[".$ifOutbound."]?CallOutbound,1) else\n";
+                                $lineData .= "    same => n,GotoIf($[".$ifInbound."]?CallInbound,1)\n";
+                                $lineData .= "    same => n,Goto(disconnect,1)\n\n";
+
+                                $lineData .= "exten => CallOutbound,1,NoOp()\n";
+                                if(in_array('outbound', $ext['config']))
+                                {
+                                    $lineData .= "    same => n,".$textSet_CallerId."\n";
+                                    $lineData .= "    same => n,Dial(SIP/".$textCall_to."@".$trunkData['host'].")\n";
+                                }
+                                $lineData .= "    same => n,Goto(disconnect,1)\n\n";
+
+                                $lineData .= "exten => CallInbound,1,NoOp()\n";
+                                if(in_array('inbound', $ext['config']))
+                                {
+                                    $lineData .= "    same => n,Set(CALLERID(num)=".$textPhone.")\n";
+                                    if(!empty($keyPad))
+                                    {
+                                        $lineData .= "    same => n,Read(keypad,beep)\n";
+                                        $keypadValue = '${keypad}';
+                                    }
+                                    if(!empty($queueData))
+                                    {
+                                        $lineData .= "    same => n,Queue(".$queueData['data']['_id'].",tT,,,".$queueData['data']['timeout'].")\n";
+                                    }
+                                    if(isset($keypadValue))
+                                    {
+                                        $lineData .= "    same => n,Dial(SIP/".$keypadValue.")\n";
+                                    }
+                                    else
+                                    {
+                                        $lineData .= "    same => n,Dial(SIP/".$textCall_to.")\n";
+                                    }
+                                }
+                                $lineData .= "    same => n,Goto(disconnect,1)\n\n";
+
+                                $lineData .= "exten => CallInternal,1,NoOp()\n";
+                                if(in_array('internal', $ext['config']))
+                                {
+                                    $lineData .= "    same => n,Set(CALLERID(num)=".$textPhone.")\n";
+                                    $lineData .= "    same => n,Dial(SIP/".$textCall_to.")\n";
+                                }
+                                $lineData .= "    same => n,Goto(disconnect,1)\n\n";
+
+                                $lineData .= "exten => disconnect,1,NoOp()\n";
+                                $lineData .= "    same => n,Hangup()\n\n"; 
+                            }
+                        }
                     }
                 }
                 $app->updateFile($lineData, $ext_conf);
@@ -338,7 +658,114 @@ if(isset($action))
                 {
                     if(!empty($ext['context']))
                     {
-						$_AGI_text = 'callerid.php';
+                        if(in_array('option', $ext['config']))
+                        {
+                            $lineData .= "[".$ext['context']."]\n";
+                            if(!empty($ext['ext_code']))
+                            {
+                                $lineData .= $ext['ext_code']."\n\n";
+                            }
+                        } 
+                        else 
+                        {
+                            $ifInternal = '"${type}"="internal"';
+                            $ifOutbound = '"${type}"="outbound"';
+                            $ifInbound 	= '"${type}"="inbound"';
+                            $textType 	= '${type}';
+                            $textTo 	= '${to}';
+                            $textLogid 	= '${logid}';
+
+                            $textLookup_phone 	= '${lookup-phone}';
+                            $textLog_id 		= '${log-id}';
+                            $textCall_to 		= '${call-to}';
+                            $textPhone 			= '${phone}';
+
+                            $textExt 			= '${EXTEN}';
+                            $textHead_from		= '${SIP_HEADER(From)}';
+                            $textHead_cut_from	= '${CUT(CUT(SIP_HEADER(From),>,1),:,2)}';
+                            $textSip_head_via 	= '${SIP_HEADER(Via)}';
+                            $textExt_name 		= '${extName}';
+
+                            $queueData = array();
+                            if(!empty($ext['queue']))
+                            { 
+                                $queueData = $mgdb->select('call_queues', array('_id' => $ext['queue']))['data'];
+                            }
+
+                            if(empty($ext['sip_trunk']))
+                            {
+                                $textSet_CallerId = 'CHANNEL(language)=en';
+                                $trunkData = array();
+                            } 
+                            else 
+                            {
+                                $textSet_CallerId = 'Set(CALLERID(num)='.$ext['sip_trunk'].')';
+                                $trunkData = $mgdb->select('call_sip_trunk', array('_id' => $ext['sip_trunk']));
+                                $trunkData = $trunkData['data'];
+                                if($trunkData['status'] == false)
+                                {
+                                    $trunkData = array();
+                                }
+                            }
+
+                            if(in_array('internal', $ext['config']) || in_array('inbound', $ext['config']) || in_array('outbound', $ext['config']))
+                            {
+                                $lineData .= "[".$ext['context']."]\n";
+                                $lineData .= "exten => ".$ext['exten'].",1,".$textSet_CallerId."\n";
+                                $lineData .= "    same => n,AGI(callerid.php, ".$textExt.", ".$textHead_from.", ".$textHead_cut_from.", ".$textSip_head_via.", ".$textExt_name.")\n";
+                                $lineData .= "    same => n,Set(type-call=".$textType.")\n";
+                                $lineData .= "    same => n,Set(call-to=".$textTo.")\n";
+                                $lineData .= "    same => n,Set(log-id=".$textLogid.")\n";
+                                $lineData .= "    same => n,Set(phone=".$textLookup_phone.")\n";
+                                $lineData .= "    same => n,GotoIf($[".$ifInternal."]?CallInternal,1) else\n";
+                                $lineData .= "    same => n,GotoIf($[".$ifOutbound."]?CallOutbound,1) else\n";
+                                $lineData .= "    same => n,GotoIf($[".$ifInbound."]?CallInbound,1)\n";
+                                $lineData .= "    same => n,Goto(disconnect,1)\n\n";
+
+                                $lineData .= "exten => CallOutbound,1,NoOp()\n";
+                                if(in_array('outbound', $ext['config']))
+                                {
+                                    $lineData .= "    same => n,".$textSet_CallerId."\n";
+                                    $lineData .= "    same => n,Dial(SIP/".$textCall_to."@".$trunkData['host'].")\n";
+                                }
+                                $lineData .= "    same => n,Goto(disconnect,1)\n\n";
+
+                                $lineData .= "exten => CallInbound,1,NoOp()\n";
+                                if(in_array('inbound', $ext['config']))
+                                {
+                                    $lineData .= "    same => n,Set(CALLERID(num)=".$textPhone.")\n";
+                                    if(!empty($keyPad))
+                                    {
+                                        $lineData .= "    same => n,Read(keypad,beep)\n";
+                                        $keypadValue = '${keypad}';
+                                    }
+                                    if(!empty($queueData))
+                                    {
+                                        $lineData .= "    same => n,Queue(".$queueData['data']['_id'].",tT,,,".$queueData['data']['timeout'].")\n";
+                                    }
+                                    if(isset($keypadValue))
+                                    {
+                                        $lineData .= "    same => n,Dial(SIP/".$keypadValue.")\n";
+                                    }
+                                    else
+                                    {
+                                        $lineData .= "    same => n,Dial(SIP/".$textCall_to.")\n";
+                                    }
+                                }
+                                $lineData .= "    same => n,Goto(disconnect,1)\n\n";
+
+                                $lineData .= "exten => CallInternal,1,NoOp()\n";
+                                if(in_array('internal', $ext['config']))
+                                {
+                                    $lineData .= "    same => n,Set(CALLERID(num)=".$textPhone.")\n";
+                                    $lineData .= "    same => n,Dial(SIP/".$textCall_to.")\n";
+                                }
+                                $lineData .= "    same => n,Goto(disconnect,1)\n\n";
+
+                                $lineData .= "exten => disconnect,1,NoOp()\n";
+                                $lineData .= "    same => n,Hangup()\n\n"; 
+                            }
+                        }
                     }
                 }
                 $app->updateFile($lineData, $ext_conf);
