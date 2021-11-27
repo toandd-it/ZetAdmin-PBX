@@ -405,7 +405,8 @@ sudo touch $asterisk_etc/extensions_api.conf
 echo ';extensions_api.conf' >> $asterisk_etc/extensions_api.conf
 echo '' >> $asterisk_etc/extensions.conf
 echo '[default_za]' >> $asterisk_etc/extensions.conf
-echo 'exten => _X.,1,NoOp(Ext: ${EXTEN})' >> $asterisk_etc/extensions.conf
+echo 'exten => _X.,1,NoOp()' >> $asterisk_etc/extensions.conf
+echo '  same => n,AGI(callerid.php,${EXTEN})' >> $asterisk_etc/extensions.conf
 echo '	same => n,Dial(SIP/${EXTEN},30)' >> $asterisk_etc/extensions.conf
 echo '	same => n,Hangup()' >> $asterisk_etc/extensions.conf
 echo '' >> $asterisk_etc/extensions.conf

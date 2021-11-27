@@ -58,6 +58,12 @@ $agi_context = $agi->request[agi_context];
 $agi_extension = $agi->request[agi_extension];
 $agi_uniqueid = $agi->request[agi_uniqueid]; 
 
+	$calleridData = $mgdb->select('call_sip_account', ['_id' => (int)$agi_callerid]);
+	if(!empty($calleridData['data']['_id']))
+	{
+		$mgdb->update('call_log', ['_id' => $agi_uniqueid], ['$push' => ['uid' => $calleridData['data']['uid']]]);
+	}
+
 	$contextData = $mgdb->select('call_contexts', ['_id' => $agi_context]);
 	if(!empty($contextData['data']['sip_trunk']))
 	{
@@ -70,14 +76,14 @@ $agi_uniqueid = $agi->request[agi_uniqueid];
 
 	if(!empty($contextData['data']['uid']))
 	{
-		$mgdb->update('call_log', ['_id' => $agi_uniqueid], ['$set' => ['uid' => $contextData['data']['uid']]]);
+		$mgdb->update('call_log', ['_id' => $agi_uniqueid, 'uid' => ['$exists' => false]], ['$set' => ['uid' => $contextData['data']['uid']]]);
 	}
 
 	$trunkData = $mgdb->select('call_sip_trunk', ['_id' => $contextData['data']['sip_trunk']]);
 
 	//type: internal / outbound / inbound
-	$sipsData = $mgdb->select('call_sip_account', ['_id' => $agi->request[agi_arg_1]]);
-	if(empty($sipsData['data']['_id']))
+	$extData = $mgdb->select('call_sip_account', ['_id' => (int)$agi->request[agi_arg_1]]);
+	if(empty($extData['data']['_id']))
 	{
 		$agi->set_variable('type', 'outbound');
 		if(isset($trunkData['data']['prefix']))
@@ -93,21 +99,19 @@ $agi_uniqueid = $agi->request[agi_uniqueid];
 	{
 		$agi->set_variable('internal_phone', $agi->request[agi_arg_1]);
 		$agi->set_variable('type', 'internal');
+
+		if(!empty($extData['data']['uid']))
+		{
+			$mgdb->update('call_log', ['_id' => $agi_uniqueid], ['$push' => ['uid' => $extData['data']['uid']]]);
+		}
 	}
 
 	$callLogData = $mgdb->select('call_log', ['_id' => $agi_uniqueid]);
 	if(!empty($callLogData['data']['Exten']))
 	{
 		$agi->set_variable('agi_calleridname', $callLogData['data']['Exten']);
-		$agi->set_variable('phone', $callLogData['data']['Exten']);
 	}
-	else
-	{
-		if(!empty($agi_calleridname))
-		{
-			$agi->set_variable('phone', $agi_calleridname);
-		}
-	}
+	$agi->set_variable('phone', $callLogData['data']['Exten']);
 
 //$agi->set_variable('channel', $agi_channel);
 //$agi->set_variable('log-id', $_id);
