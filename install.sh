@@ -159,10 +159,10 @@ chmod 777 /run/asterisk/
 sudo systemctl start asterisk
 /sbin/chkconfig asterisk on
 
-sudo firewall-cmd --zone=public --permanent --add-service={sip,sips}
+sudo firewall-cmd --zone=public --add-service={sip,sips} --permanent
 sudo firewall-cmd --zone=public --add-port=8089/tcp --permanent
-sudo firewall-cmd --zone=public --permanent --add-port=10000-20000/udp
-sudo firewall-cmd --zone=public --permanent --add-service={http,https}
+sudo firewall-cmd --zone=public --add-port=10000-20000/udp --permanent 
+sudo firewall-cmd --zone=public --add-service={http,https} --permanent
 sudo firewall-cmd --reload
 echo -e "\033[32mInstall Asterisk successful!\033[m"
 echo " "
@@ -383,6 +383,7 @@ echo '[general]' >> $asterisk_etc/manager.conf
 echo 'enabled = yes' >> $asterisk_etc/manager.conf
 echo 'port = 5038' >> $asterisk_etc/manager.conf
 echo 'bindaddr = 127.0.0.1' >> $asterisk_etc/manager.conf
+echo '' >> $asterisk_etc/manager.conf
 echo '[zetadmin_api]' >> $asterisk_etc/manager.conf
 echo 'secret = zetadmin_api' >> $asterisk_etc/manager.conf
 echo 'deny=0.0.0.0/0.0.0.0' >> $asterisk_etc/manager.conf
@@ -401,14 +402,14 @@ sudo chown -R asterisk:asterisk $asterisk_etc/manager.conf
 
 sudo touch $asterisk_etc/extensions_api.conf
 echo ';extensions_api.conf' >> $asterisk_etc/extensions_api.conf
+echo '' >> $asterisk_etc/extensions.conf
 echo '[default_za]' >> $asterisk_etc/extensions.conf
-echo 'exten => _X.,1,Answer()' >> $asterisk_etc/extensions.conf
+echo 'exten => _X.,1,NoOp(Ext: ${EXTEN})' >> $asterisk_etc/extensions.conf
 echo '	same => n,Dial(SIP/${EXTEN},30)' >> $asterisk_etc/extensions.conf
 echo '	same => n,Hangup()' >> $asterisk_etc/extensions.conf
 echo '' >> $asterisk_etc/extensions.conf
 echo '#include extensions_api.conf' >> $asterisk_etc/extensions.conf
 sudo chmod 777 $asterisk_etc/extensions_api.conf
-
 
 sudo touch $asterisk_etc/queues_api.conf
 echo ';queues_api.conf' >> $asterisk_etc/queues_api.conf
@@ -422,15 +423,15 @@ echo 'servername='$pbx_domain'' >> $asterisk_etc/http.conf
 echo 'enabled=yes' >> $asterisk_etc/http.conf
 echo 'tlsenable=yes' >> $asterisk_etc/http.conf
 echo 'tlsbindaddr=0.0.0.0:8089' >> $asterisk_etc/http.conf
-echo 'tlscertfile=/etc/asterisk/keys/asterisk.pem' >> $asterisk_etc/http.conf
-echo ';tlscertfile=/etc/letsencrypt/live/'$pbx_domain'/fullchain.pem' >> $asterisk_etc/http.conf
-echo ';tlsprivatekey=/etc/letsencrypt/live/'$pbx_domain'/privkey.pem' >> $asterisk_etc/http.conf
+echo ';tlscertfile=/etc/asterisk/keys/asterisk.pem' >> $asterisk_etc/http.conf
+echo 'tlscertfile=/etc/letsencrypt/live/'$pbx_domain'/fullchain.pem' >> $asterisk_etc/http.conf
+echo 'tlsprivatekey=/etc/letsencrypt/live/'$pbx_domain'/privkey.pem' >> $asterisk_etc/http.conf
 sudo chown -R asterisk:asterisk $asterisk_etc/http.conf
 #sudo systemctl restart asterisk
 
 sudo touch $asterisk_etc/sip_account.conf
 echo ';sip_account.conf' >> $asterisk_etc/sip_account.conf
-echo '#include pjsip_account.conf' >> $asterisk_etc/sip.conf
+echo '#include sip_account.conf' >> $asterisk_etc/sip.conf
 sudo chmod 777 $asterisk_etc/sip_account.conf
 
 sudo touch $asterisk_etc/pjsip_trunk.conf
