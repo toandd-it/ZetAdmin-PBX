@@ -241,6 +241,7 @@ echo "|   Install Let’s Encrypt                   |"
 echo "+-------------------------------------------+"
 echo " "
 yum install -y certbot
+webroot=/var/www/public_html/$pbx_domain
 certbot certonly --webroot -w $webroot/ --agree-tos -m admin@$pbx_domain -d $pbx_domain
 crontab_line="* */12 * * * root /usr/bin/certbot renew >/dev/null 2>&1"
 (crontab -u $(whoami) -l; echo "$crontab_line" ) | crontab -u $(whoami) -
@@ -256,7 +257,6 @@ echo "|   Create OpenLiteSpeed VirtualHost        |"
 echo "+-------------------------------------------+"
 echo " "
 
-webroot=/var/www/public_html/$pbx_domain
 echo "nobody ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 sudo mkdir /usr/local/lsws/conf/vhosts/$pbx_domain/
 vh_conf=/usr/local/lsws/conf/vhosts/$pbx_domain/$pbx_domain.conf
