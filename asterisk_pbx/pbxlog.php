@@ -218,6 +218,11 @@ else
 						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['t_answer' => (float)$res['Value']]], []);
 					}
 
+					if($res['Variable'] == 'CAMPAIGN_ID')
+					{
+						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['campaign_id' => (float)$res['Value']]], []);
+					}
+
 					$update = $mgdb->update($db_collection, ['_id' => (float)$_id], $updateVariableData[$_id], []);
 					if($update['status'] == false)
 					{
@@ -226,7 +231,8 @@ else
 						$app->callLogSave($res);
 					}
 				}
-				if(isset($res['Event']) && $res['Event'] == 'Cdr'){ 
+				if(isset($res['Event']) && $res['Event'] == 'Cdr')
+				{ 
 					$dataInsertCdr = $res;
 					$dataInsertCdr['_id'] = (float)$_id;
 					$mgdb->insert('call_cdr', $dataInsertCdr);
