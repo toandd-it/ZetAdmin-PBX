@@ -220,7 +220,7 @@ else
 
 					if($res['Variable'] == 'CAMPAIGN_ID')
 					{
-						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['campaign_id' => (float)$res['Value']]], []);
+						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['campaign_id' => (string)$res['Value']]], []);
 					}
 
 					$update = $mgdb->update($db_collection, ['_id' => (float)$_id], $updateVariableData[$_id], []);
