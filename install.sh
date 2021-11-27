@@ -233,21 +233,7 @@ rm -rf $mongodb_createdb
 echo -e "\033[32mInstall MongoDB Server successful!\033[m"
 echo " "
 
-sleep 0.5
-
-echo " "
-echo "+-------------------------------------------+"
-echo "|   Install Let’s Encrypt                   |"
-echo "+-------------------------------------------+"
-echo " "
-yum install -y certbot
 webroot=/var/www/public_html/$pbx_domain
-certbot certonly --webroot -w $webroot/ --agree-tos -m admin@$pbx_domain -d $pbx_domain
-crontab_line="* */12 * * * root /usr/bin/certbot renew >/dev/null 2>&1"
-(crontab -u $(whoami) -l; echo "$crontab_line" ) | crontab -u $(whoami) -
-sudo systemctl restart crond.service
-echo -e "\033[32mInstall Let’s Encrypt successful!\033[m"
-echo " "
 
 sleep 0.5
 
@@ -323,6 +309,23 @@ echo 'pageok!' >> index.html
 cd ~
 sudo systemctl restart lsws.service
 echo -e "\033[32mCreate VirtualHost successful!\033[m"
+echo " "
+
+sleep 0.5
+
+echo " "
+echo "+-------------------------------------------+"
+echo "|   Install Let’s Encrypt                   |"
+echo "+-------------------------------------------+"
+echo " "
+yum install -y certbot
+
+certbot certonly --webroot -w $webroot/ --agree-tos -m admin@$pbx_domain -d $pbx_domain
+crontab_line="* */12 * * * root /usr/bin/certbot renew >/dev/null 2>&1"
+(crontab -u $(whoami) -l; echo "$crontab_line" ) | crontab -u $(whoami) -
+sudo systemctl restart crond.service
+sudo systemctl restart lsws.service
+echo -e "\033[32mInstall Let’s Encrypt successful!\033[m"
 echo " "
 
 sleep 0.5
