@@ -5,7 +5,7 @@ Build a simple Cloud PBX server, manage and use via API. Easily integrate into y
   - CentOS 7 (Hardware MIN 2 core 4GB RAM)
   - PHP 7.3 & OpenLiteSpeed
   - MongoDB 4.4
-  - Asterisk 13
+  - Asterisk 13.x
   - API source code AND documents using API by ZetAdmin Framework
 
 **Install:**
