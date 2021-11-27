@@ -334,6 +334,7 @@ echo '[general]' >> $asterisk_etc/manager.conf
 echo 'enabled = yes' >> $asterisk_etc/manager.conf
 echo 'port = 5038' >> $asterisk_etc/manager.conf
 echo 'bindaddr = 127.0.0.1' >> $asterisk_etc/manager.conf
+echo '' >> $asterisk_etc/manager.conf
 echo '[zetadmin_api]' >> $asterisk_etc/manager.conf
 echo 'secret = zetadmin_api' >> $asterisk_etc/manager.conf
 echo 'deny=0.0.0.0/0.0.0.0' >> $asterisk_etc/manager.conf
@@ -347,6 +348,7 @@ echo 'deny=0.0.0.0/0.0.0.0' >> $asterisk_etc/manager.conf
 echo 'permit=127.0.0.1/255.255.255.0' >> $asterisk_etc/manager.conf
 echo 'read = system,call,log,verbose,agent,user,config,dtmf,reporting,cdr,dialplan' >> $asterisk_etc/manager.conf
 echo 'write = system,call,agent,user,config,command,reporting,originate,message' >> $asterisk_etc/manager.conf
+echo '' >> $asterisk_etc/manager.conf
 echo '#include manager_api.conf' >> $asterisk_etc/manager.conf
 sudo chown -R asterisk:asterisk $asterisk_etc/manager.conf
 
