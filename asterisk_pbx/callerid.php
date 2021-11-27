@@ -110,8 +110,8 @@ $agi_uniqueid = $agi->request[agi_uniqueid];
 		}
 	}
 
-$agi->set_variable('channel', $agi_channel);
-$agi->set_variable('log-id', $_id);
+//$agi->set_variable('channel', $agi_channel);
+//$agi->set_variable('log-id', $_id);
 
 //$agi->exec("MixMonitor", "/var/spool/asterisk/monitor/$dateformat/$myfile.wav,b");
 //$agi->say_number();
