@@ -50,7 +50,6 @@ else
 }
 //End debug
 
-//$callerid = $agi->get_variable("CALLERID(name)");
 $timenow = strtotime('now');
 $agi_callerid = preg_replace("#[^0-9]#", "", $agi->request[agi_callerid]);
 $agi_calleridname = $agi->request[agi_calleridname];
