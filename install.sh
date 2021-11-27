@@ -30,20 +30,15 @@ read pbx_domain
 echo -n "Please enter name for PBX: ";
 read pbx_name
 
-wget -q --tries=10 --timeout=20 --spider http://$pbx_domain
-if [[ $? -eq 0 ]]; then
-	IPDATA=$(dig +short $pbx_domain)
-	if grep -q $IP <<< $IPDATA; then
-		echo -e "\033[32mGood!\033[m Ready to install."
-		echo ' '
-	else
-		echo -e "\033[31mError!\033[m Please point your domain name "$pbx_domain" to IP "$IP""
-		exit
-	fi
+IPDATA=$(dig +short $pbx_domain)
+if grep -q $IP <<< $IPDATA; then
+	echo -e "\033[32mGood!\033[m Ready to install."
+	echo ' '
 else
-    echo -e "\033[31mError!\033[m Please point your domain name "$pbx_domain" to IP "$IP""
+	echo -e "\033[31mError!\033[m Please point your domain name "$pbx_domain" to IP "$IP""
 	exit
 fi
+
 sleep 0.5
 sudo setenforce 0
 sudo sed -i 's/\(^SELINUX=\).*/\SELINUX=permissive/' /etc/selinux/config
