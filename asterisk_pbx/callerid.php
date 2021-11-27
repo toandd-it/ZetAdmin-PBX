@@ -69,6 +69,11 @@ $agi_uniqueid = $agi->request[agi_uniqueid];
 		$agi->set_variable('trunk_out', '');
 	}
 
+	if(!empty($contextData['data']['uid']))
+	{
+		$mgdb->update('call_log', ['_id' => $agi_uniqueid], ['$set' => ['uid' => $contextData['data']['uid']]]);
+	}
+
 	$trunkData = $mgdb->select('call_sip_trunk', ['_id' => $contextData['data']['sip_trunk']]);
 
 	//type: internal / outbound / inbound
