@@ -223,6 +223,11 @@ else
 						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['campaign_id' => (string)$res['Value']]], []);
 					}
 
+					if($res['Variable'] == 'USER_UID')
+					{
+						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['UID' => explode(',',$res['Value'])]], []);
+					}
+
 					$update = $mgdb->update($db_collection, ['_id' => (float)$_id], $updateVariableData[$_id], []);
 					if($update['status'] == false)
 					{
