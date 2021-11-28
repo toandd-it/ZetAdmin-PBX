@@ -68,34 +68,36 @@ $agi_uniqueid = $agi->request[agi_uniqueid];
 		$agi->set_variable('trunk_out', '');
 	}
 
-	$trunkData = $mgdb->select('call_sip_trunk', ['_id' => $contextData['data']['sip_trunk']]);
-
 	//type: internal / outbound / inbound
-	$extData = $mgdb->select('call_sip_account', ['_id' => (int)$agi->request[agi_arg_1]]);
+	$extData = $mgdb->select('call_sip_account', ['_id' => (float)$agi->request[agi_arg_1]]);
 	if(empty($extData['data']['_id']))
 	{
-		$agi->set_variable('type', 'outbound');
-		if(isset($trunkData['data']['prefix']))
+		$trunkData = $mgdb->select('call_sip_trunk', ['_id' => $agi->request[agi_arg_1]]);
+		if(empty($trunkData['data']['_id']))
 		{
-			$agi->set_variable('outbound_phone', $trunkData['data']['prefix'].$agi->request[agi_arg_1]);
+			$agi->set_variable('type', 'outbound');
+			$trunkData = $mgdb->select('call_sip_trunk', ['_id' => $contextData['data']['sip_trunk']]);
+
+			if(isset($trunkData['data']['prefix']))
+			{
+				$agi->set_variable('phone', $trunkData['data']['prefix'].$agi->request[agi_arg_1]);
+			}
+			else
+			{
+				$agi->set_variable('phone', $agi->request[agi_arg_1]);
+			}
 		}
 		else
 		{
-			$agi->set_variable('outbound_phone', $agi->request[agi_arg_1]);
+			$agi->set_variable('type', 'inbound');
+			$agi->set_variable('phone', $agi->request[agi_arg_1]);
 		}
 	}
 	else
 	{
-		$agi->set_variable('internal_phone', $agi->request[agi_arg_1]);
+		$agi->set_variable('phone', $agi->request[agi_arg_1]);
 		$agi->set_variable('type', 'internal');
 	}
-
-	$callLogData = $mgdb->select('call_log', ['_id' => $agi_uniqueid]);
-	if(!empty($callLogData['data']['Exten']))
-	{
-		$agi->set_variable('agi_calleridname', $callLogData['data']['Exten']);
-	}
-	$agi->set_variable('phone', $callLogData['data']['Exten']);
 
 //$agi->set_variable('channel', $agi_channel);
 //$agi->set_variable('log-id', $_id);
