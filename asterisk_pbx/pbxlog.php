@@ -228,6 +228,18 @@ else
 						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['UID' => explode(',',$res['Value'])]], []);
 					}
 
+					if($res['Variable'] == 'CAMPAIGN_CONTACT_ID')
+					{
+						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['campaign_contact_id' => (string)$res['Value']]], []);
+						$mgdb->update('call_campaign_contacts', ['_id' => (string)$res['Value']], ['$set' => (float)$_id], []);
+					}
+
+					if($res['Variable'] == 'CONTACT_ID')
+					{
+						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['contact_id' => (string)$res['Value']]], []);
+						$mgdb->update('call_contacts', ['_id' => (string)$res['Value']], ['$set' => (float)$_id], []);
+					}
+
 					$update = $mgdb->update($db_collection, ['_id' => (float)$_id], $updateVariableData[$_id], []);
 					if($update['status'] == false)
 					{
