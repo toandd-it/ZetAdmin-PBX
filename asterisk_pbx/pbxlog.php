@@ -216,6 +216,11 @@ else
 					if($res['Variable'] == 'ANSWEREDTIME')
 					{
 						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['t_answer' => (float)$res['Value']]], []);
+                        $dataCallLog = $mgdb->select($db_collection, ['_id' => (float)$_id], []);
+                        if($dataCallLog['data']['campaign_contact_id'])
+                        {
+                          	$mgdb->update('call_campaign_contacts', ['_id' => (string)$dataCallLog['data']['campaign_contact_id']], ['$set' => ['t_answer' => (float)$res['Value']]], []);
+                        }
 					}
 
 					if($res['Variable'] == 'CAMPAIGN_ID')
