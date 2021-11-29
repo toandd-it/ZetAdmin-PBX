@@ -186,9 +186,9 @@ else
 				elseif($res['Event'] == 'AgentComplete')
 				{
 					$t_end_sub = microtime(true);
-					unset($res['Event']);
-					unset($res['Privilege']);
-					$updateData['$set'] = $res;
+					//unset($res['Event']);
+					//unset($res['Privilege']);
+					//$updateData['$set'] = $res;
 					$updateData['$set']['t_end_sub'] = $t_end_sub;
 					
 					$update = $mgdb->update($db_collection, ['_id' => (float)$_id], $updateData, []);
