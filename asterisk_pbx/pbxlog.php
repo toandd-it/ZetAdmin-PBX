@@ -230,7 +230,7 @@ else
 
 					if($res['Variable'] == 'USER_UID')
 					{
-						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['UID' => explode(',',$res['Value'])]], []);
+						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['uid' => explode(',',$res['Value'])]], []);
 					}
 
 					if($res['Variable'] == 'CAMPAIGN_CONTACT_ID')
@@ -243,6 +243,11 @@ else
 					{
 						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['contact_id' => (string)$res['Value']]], []);
 						$mgdb->update('call_contacts', ['_id' => (string)$res['Value']], ['$set' => ['t_dial' => (float)$_id]], []);
+					}
+
+					if($res['Variable'] == 'AGI_TRUNK')
+					{
+						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['trunk' => explode(',',$res['Value'])]], []);
 					}
 
 					$update = $mgdb->update($db_collection, ['_id' => (float)$_id], $updateVariableData[$_id], []);
