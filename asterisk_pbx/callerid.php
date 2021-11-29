@@ -61,11 +61,11 @@ $agi_uniqueid = $agi->request[agi_uniqueid];
 	$contextData = $mgdb->select('call_contexts', ['_id' => $agi_context]);
 	if(!empty($contextData['data']['sip_trunk']))
 	{
-		$agi->set_variable('trunk_out', $contextData['data']['sip_trunk']);
+		$agi->set_variable('AGI_TRUNK', $contextData['data']['sip_trunk']);
 	}
 	else
 	{
-		$agi->set_variable('trunk_out', '');
+		$agi->set_variable('AGI_TRUNK', '');
 	}
 
 	//type: internal / outbound / inbound
@@ -75,28 +75,28 @@ $agi_uniqueid = $agi->request[agi_uniqueid];
 		$trunkData = $mgdb->select('call_sip_trunk', ['_id' => $agi->request[agi_arg_1]]);
 		if(empty($trunkData['data']['_id']))
 		{
-			$agi->set_variable('type', 'outbound');
+			$agi->set_variable('AGI_CALL_TYPE', 'outbound');
 			$trunkData = $mgdb->select('call_sip_trunk', ['_id' => $contextData['data']['sip_trunk']]);
 
 			if(isset($trunkData['data']['prefix']))
 			{
-				$agi->set_variable('phone', $trunkData['data']['prefix'].$agi->request[agi_arg_1]);
+				$agi->set_variable('AGI_CALL_NUMBER', $trunkData['data']['prefix'].$agi->request[agi_arg_1]);
 			}
 			else
 			{
-				$agi->set_variable('phone', $agi->request[agi_arg_1]);
+				$agi->set_variable('AGI_CALL_NUMBER', $agi->request[agi_arg_1]);
 			}
 		}
 		else
 		{
-			$agi->set_variable('type', 'inbound');
-			$agi->set_variable('phone', $agi->request[agi_arg_1]);
+			$agi->set_variable('AGI_CALL_TYPE', 'inbound');
+			$agi->set_variable('AGI_CALL_NUMBER', $agi->request[agi_arg_1]);
 		}
 	}
 	else
 	{
-		$agi->set_variable('phone', $agi->request[agi_arg_1]);
-		$agi->set_variable('type', 'internal');
+		$agi->set_variable('AGI_CALL_NUMBER', $agi->request[agi_arg_1]);
+		$agi->set_variable('AGI_CALL_TYPE', 'internal');
 	}
 	
 $agi->set_variable('PBX_AUTHOR', 'zetadmin.com');
