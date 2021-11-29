@@ -66,7 +66,7 @@ else
 
 			if(isset($res['Event']) && in_array($res['Event'], $eventsAllow) && !empty($channel))
 			{
-				if($res['DialStatus'] == 'ANSWER')
+				if(isset($res['DialStatus']) && $res['DialStatus'] == 'ANSWER')
 				{
 					$resCache[$_id]['t_up'] = microtime(true);
 				}
