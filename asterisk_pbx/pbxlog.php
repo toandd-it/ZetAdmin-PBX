@@ -137,13 +137,8 @@ else
 				elseif($res['Event'] == 'AgentCalled')
 				{
 					$t_create_sub = microtime(true);
-					
-					unset($res['Event']);
-					unset($res['Privilege']);
-					$updateData['$set'] = $res;
-					$updateData['$set']['t_create_sub'] = $t_create_sub;
-					
-					$update = $mgdb->update($db_collection, ['_id' => (float)$_id], $updateData, []);
+
+					$update = $mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['t_create_sub' => $t_create_sub, 'DestChannel' => $res['DestChannel'], 'MemberName' => $res['MemberName']]], []);
 					if($update['status'] == false)
 					{
 						$res['t_create_sub'] = microtime(true);
