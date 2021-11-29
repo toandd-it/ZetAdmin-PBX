@@ -149,6 +149,8 @@ else
 					{
 						$resCache[$channel]['t_up_sub'] = $t_up_sub;
 					}
+					$mgdb->update('call_campaign_contacts', ['t_dial' => (string)$_id], ['$set' => ['agent' => $res['MemberName']]], []);
+					$mgdb->update('call_contacts', ['t_dial' => (string)$_id], ['$set' => ['agent' => $res['MemberName']]], []);
 				}
 				elseif($res['Event'] == 'AgentComplete')
 				{
