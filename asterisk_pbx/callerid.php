@@ -58,6 +58,11 @@ $agi_context = $agi->request[agi_context];
 $agi_extension = $agi->request[agi_extension];
 $agi_uniqueid = $agi->request[agi_uniqueid]; 
 
+$_CONTACT_NUM = $agi->request[agi_arg_1];
+if(!empty($agi->get_variable('CAMPAIGN_CONTACT_NUM')))
+{
+	$_CONTACT_NUM = $agi->get_variable('CAMPAIGN_CONTACT_NUM');
+}
 	$contextData = $mgdb->select('call_contexts', ['_id' => $agi_context]);
 	if(!empty($contextData['data']['sip_trunk']))
 	{
@@ -69,33 +74,33 @@ $agi_uniqueid = $agi->request[agi_uniqueid];
 	}
 
 	//type: internal / outbound / inbound
-	$extData = $mgdb->select('call_sip_account', ['_id' => (float)$agi->request[agi_arg_1]]);
+	$extData = $mgdb->select('call_sip_account', ['_id' => (float)$_CONTACT_NUM]);
 	if(empty($extData['data']['_id']))
 	{
-		$trunkData = $mgdb->select('call_sip_trunk', ['_id' => $agi->request[agi_arg_1]]);
+		$trunkData = $mgdb->select('call_sip_trunk', ['_id' => $_CONTACT_NUM]);
 		if(empty($trunkData['data']['_id']))
 		{
 			$agi->set_variable('AGI_CALL_TYPE', 'outbound');
 			$trunkData = $mgdb->select('call_sip_trunk', ['_id' => $contextData['data']['sip_trunk']]);
-
+			
 			if(isset($trunkData['data']['prefix']))
 			{
-				$agi->set_variable('AGI_CALL_NUMBER', $trunkData['data']['prefix'].$agi->request[agi_arg_1]);
+				$agi->set_variable('AGI_CALL_NUMBER', $trunkData['data']['prefix'].$_CONTACT_NUM);
 			}
 			else
 			{
-				$agi->set_variable('AGI_CALL_NUMBER', $agi->request[agi_arg_1]);
+				$agi->set_variable('AGI_CALL_NUMBER', $_CONTACT_NUM);
 			}
 		}
 		else
 		{
 			$agi->set_variable('AGI_CALL_TYPE', 'inbound');
-			$agi->set_variable('AGI_CALL_NUMBER', $agi->request[agi_arg_1]);
+			$agi->set_variable('AGI_CALL_NUMBER', $_CONTACT_NUM);
 		}
 	}
 	else
 	{
-		$agi->set_variable('AGI_CALL_NUMBER', $agi->request[agi_arg_1]);
+		$agi->set_variable('AGI_CALL_NUMBER', $_CONTACT_NUM);
 		$agi->set_variable('AGI_CALL_TYPE', 'internal');
 	}
 	

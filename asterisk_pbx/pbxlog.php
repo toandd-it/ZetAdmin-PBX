@@ -62,6 +62,7 @@ else
 				if(!isset($res['Channel'])) { $res['Channel'] = ''; }
 				$channel = isset($res['DestChannel']) ? $res['DestChannel'] : $res['Channel'];
 			}
+			$res['Channel'] = $channel;
 
 			if(isset($res['Event']) && in_array($res['Event'], $eventsAllow) && !empty($channel))
 			{
@@ -85,18 +86,47 @@ else
 						$res['Msg'] = $insert['data']['msg'];
 						$app->callLogSave($res);
 					}
+					$logCheck[$_id]['status'] = $insert['status'];
 				}
 				elseif($res['Event'] == 'DialBegin')
 				{	
 					unset($res['Event']);
 					unset($res['Privilege']);
 					$updateData['$set'] = $res;
-
+					if(isset($res['DestCallerIDNum']) && empty($res['CallerIDNum']))
+					{
+						$updateData['$set']['CallerIDNum'] = $res['DestCallerIDNum'];
+						$updateData['$set']['CallerIDName'] = '';
+					}
+					
+					if(isset($logCheck[$_id]['status']) && $logCheck[$_id]['status'] == true)
+					{
+						/**/
+					}
+					else
+					{
+						$dialData = explode("/", $res['DialString']);
+						$Exten = empty($dialData[1]) ? $dialData[0] : $dialData[1];
+						$Trunk = isset($dialData[1]) ? $dialData[0] : '';
+						
+						$dataInsert = $res;
+						$dataInsert['_id'] = (float)$_id;
+						$dataInsert['t_create'] = (float)$_id;
+						$dataInsert['t_ring'] = 0;
+						$dataInsert['t_answer'] = 0;
+						$dataInsert['t_hangup'] = 0;
+						$dataInsert['Variable'] = [];
+						$dataInsert['Exten'] = $Exten;
+						$dataInsert['Trunk'] = $Trunk;
+						$dataInsert['Context'] = empty($res['Context']) ? $res['DestContext'] : $res['Context'];
+						$mgdb->insert($db_collection, $dataInsert);
+					}
+					
 					$update = $mgdb->update($db_collection, ['_id' => (float)$_id], $updateData, []);
-					if($insert['status'] == false)
+					if($update['status'] == false)
 					{
 						$res['Error'] = 'Update DialBegin';
-						$res['Msg'] = $insert['data']['msg'];
+						$res['Msg'] = $update['data']['msg'];
 						$app->callLogSave($res);
 					}
 				}
@@ -133,7 +163,7 @@ else
 						$res['Msg'] = $update['data']['msg'];
 						$app->callLogSave($res);
 					}
-					$mgdb->update('call_campaign_contacts', ['t_dial' => (float)$_id], ['$set' => ['t_up' => $t_up, 'DialStatus' => $res['DialStatus']]], []);
+					$mgdb->update('call_campaign_contacts', ['t_dial' => (float)$_id], ['$set' => ['t_end' => $t_end, 'DialStatus' => $res['DialStatus']]], []);
 				}
 				elseif($res['Event'] == 'AgentConnect')
 				{
@@ -211,42 +241,54 @@ else
 						'Time' => microtime(true)
 					];
 					
-					if($res['Variable'] == 'RINGTIME_MS')
-					{
-						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['t_ring' => (float)$res['Value']]], []);
-					}
-					
-					if($res['Variable'] == 'ANSWEREDTIME')
-					{
-						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['t_answer' => (float)$res['Value']]], []);
-                        $mgdb->update('call_campaign_contacts', ['t_dial' => (float)$_id], ['$set' => ['t_answer' => (float)$res['Value']]], []);
-					}
-
+					//update campaign id
 					if($res['Variable'] == 'CAMPAIGN_ID')
 					{
-						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['campaign_id' => (string)$res['Value']]], []);
+						//$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['campaign_id' => $res['Value']]], []);
+						$mgdb->update('call_campaigns', ['_id' => $res['Value']], ['$inc' => ['totalCalled' => 1]], []);
 					}
-
-					if($res['Variable'] == 'USER_UID')
+					if(isset($updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_ID']))
 					{
-						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['uid' => explode(',',$res['Value'])]], []);
+						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['campaign_id' => $updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_ID']['Value']]], []);
 					}
-
+					
+					//update user id
+					if(isset($updateVariableData[$_id]['$set']['Variable']['USER_UID']))
+					{
+						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['uid' => explode(',',$updateVariableData[$_id]['$set']['Variable']['USER_UID']['Value'])]], []);
+					}
+					
+					//update campaign contact id
 					if($res['Variable'] == 'CAMPAIGN_CONTACT_ID')
 					{
-						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['campaign_contact_id' => (string)$res['Value']]], []);
+						//$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['campaign_contact_id' => (string)$res['Value']]], []);
 						$mgdb->update('call_campaign_contacts', ['_id' => $res['Value']], ['$set' => ['t_dial' => (float)$_id]], []);
 					}
-
+					if(isset($updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_CONTACT_ID']))
+					{
+						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['campaign_contact_id' => (string)$updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_CONTACT_ID']['Value']]], []);
+					}
+					
+					//update contact id
 					if($res['Variable'] == 'CONTACT_ID')
 					{
-						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['contact_id' => (string)$res['Value']]], []);
+						//$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['contact_id' => (string)$res['Value']]], []);
 						$mgdb->update('call_contacts', ['_id' => $res['Value']], ['$set' => ['t_dial' => (float)$_id]], []);
 					}
-
-					if($res['Variable'] == 'AGI_TRUNK')
+					if(isset($updateVariableData[$_id]['$set']['Variable']['CONTACT_ID']))
 					{
-						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['trunk' => explode(',',$res['Value'])]], []);
+						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['contact_id' => (string)$updateVariableData[$_id]['$set']['Variable']['CONTACT_ID']['Value']]], []);
+					}
+					
+					if(isset($updateVariableData[$_id]['$set']['Variable']['RINGTIME']))
+					{
+						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['t_ring' => $updateVariableData[$_id]['$set']['Variable']['RINGTIME']['Value']]], []);
+					}
+
+					if(isset($updateVariableData[$_id]['$set']['Variable']['ANSWEREDTIME']))
+					{
+						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['t_answer' => (float)$updateVariableData[$_id]['$set']['Variable']['ANSWEREDTIME']['Value']]], []);
+                        $mgdb->update('call_campaign_contacts', ['t_dial' => (float)$_id], ['$set' => ['t_answer' => (float)$updateVariableData[$_id]['$set']['Variable']['ANSWEREDTIME']['Value']]], []);
 					}
 
 					$update = $mgdb->update($db_collection, ['_id' => (float)$_id], $updateVariableData[$_id], []);
