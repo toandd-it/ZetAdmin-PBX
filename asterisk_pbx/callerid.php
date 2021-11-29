@@ -58,11 +58,21 @@ $agi_context = $agi->request[agi_context];
 $agi_extension = $agi->request[agi_extension];
 $agi_uniqueid = $agi->request[agi_uniqueid]; 
 
-$_CONTACT_NUM = $agi->request[agi_arg_1];
-if(!empty($agi->get_variable('CAMPAIGN_CONTACT_NUM')))
+$CAMPAIGN_CONTACT_NUM = $agi->get_variable("CAMPAIGN_CONTACT_NUM", true);
+if(!empty($CAMPAIGN_CONTACT_NUM))
 {
-	$_CONTACT_NUM = $agi->get_variable('CAMPAIGN_CONTACT_NUM');
+	$_CONTACT_NUM = $CAMPAIGN_CONTACT_NUM;
+	$agi->set_variable('CAMPAIGN_CONTACT_NUM_vale', $_CONTACT_NUM);
 }
+else
+{
+	$_CONTACT_NUM = $agi_extension;
+}
+if(is_numeric($_CONTACT_NUM))
+{
+	$_CONTACT_NUM = (float)$_CONTACT_NUM;
+}
+
 	$contextData = $mgdb->select('call_contexts', ['_id' => $agi_context]);
 	if(!empty($contextData['data']['sip_trunk']))
 	{
@@ -74,10 +84,10 @@ if(!empty($agi->get_variable('CAMPAIGN_CONTACT_NUM')))
 	}
 
 	//type: internal / outbound / inbound
-	$extData = $mgdb->select('call_sip_account', ['_id' => (float)$_CONTACT_NUM]);
+	$extData = $mgdb->select('call_sip_account', ['_id' => $_CONTACT_NUM]);
 	if(empty($extData['data']['_id']))
 	{
-		$trunkData = $mgdb->select('call_sip_trunk', ['_id' => $_CONTACT_NUM]);
+		$trunkData = $mgdb->select('call_sip_trunk', ['_id' => (float)$_CONTACT_NUM]);
 		if(empty($trunkData['data']['_id']))
 		{
 			$agi->set_variable('AGI_CALL_TYPE', 'outbound');
@@ -103,7 +113,8 @@ if(!empty($agi->get_variable('CAMPAIGN_CONTACT_NUM')))
 		$agi->set_variable('AGI_CALL_NUMBER', $_CONTACT_NUM);
 		$agi->set_variable('AGI_CALL_TYPE', 'internal');
 	}
-	
+
+$agi->set_variable('_CONTACT_NUM', $_CONTACT_NUM);
 $agi->set_variable('PBX_AUTHOR', 'zetadmin.com');
 $agi->set_variable('PBX_AUTHOR_EMAIL', 'info@zetadmin.com;toandd.it@gmail.com');
 
