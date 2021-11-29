@@ -133,6 +133,7 @@ else
 						$res['Msg'] = $update['data']['msg'];
 						$app->callLogSave($res);
 					}
+					$mgdb->update('call_campaign_contacts', ['t_dial' => (float)$_id], ['$set' => ['t_end' => $t_end, 'DialStatus' => $res['DialStatus']]], []);
 				}
 				elseif($res['Event'] == 'AgentConnect')
 				{
@@ -149,8 +150,8 @@ else
 					{
 						$resCache[$channel]['t_up_sub'] = $t_up_sub;
 					}
-					$mgdb->update('call_campaign_contacts', ['t_dial' => (string)$_id], ['$set' => ['agent' => $res['MemberName']]], []);
-					$mgdb->update('call_contacts', ['t_dial' => (string)$_id], ['$set' => ['agent' => $res['MemberName']]], []);
+					$mgdb->update('call_campaign_contacts', ['t_dial' => (float)$_id], ['$set' => ['agent' => $res['MemberName']]], []);
+					$mgdb->update('call_contacts', ['t_dial' => (float)$_id], ['$set' => ['agent' => $res['MemberName']]], []);
 				}
 				elseif($res['Event'] == 'AgentComplete')
 				{
@@ -218,11 +219,7 @@ else
 					if($res['Variable'] == 'ANSWEREDTIME')
 					{
 						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['t_answer' => (float)$res['Value']]], []);
-                        $dataCallLog = $mgdb->select($db_collection, ['_id' => (float)$_id], []);
-                        if($dataCallLog['data']['campaign_contact_id'])
-                        {
-                          	$mgdb->update('call_campaign_contacts', ['_id' => (string)$dataCallLog['data']['campaign_contact_id']], ['$set' => ['t_answer' => (float)$res['Value']]], []);
-                        }
+                        $mgdb->update('call_campaign_contacts', ['_id' => (string)$dataCallLog['data']['campaign_contact_id']], ['$set' => ['t_answer' => (float)$res['Value']]], []);
 					}
 
 					if($res['Variable'] == 'CAMPAIGN_ID')
