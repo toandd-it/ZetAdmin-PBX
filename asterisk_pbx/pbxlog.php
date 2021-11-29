@@ -96,10 +96,11 @@ else
 				{	
 					unset($res['Event']);
 					unset($res['Privilege']);
-					$updateData['$set'] = $res;
-					if(isset($res['DestCallerIDNum']) && empty($res['CallerIDNum']))
+					
+					if(!empty($res['Context']) && !empty($res['ChannelStateDesc']))
 					{
-						$updateData['$set']['CallerIDNum'] = $res['DestCallerIDNum'];
+						$updateData['$set']['Context'] = $res['Context'];
+						$updateData['$set']['CallerIDNum'] = $res['ConnectedLineNum'];
 						$updateData['$set']['CallerIDName'] = '';
 					}
 					
@@ -126,13 +127,17 @@ else
 						$mgdb->insert($db_collection, $dataInsert);
 					}
 					
-					$update = $mgdb->update($db_collection, ['_id' => (float)$_id], $updateData, []);
-					if($update['status'] == false)
+					if(!empty($updateData))
 					{
-						$res['Error'] = 'Update DialBegin';
-						$res['Msg'] = $update['data']['msg'];
-						$app->callLogSave($res);
+						$update = $mgdb->update($db_collection, ['_id' => (float)$_id], $updateData, []);
+						if($update['status'] == false)
+						{
+							$res['Error'] = 'Update DialBegin';
+							$res['Msg'] = $update['data']['msg'];
+							$app->callLogSave($res);
+						}
 					}
+					$app->callLogSave($res);
 				}
 				elseif($res['Event'] == 'AgentCalled')
 				{
@@ -181,9 +186,6 @@ else
 				elseif($res['Event'] == 'AgentComplete')
 				{
 					$t_end_sub = microtime(true);
-					//unset($res['Event']);
-					//unset($res['Privilege']);
-					//$updateData['$set'] = $res;
 					
 					$update = $mgdb->update($db_collection, ['_id' => (float)$_id], ['t_end_sub' => (float)$t_end_sub], []);
 					if($update['status'] == false)
@@ -268,7 +270,7 @@ else
 					
 					if(!empty($updateVariableData[$_id]))
 					{
-						$update = $mgdb->update($db_collection, ['_id' => (float)$_id], $updateVariableData[$_id], []);
+						$update = $mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['Variable' => $updateVariableData[$_id]['$set']['Variable']]], []);
 						if($update['status'] == false)
 						{
 							$res['Error'] = 'Update VarSet';
