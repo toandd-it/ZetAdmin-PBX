@@ -130,6 +130,10 @@ else
 						$app->callLogSave($res);
 					}
 				}
+				elseif($res['DialStatus'] == 'ANSWER')
+				{
+					$resCache[$_id]['t_up'] = microtime(true);
+				}
 				elseif($res['Event'] == 'AgentCalled')
 				{
 					$t_create_sub = microtime(true);
@@ -209,13 +213,26 @@ else
 					$t_hangup = microtime(true);
 					if(!empty($resCache[$_id]['t_up_sub']))
 					{
-						$setHangup = ['$set' => ['t_hangup' => $t_hangup, 't_call_sub' => ($t_hangup - $resCache[$_id]['t_up_sub']), 'cause_txt' => $res['Cause-txt']]];
+						$setHangup = ['$set' => ['t_hangup' => $t_hangup, 't_answer' => (float)round($t_hangup - $resCache[$_id]['t_up']), 't_answer_sub' => (float)round($t_hangup - $resCache[$_id]['t_up_sub']), 'cause_txt' => $res['Cause-txt']]];
 					}
 					else
 					{
-						$setHangup = ['$set' => ['t_hangup' => $t_hangup, 'cause_txt' => $res['Cause-txt']]];
+						if(!empty($resCache[$_id]['t_up']))
+						{
+							$setHangup = ['$set' => ['t_hangup' => $t_hangup, 't_answer' => (float)round($t_hangup - $resCache[$_id]['t_up']), 'cause_txt' => $res['Cause-txt']]];
+						}
+						else
+						{
+							$setHangup = ['$set' => ['t_hangup' => $t_hangup, 'cause_txt' => $res['Cause-txt']]];
+						}
 					}
 					$update = $mgdb->update($db_collection, ['_id' => (float)$_id], $setHangup, []);
+					
+					if(isset($updateVariableData[$_id]['$set']['Variable']['ANSWEREDTIME']))
+					{
+                        $mgdb->update('call_campaign_contacts', ['t_dial' => (float)$_id], ['$set' => ['t_answer' => (float)round($t_hangup - $resCache[$_id]['t_up'])]], []);
+					}
+					
 					if($update['status'] == false)
 					{
 						$res['t_hangup'] = microtime(true);
