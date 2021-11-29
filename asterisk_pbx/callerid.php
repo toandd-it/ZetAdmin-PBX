@@ -62,7 +62,6 @@ $CAMPAIGN_CONTACT_NUM = $agi->get_variable("CAMPAIGN_CONTACT_NUM", true);
 if(!empty($CAMPAIGN_CONTACT_NUM))
 {
 	$_CONTACT_NUM = $CAMPAIGN_CONTACT_NUM;
-	$agi->set_variable('CAMPAIGN_CONTACT_NUM_vale', $_CONTACT_NUM);
 }
 else
 {
