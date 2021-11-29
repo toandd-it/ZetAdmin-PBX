@@ -312,7 +312,6 @@ else
 					{
 						$mgdb->update('call_contacts', ['_id' => $res['Value']], ['$set' => ['t_dial' => (float)$_id]], []);
 					}
-					$app->callLogSave($updateVariableData);
 				}
 				if(isset($res['Event']) && $res['Event'] == 'Cdr')
 				{ 
