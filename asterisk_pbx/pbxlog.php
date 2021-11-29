@@ -150,11 +150,12 @@ else
 				elseif($res['Event'] == 'DialEnd')
 				{
 					$t_end = microtime(true);
-					unset($res['Event']);
-					unset($res['Privilege']);
-					$updateData['$set'] = $res;
+					//unset($res['Event']);
+					//unset($res['Privilege']);
+					//$updateData['$set'] = $res;
 					
-					$update = $mgdb->update($db_collection, ['_id' => (float)$_id], $updateData, []);
+					//$update = $mgdb->update($db_collection, ['_id' => (float)$_id], $updateData, []);
+					$update = $mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['DialStatus' => $res['DialStatus']]], []);
 					if($update['status'] == false)
 					{
 						$res['t_end'] = $t_end;
