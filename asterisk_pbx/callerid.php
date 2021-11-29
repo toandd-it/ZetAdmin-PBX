@@ -101,8 +101,6 @@ $agi_uniqueid = $agi->request[agi_uniqueid];
 	
 $agi->set_variable('PBX_AUTHOR', 'zetadmin.com');
 $agi->set_variable('PBX_AUTHOR_EMAIL', 'info@zetadmin.com;toandd.it@gmail.com');
-//$agi->set_variable('channel', $agi_channel);
-//$agi->set_variable('log-id', $_id);
 
 //$agi->exec("MixMonitor", "/var/spool/asterisk/monitor/$dateformat/$myfile.wav,b");
 //$agi->say_number();
