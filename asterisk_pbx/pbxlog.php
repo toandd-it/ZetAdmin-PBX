@@ -228,9 +228,9 @@ else
 					}
 					$update = $mgdb->update($db_collection, ['_id' => (float)$_id], $setHangup, []);
 					
-					if(isset($updateVariableData[$_id]['$set']['Variable']['ANSWEREDTIME']))
+					if(isset($updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_CONTACT_ID']))
 					{
-                        $mgdb->update('call_campaign_contacts', ['t_dial' => (float)$_id], ['$set' => ['t_answer' => (float)round($t_hangup - $resCache[$_id]['t_up'])]], []);
+                        $mgdb->update('call_campaign_contacts', ['_id' => $updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_CONTACT_ID']['Value']], ['$set' => ['t_answer' => (float)round($t_hangup - $resCache[$_id]['t_up'])]], []);
 					}
 					
 					if($update['status'] == false)
@@ -305,7 +305,11 @@ else
 					if(isset($updateVariableData[$_id]['$set']['Variable']['ANSWEREDTIME']))
 					{
 						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['t_answer' => (float)$updateVariableData[$_id]['$set']['Variable']['ANSWEREDTIME']['Value']]], []);
-                        $mgdb->update('call_campaign_contacts', ['t_dial' => (float)$_id], ['$set' => ['t_answer' => (float)$updateVariableData[$_id]['$set']['Variable']['ANSWEREDTIME']['Value']]], []);
+					}
+					
+					if(isset($updateVariableData[$_id]['$set']['Variable']['ANSWEREDTIME']) && isset($updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_CONTACT_ID']))
+					{
+                        $mgdb->update('call_campaign_contacts', ['_id' => $updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_CONTACT_ID']['Value']], ['$set' => ['t_answer' => (float)$updateVariableData[$_id]['$set']['Variable']['ANSWEREDTIME']['Value']]], []);
 					}
 
 					$update = $mgdb->update($db_collection, ['_id' => (float)$_id], $updateVariableData[$_id], []);
