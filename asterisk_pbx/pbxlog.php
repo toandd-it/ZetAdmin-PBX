@@ -66,6 +66,10 @@ else
 
 			if(isset($res['Event']) && in_array($res['Event'], $eventsAllow) && !empty($channel))
 			{
+				if($res['DialStatus'] == 'ANSWER')
+				{
+					$resCache[$_id]['t_up'] = microtime(true);
+				}
 				/*call Event*/
 				if($res['Event'] == 'Newchannel' && $res['Exten'] != 's')
 				{
@@ -129,10 +133,6 @@ else
 						$res['Msg'] = $update['data']['msg'];
 						$app->callLogSave($res);
 					}
-				}
-				elseif($res['DialStatus'] == 'ANSWER')
-				{
-					$resCache[$_id]['t_up'] = microtime(true);
 				}
 				elseif($res['Event'] == 'AgentCalled')
 				{
