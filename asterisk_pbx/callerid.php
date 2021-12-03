@@ -74,15 +74,21 @@ if(is_numeric($_CONTACT_NUM))
 {
 	$_CONTACT_NUM = (float)$_CONTACT_NUM;
 }
-
-	$contextData = $mgdb->select('call_contexts', ['_id' => $agi_context]);
-	if(!empty($contextData['data']['sip_trunk']))
+	if(empty($AGI_TRUNK))
 	{
-		//$agi->set_variable('AGI_TRUNK', $contextData['data']['sip_trunk']);
+		$contextData = $mgdb->select('call_contexts', ['_id' => $agi_context]);
+		if(!empty($contextData['data']['sip_trunk']))
+		{
+			$agi->set_variable('AGI_TRUNK', $contextData['data']['sip_trunk']);
+		}
+		else
+		{
+			$agi->set_variable('AGI_TRUNK', '');
+		}
 	}
 	else
 	{
-		//$agi->set_variable('AGI_TRUNK', '');
+		$agi->set_variable('AGI_TRUNK', $AGI_TRUNK);
 	}
 
 	//type: internal / outbound / inbound
