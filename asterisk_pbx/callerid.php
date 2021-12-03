@@ -87,11 +87,14 @@ if(!empty($agi_callerid) && !empty($agi_extension))
 {
 	$extCheckData = $mgdb->selects('call_sip_account', ['_id' => ['$in' => [(float)$agi_callerid, (float)$_CONTACT_NUM]]]);
 	$uid = [];
-	foreach($extCheckData['data'] as $udata)
+	if($extCheckData['status'] == true)
 	{
-		$uid[] = array_merge($uid, (array)$udata['uid']);
+		foreach($extCheckData['data'] as $udata)
+		{
+			$uid = array_merge($uid, (array)$udata['uid']);
+		}
+		$uid = array_unique($uid, 0);
 	}
-	$uid = array_unique($uid, 0);
 	$mgdb->update('call_log', ['_id' => (float)$agi_uniqueid], ['CallerIDNum' => $agi_callerid, 'Exten' => $agi_extension, 'uid' => $uid]);
 }
 //type: internal / outbound / inbound
