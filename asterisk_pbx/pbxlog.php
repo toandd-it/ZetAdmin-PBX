@@ -77,10 +77,14 @@ else
 					unset($res['Privilege']);
 					$dataInsert = $res;
 					$dataInsert['_id'] = (float)$_id;
-                    if(empty($res['CallerIDNum']) && !empty($res['DestCallerIDNum']) && is_numberic($res['DestCallerIDNum']))
+                    if(empty($res['CallerIDNum']) && !empty($res['DestCallerIDNum']) && is_numeric($res['DestCallerIDNum']))
                     {
-                      $dataInsert['CallerIDNum'] = $res['DestCallerIDNum'];
+                      	$dataInsert['CallerIDNum'] = empty($res['DestCallerIDNum']) ? $res['DestConnectedLineNum'] : $res['DestCallerIDNum'];
                     }
+					elseif(empty($res['CallerIDNum']) && !empty($res['DestConnectedLineNum']) && is_numeric($res['DestConnectedLineNum']))
+					{
+						$dataInsert['CallerIDNum'] = !empty($res['DestConnectedLineNum']) ? $res['DestConnectedLineNum'] : $res['DestCallerIDNum'];
+					}
 					$dataInsert['t_create'] = (float)$_id;
 					$dataInsert['t_ring'] = 0;
 					$dataInsert['t_answer'] = 0;
@@ -101,25 +105,24 @@ else
 					unset($res['Event']);
 					unset($res['Privilege']);
 					
-					if(!empty($res['Context']) && !empty($res['ChannelStateDesc']) && !empty($res['ConnectedLineNum']))
-					{
-						$updateData['$set']['Context'] = $res['Context'];
-						$updateData['$set']['CallerIDNum'] = $res['ConnectedLineNum'];
-						$updateData['$set']['CallerIDName'] = '';
-					}
-					
+					$dialData = explode("/", $res['DialString']);
+					$Exten = empty($dialData[1]) ? $dialData[0] : $dialData[1];
+					$Trunk = isset($dialData[1]) ? $dialData[0] : '';
+					$res['Exten'] = $Exten;
+					$res['Trunk'] = $Trunk;
 					if(isset($logCheck[$_id]['status']) && $logCheck[$_id]['status'] == true)
 					{
 						/**/
+						unset($res['CallerIDNum']);
 						$updateData['$set'] = $res;
 					}
 					else
 					{
-						$dialData = explode("/", $res['DialString']);
-						$Exten = empty($dialData[1]) ? $dialData[0] : $dialData[1];
-						$Trunk = isset($dialData[1]) ? $dialData[0] : '';
-						
 						$dataInsert = $res;
+						if(empty($res['CallerIDNum']) && !empty($res['DestConnectedLineNum']) && is_numeric($res['DestConnectedLineNum']))
+						{
+							$dataInsert['CallerIDNum'] = !empty($res['DestConnectedLineNum']) ? $res['DestConnectedLineNum'] : $res['DestCallerIDNum'];
+						}
 						$dataInsert['_id'] = (float)$_id;
 						$dataInsert['t_create'] = (float)$_id;
 						$dataInsert['t_ring'] = 0;
@@ -130,6 +133,17 @@ else
 						$dataInsert['Trunk'] = $Trunk;
 						$dataInsert['Context'] = empty($res['Context']) ? $res['DestContext'] : $res['Context'];
 						$mgdb->insert($db_collection, $dataInsert);
+					}
+					
+					if(!empty($res['Context']) && !empty($res['ChannelStateDesc']) && !empty($res['ConnectedLineNum']) && is_numeric($res['ConnectedLineNum']))
+					{
+						$updateData['$set']['Context'] = $res['Context'];
+						$updateData['$set']['CallerIDNum'] = $res['ConnectedLineNum'];
+						$updateData['$set']['CallerIDName'] = '';
+					}
+					elseif(empty($res['CallerIDNum']) && !empty($res['DestConnectedLineNum']) && is_numeric($res['DestConnectedLineNum']))
+					{
+						$updateData['$set']['CallerIDNum'] = !empty($res['DestConnectedLineNum']) ? $res['DestConnectedLineNum'] : $res['DestCallerIDNum'];
 					}
 					
 					if(!empty($updateData))
@@ -278,6 +292,17 @@ else
 						$mgdb->update('call_campaign_contacts', ['_id' => $updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_CONTACT_ID']['Value']], ['$set' => ['DialStatus' => $updateVariableData[$_id]['$set']['Variable']['DIALSTATUS']['Value']]], []);
 					}
 					
+					if(isset($updateVariableData[$_id]['$set']['Variable']['KEYPAD']) || isset($updateVariableData[$_id]['$set']['Variable']['keypad']))
+					{
+						$keypadInsert = empty($updateVariableData[$_id]['$set']['Variable']['KEYPAD']) ? $updateVariableData[$_id]['$set']['Variable']['keypad'] : $updateVariableData[$_id]['$set']['Variable']['KEYPAD'];
+						if(isset($updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_CONTACT_ID']['Value']))
+						{
+							$mgdb->update('call_campaign_contacts', ['_id' => $updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_CONTACT_ID']['Value']], ['$set' => ['keypad' => (array)$keypadInsert]], []);
+						}
+						
+						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['keypad' => (array)$keypadInsert]], []);
+					}
+					
 					if(isset($updateVariableData[$_id]['$set']['Variable']['DIALSTATUS']))
 					{
 						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['DialStatus' => $updateVariableData[$_id]['$set']['Variable']['DIALSTATUS']['Value']]], []);
@@ -306,6 +331,11 @@ else
 				if(isset($res['Event']) && isset($res['Variable']) && $res['Event'] == 'VarSet' && isset($res['Value']))
 				{
 					$varNameUpdate = (string)$res['Variable'];
+					if($res['Variable'] == 'KEYPAD' || $res['Variable'] == 'keypad')
+					{
+						$res['Value'][] = $res['Value'];
+					}
+					$res['Value'] = (string)$res['Value'];
 					$updateVariableData[$_id]['$set']['Variable'][$varNameUpdate] = [
 						'Name' => $res['Variable'], 
 						'Value' => $res['Value'], 
