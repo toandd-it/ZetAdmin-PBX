@@ -77,6 +77,10 @@ else
 					unset($res['Privilege']);
 					$dataInsert = $res;
 					$dataInsert['_id'] = (float)$_id;
+                    if(empty($res['CallerIDNum']) && !empty($res['DestCallerIDNum']) && is_numberic($res['DestCallerIDNum']))
+                    {
+                      $dataInsert['CallerIDNum'] = $res['DestCallerIDNum'];
+                    }
 					$dataInsert['t_create'] = (float)$_id;
 					$dataInsert['t_ring'] = 0;
 					$dataInsert['t_answer'] = 0;
@@ -97,7 +101,7 @@ else
 					unset($res['Event']);
 					unset($res['Privilege']);
 					
-					if(!empty($res['Context']) && !empty($res['ChannelStateDesc']))
+					if(!empty($res['Context']) && !empty($res['ChannelStateDesc']) && !empty($res['ConnectedLineNum']))
 					{
 						$updateData['$set']['Context'] = $res['Context'];
 						$updateData['$set']['CallerIDNum'] = $res['ConnectedLineNum'];
@@ -107,6 +111,7 @@ else
 					if(isset($logCheck[$_id]['status']) && $logCheck[$_id]['status'] == true)
 					{
 						/**/
+						$updateData['$set'] = $res;
 					}
 					else
 					{
@@ -137,7 +142,7 @@ else
 							$app->callLogSave($res);
 						}
 					}
-					$app->callLogSave($res);
+					//$app->callLogSave($res);
 				}
 				elseif($res['Event'] == 'AgentCalled')
 				{
@@ -266,6 +271,16 @@ else
 					if(isset($updateVariableData[$_id]['$set']['Variable']['ANSWEREDTIME']) && isset($updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_CONTACT_ID']))
 					{
                         $mgdb->update('call_campaign_contacts', ['_id' => $updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_CONTACT_ID']['Value']], ['$set' => ['t_answer' => (float)$updateVariableData[$_id]['$set']['Variable']['ANSWEREDTIME']['Value']]], []);
+					}
+					
+					if(isset($updateVariableData[$_id]['$set']['Variable']['DIALSTATUS']) && isset($updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_CONTACT_ID']))
+					{
+						$mgdb->update('call_campaign_contacts', ['_id' => $updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_CONTACT_ID']['Value']], ['$set' => ['DialStatus' => $updateVariableData[$_id]['$set']['Variable']['DIALSTATUS']['Value']]], []);
+					}
+					
+					if(isset($updateVariableData[$_id]['$set']['Variable']['DIALSTATUS']))
+					{
+						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['DialStatus' => $updateVariableData[$_id]['$set']['Variable']['DIALSTATUS']['Value']]], []);
 					}
 					
 					if(!empty($updateVariableData[$_id]))
