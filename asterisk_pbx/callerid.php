@@ -72,34 +72,27 @@ else
 }
 if(is_numeric($_CONTACT_NUM))
 {
-	$_CONTACT_NUM = (float)$_CONTACT_NUM;
+	$_CONTACT_NUM = $_CONTACT_NUM;
 }
 	$contextData = $mgdb->select('call_contexts', ['_id' => $agi_context]);
-	if(empty($AGI_TRUNK))
-	{
 		if(!empty($contextData['data']['sip_trunk']))
 		{
 			$agi->set_variable('AGI_TRUNK', $contextData['data']['sip_trunk']);
 		}
 		else
 		{
-			$agi->set_variable('AGI_TRUNK', '');
+			$agi->set_variable('AGI_TRUNK', $AGI_TRUNK);
 		}
-	}
-	else
-	{
-		$agi->set_variable('AGI_TRUNK', $AGI_TRUNK);
-	}
 
 	//type: internal / outbound / inbound
-	$extData = $mgdb->select('call_sip_account', ['_id' => $_CONTACT_NUM]);
+	$extData = $mgdb->select('call_sip_account', ['_id' => (float)$_CONTACT_NUM]);
 	if(empty($extData['data']['_id']))
 	{
 		$trunkData = $mgdb->select('call_sip_trunk', ['_id' => (float)$_CONTACT_NUM]);
 		if(empty($trunkData['data']['_id']))
 		{
 			$agi->set_variable('AGI_CALL_TYPE', 'outbound');
-			$trunkData = $mgdb->select('call_sip_trunk', ['_id' => $contextData['data']['sip_trunk']]);
+			$trunkData = $mgdb->select('call_sip_trunk', ['_id' => (float)$contextData['data']['sip_trunk']]);
 			
 			if(isset($trunkData['data']['prefix']))
 			{
