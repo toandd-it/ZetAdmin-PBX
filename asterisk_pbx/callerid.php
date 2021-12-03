@@ -70,10 +70,6 @@ else
 {
 	$_CONTACT_NUM = $agi_extension;
 }
-if(is_numeric($_CONTACT_NUM))
-{
-	$_CONTACT_NUM = $_CONTACT_NUM;
-}
 $contextData = $mgdb->select('call_contexts', ['_id' => $agi_context]);
 if(!empty($contextData['data']['sip_trunk']))
 {
