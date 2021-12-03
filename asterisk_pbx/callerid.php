@@ -74,9 +74,9 @@ if(is_numeric($_CONTACT_NUM))
 {
 	$_CONTACT_NUM = (float)$_CONTACT_NUM;
 }
+	$contextData = $mgdb->select('call_contexts', ['_id' => $agi_context]);
 	if(empty($AGI_TRUNK))
 	{
-		$contextData = $mgdb->select('call_contexts', ['_id' => $agi_context]);
 		if(!empty($contextData['data']['sip_trunk']))
 		{
 			$agi->set_variable('AGI_TRUNK', $contextData['data']['sip_trunk']);
@@ -125,7 +125,10 @@ if(is_numeric($_CONTACT_NUM))
 $agi->set_variable('PBX_AUTHOR', 'zetadmin.com');
 $agi->set_variable('PBX_AUTHOR_EMAIL', 'info@zetadmin.com;toandd.it@gmail.com');
 
-//$agi->exec("MixMonitor", "/var/spool/asterisk/monitor/$dateformat/$myfile.wav,b");
+if(isset($contextData['data']['recording']) && $contextData['data']['recording'] == 'yes')
+{
+	$agi->exec("MixMonitor", "/var/spool/asterisk/monitor/$agi_uniqueid.wav,b");
+}
 //$agi->say_number();
 //$agi->hangup();
 //request
