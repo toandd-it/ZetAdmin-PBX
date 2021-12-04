@@ -41,6 +41,20 @@ sleep 0.5
 
 echo " "
 echo "+------------------------------------+"
+echo "|  Install Tool for Text to speech   |"
+echo "+------------------------------------+"
+echo " "
+sudo wget http://mirror.centos.org/centos/7/os/x86_64/Packages/sox-14.4.1-7.el7.x86_64.rpm
+sudo yum -y install sox-14.4.1-7.el7.x86_64.rpm
+
+sudo yum -y install mpg123
+
+echo -e "\033[32mInstall Tool for Text to speech successful!\033[m"
+echo " "
+sleep 0.5
+
+echo " "
+echo "+------------------------------------+"
 echo "|      Install jansson               |"
 echo "+------------------------------------+"
 echo " "
