@@ -58,6 +58,9 @@ sudo yum -y install sox-14.4.1-7.el7.x86_64.rpm
 
 sudo yum -y install mpg123
 
+sudo yum -y localinstall --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-7.noarch.rpm
+sudo yum -y install ffmpeg ffmpeg-devel
+
 echo -e "\033[32mInstall Tool for Text to speech successful!\033[m"
 echo " "
 sleep 0.5
