@@ -444,8 +444,8 @@ sudo ls -l $usr_dir/pbxlog.service
 
 sudo systemd-analyze verify pbxlog.service 
 sudo systemctl daemon-reload
-sudo systemctl start pbxlog.service
 sudo systemctl enable pbxlog.service
+sudo systemctl start pbxlog.service
 
 sleep 0.5
 
