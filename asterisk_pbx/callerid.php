@@ -97,7 +97,14 @@ if(!empty($agi_callerid) && !empty($agi_extension))
 		}
 		$uid = array_unique($uid, 0);
 	}
-	$mgdb->update('call_log', ['_id' => (float)$agi_uniqueid], ['$set' => ['Recording' => $recording, 'CallerIDNum' => $agi_callerid, 'Exten' => $agi_extension, 'uid' => $uid]]);
+	if(!empty($extCheckData['data']))
+	{
+		$mgdb->update('call_log', ['_id' => (float)$agi_uniqueid], ['$set' => ['Recording' => $recording, 'CallerIDNum' => $agi_callerid, 'Exten' => $_CONTACT_NUM, 'uid' => $uid]]);
+	}
+	else
+	{
+		$mgdb->update('call_log', ['_id' => (float)$agi_uniqueid], ['$set' => ['Recording' => $recording, 'CallerIDNum' => $agi_callerid, 'Exten' => $_CONTACT_NUM]]);
+	}
 }
 //type: internal / outbound / inbound
 
