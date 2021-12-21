@@ -194,7 +194,7 @@ then
 	echo 'enabled=1' >> $mongodb_repo
 	echo 'gpgkey=https://www.mongodb.org/static/pgp/server-4.4.asc' >> $mongodb_repo
 fi
-sudo yum install -y mongodb-orgb
+sudo yum install -y mongodb-org
 sudo firewall-cmd --zone=public --add-port=27017/tcp --permanent
 sudo firewall-cmd --reload
 sudo systemctl start mongod.service
