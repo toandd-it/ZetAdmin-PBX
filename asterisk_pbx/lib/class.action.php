@@ -615,17 +615,9 @@ class PbxApi
 
 	public function unixToLocal($timestamp=0, $timezone='Atlantic/Reykjavik')
     {
-		$local_timezone = new DateTimeZone($timezone);
-		$date_time = new DateTime('now', $local_timezone);
-		$offset = $date_time->format('P');
-		$offset = explode(':', $offset);
-		if($offset[1] == 00){ $offset2 = .0; }
-		if($offset[1] == 30){ $offset2 = .5; }
-		if($offset[1] == 45){ $offset2 = .75; }
-		$hours = $offset[0].$offset2 + 0;
-		$seconds = $hours * 3600;
-		$result = floor( $timestamp + $seconds );
-		return $result;
+		$dateTime = new DateTime (date('Y-m-d H:i:s', $timestamp), new DateTimeZone($timezone));
+		$dateTime->setTimezone(new DateTimeZone(date_default_timezone_get()));
+		return strtotime($dateTime->format('Y-m-d H:i:s'));
 	}
 	
 	public function convertTimeData($data=NULL)
