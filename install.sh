@@ -335,8 +335,8 @@ echo " "
 yum install -y certbot
 
 certbot certonly --webroot -w $webroot/ --agree-tos -m admin@$pbx_domain -d $pbx_domain
-crontab_line="* */12 * * * root /usr/bin/certbot renew >/dev/null 2>&1"
-(crontab -u $(whoami) -l; echo "$crontab_line" ) | crontab -u $(whoami) -
+crontab_line="* */12 * * * /usr/bin/certbot renew >/dev/certbot 2>&1"
+(crontab -u $(whoami) -l; echo "* */12 * * * /usr/bin/certbot renew >/dev/certbot 2>&1" ) | crontab -u $(whoami) -
 sudo systemctl restart crond.service
 sudo systemctl restart lsws.service
 echo -e "\033[32mInstall Let’s Encrypt successful!\033[m"
@@ -538,6 +538,22 @@ echo 'bantime = 86400' >> $asterisk_file
 
 sudo systemctl enable fail2ban
 sudo systemctl start fail2ban
+
+cronPbxLogFile=/var/www/pbxlog.sh
+sudo touch $cronPbxLogFile
+echo '#!/bin/sh' >> $cronPbxLogFile
+echo 'STATUS="$(systemctl is-active pbxlog.service)"' >> $cronPbxLogFile
+echo 'if [ "${STATUS}" = "active" ]; then' >> $cronPbxLogFile
+echo '    echo "pbxlog: true"' >> $cronPbxLogFile
+echo 'else ' >> $cronPbxLogFile
+echo '	echo "pbxlog: false"' >> $cronPbxLogFile
+echo '	sudo systemctl restart pbxlog.service' >> $cronPbxLogFile
+echo '    exit 1' >> $cronPbxLogFile
+echo 'fi' >> $cronPbxLogFile
+
+crontab_line_pbxlog="*/1 * * * * sh /var/www/pbxlog.sh >/dev/pbxlog 2>&1"
+(crontab -u $(whoami) -l; echo "$crontab_line_pbxlog" ) | crontab -u $(whoami) -
+sudo systemctl restart crond.service
 
 sudo chown -R nobody:nobody $webroot/
 

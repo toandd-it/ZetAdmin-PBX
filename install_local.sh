@@ -5,7 +5,7 @@ echo "|  Install Cloud PBX API vs Asterisk 13 on Centos 7                     |"
 echo "|  Database: MongoDB 4.4                                                |"
 echo "|  PHP: 7.3                                                             |"
 echo "|  By ZetAdmin Framework                                                |"
-echo "|  NOTE: Only apply installation at cloud server or cloud VPS services  |"
+echo "|  NOTE: Only apply installation on VMWare  							  |"
 echo "+-----------------------------------------------------------------------+"
 
 IP=$(hostname -I)
@@ -475,6 +475,22 @@ sudo systemctl enable pbxlog.service
 sudo systemctl start pbxlog.service
 
 sleep 0.5
+
+cronPbxLogFile=/var/www/pbxlog.sh
+sudo touch /var/www/pbxlog.sh
+echo '#!/bin/sh' >> $cronPbxLogFile
+echo 'STATUS="$(systemctl is-active pbxlog.service)"' >> $cronPbxLogFile
+echo 'if [ "${STATUS}" = "active" ]; then' >> $cronPbxLogFile
+echo '    echo "pbxlog: true"' >> $cronPbxLogFile
+echo 'else ' >> $cronPbxLogFile
+echo '	echo "pbxlog: false"' >> $cronPbxLogFile
+echo '	sudo systemctl restart pbxlog.service' >> $cronPbxLogFile
+echo '    exit 1' >> $cronPbxLogFile
+echo 'fi' >> $cronPbxLogFile
+
+crontab_line_pbxlog="*/1 * * * * sh /var/www/pbxlog.sh >/dev/pbxlog 2>&1"
+(crontab -u $(whoami) -l; echo "$crontab_line_pbxlog" ) | crontab -u $(whoami) -
+sudo systemctl restart crond.service
 
 sudo chown -R nobody:nobody $webroot/
 
