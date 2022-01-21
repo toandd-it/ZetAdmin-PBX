@@ -546,8 +546,8 @@ echo 'STATUS="$(systemctl is-active pbxlog.service)"' >> $cronPbxLogFile
 echo 'if [ "${STATUS}" = "active" ]; then' >> $cronPbxLogFile
 echo '    echo "pbxlog: true"' >> $cronPbxLogFile
 echo 'else ' >> $cronPbxLogFile
-echo '	echo "pbxlog: false"' >> $cronPbxLogFile
-echo '	sudo systemctl restart pbxlog.service' >> $cronPbxLogFile
+echo '    echo "pbxlog: false"' >> $cronPbxLogFile
+echo '    sudo systemctl restart pbxlog.service' >> $cronPbxLogFile
 echo '    exit 1' >> $cronPbxLogFile
 echo 'fi' >> $cronPbxLogFile
 
