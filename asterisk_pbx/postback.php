@@ -20,7 +20,14 @@ if(isset($_SERVER['HTTP_USER_AGENT']))
 $_languageDefault = 'en';
 
 include("config.php");
-
+if(empty($_POST))
+{
+	$json = file_get_contents('php://input');
+	if(!empty($json))
+	{
+		$_POST = json_decode($json, true);
+	}
+}
 if(isset($_POST['action']) && !empty($_POST['action']) && !empty($_POST['api_id']) && !empty($_POST['api_key']))
 {
 	$action = $_POST['action'];
