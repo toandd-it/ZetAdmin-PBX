@@ -430,9 +430,13 @@ echo '	same => n,Hangup()' >> $asterisk_etc/extensions.conf
 echo '' >> $asterisk_etc/extensions.conf
 echo '#include extensions_api.conf' >> $asterisk_etc/extensions.conf
 sudo chmod 777 $asterisk_etc/extensions_api.conf
+sudo touch $asterisk_etc/extensions_radio.conf
+echo ';extensions_radio.conf' >> $asterisk_etc/extensions_radio.conf
 echo '' >> $asterisk_etc/extensions.conf
 echo '#include extensions_radio.conf' >> $asterisk_etc/extensions.conf
 sudo chmod 777 $asterisk_etc/extensions_radio.conf
+sudo touch $asterisk_etc/extensions_otp.conf
+echo ';extensions_otp.conf' >> $asterisk_etc/extensions_otp.conf
 echo '' >> $asterisk_etc/extensions.conf
 echo '#include extensions_otp.conf' >> $asterisk_etc/extensions.conf
 sudo chmod 777 $asterisk_etc/extensions_otp.conf
