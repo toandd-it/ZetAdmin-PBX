@@ -11,6 +11,7 @@ $app = new PbxApi();
 $mgdb = new MGDB_Api($db_url, $db_name);
 $agi = new AGI();
 
+$partnerId = '';
 $_id = (string)new \MongoDB\BSON\ObjectID;
 
 //Start debug
@@ -65,6 +66,12 @@ $CAMPAIGN_CONTACT_NUM = $agi->get_variable("CAMPAIGN_CONTACT_NUM", true);
 $AGI_TRUNK = $agi->get_variable("AGI_TRUNK", true);
 $AGI_CALL_TYPE = $agi->get_variable("AGI_CALL_TYPE", true);
 
+$AGI_OTP_NUMBER = $agi->get_variable("AGI_OTP_NUMBER", true);
+if(!empty($AGI_OTP_NUMBER))
+{
+	$agi->set_variable('AGI_OTP_NUMBER', $AGI_OTP_NUMBER);
+}
+
 if(!empty($CAMPAIGN_CONTACT_NUM))
 {
 	$_CONTACT_NUM = $CAMPAIGN_CONTACT_NUM;
@@ -76,6 +83,7 @@ else
 $contextData = $mgdb->select('call_contexts', ['_id' => $agi_context]);
 if(!empty($contextData['data']['sip_trunk']))
 {
+	$AGI_TRUNK = $contextData['data']['sip_trunk'];
 	$agi->set_variable('AGI_TRUNK', $contextData['data']['sip_trunk']);
 }
 else
@@ -175,7 +183,7 @@ if(!empty($contextData['data']['forward_trunks']) && !empty($contextData['data']
 }
 
 $recording = 'no';
-if(isset($contextData['data']['recording']) && $contextData['data']['recording'] == 'yes')
+if(isset($contextData['data']['recording']) && $contextData['data']['recording'] == 'yes' && !empty($agi_callerid) && !empty($agi_extension))
 {
     $agi_uniqueid_md5 = md5($agi_uniqueid);
 	$agi->exec("MixMonitor", "/var/spool/asterisk/monitor/$agi_uniqueid_md5.wav,b");
@@ -183,7 +191,7 @@ if(isset($contextData['data']['recording']) && $contextData['data']['recording']
 }
 
 $callback = 'no';
-if(isset($contextData['data']['callback']) && $contextData['data']['callback'] == 'yes')
+if(isset($contextData['data']['callback']) && $contextData['data']['callback'] == 'yes' && !empty($agi_callerid) && !empty($agi_extension))
 {
 	$callback = $contextData['data']['callback'];
 }
@@ -207,7 +215,7 @@ if(!empty($agi_callerid) && !empty($agi_extension))
 	}
 	else
 	{
-		$updateCallLog = ['$set' => ['Callback' => $callback, 'Recording' => $recording, 'CallerIDNum' => $agi_callerid, 'Exten' => $_CONTACT_NUM, 'uid' => $uid]];
+		$updateCallLog = ['$set' => ['Callback' => $callback, 'Recording' => $recording, 'CallerIDNum' => $agi_callerid, 'Exten' => $_CONTACT_NUM, 'Trunk' => $AGI_TRUNK, 'uid' => $uid]];
 	}
 	
 	$mgdb->update('call_log', ['_id' => (float)$agi_uniqueid], $updateCallLog);
@@ -317,7 +325,7 @@ if(!empty($callType) && $callType == 'outbound')
 		}
 	}
 }
-//$agi->say_number();
+
 //$agi->hangup();
 $app->errorSave();
 ?>
