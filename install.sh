@@ -322,6 +322,7 @@ touch index.html
 echo 'pageok!' >> index.html
 cd ~
 sudo systemctl restart lsws.service
+ln -s /usr/local/lsws/lsphp73/bin/php /usr/bin/php
 echo -e "\033[32mCreate VirtualHost successful!\033[m"
 echo " "
 
