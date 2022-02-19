@@ -30,7 +30,7 @@ read pbx_domain
 echo -n "Please enter name for PBX: ";
 read pbx_name
 
-sudo yum -y install bind-utils
+sudo yum -y install bind-utils wget zip unzip
 
 IPDATA=$(dig +short $pbx_domain)
 if grep -q $IP <<< $IPDATA; then
