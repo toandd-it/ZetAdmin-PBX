@@ -377,6 +377,18 @@ echo '' >> $asterisk_etc/manager.conf
 echo '#include manager_api.conf' >> $asterisk_etc/manager.conf
 sudo chown -R asterisk:asterisk $asterisk_etc/manager.conf
 
+rm -rf $asterisk_etc/extensions.conf
+sudo touch $asterisk_etc/extensions.conf
+echo '[general]' >> $asterisk_etc/extensions.conf
+echo 'static=yes' >> $asterisk_etc/extensions.conf
+echo 'writeprotect=no' >> $asterisk_etc/extensions.conf
+echo 'clearglobalvars=no' >> $asterisk_etc/extensions.conf
+echo ' ' >> $asterisk_etc/extensions.conf
+echo '[public]' >> $asterisk_etc/extensions.conf
+echo ' ' >> $asterisk_etc/extensions.conf
+echo '[default]' >> $asterisk_etc/extensions.conf
+echo ' ' >> $asterisk_etc/extensions.conf
+
 sudo touch $asterisk_etc/extensions_api.conf
 echo ';extensions_api.conf' >> $asterisk_etc/extensions_api.conf
 echo '' >> $asterisk_etc/extensions.conf
