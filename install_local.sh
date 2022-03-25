@@ -449,6 +449,8 @@ sudo cp -pf $webroot/api/zetadmin_pbx/config.php $agibin_dir/config.php
 
 sudo chmod 777 $agibin_dir/*.php
 sudo chown -R asterisk:asterisk $asterisk_etc/phpagi.conf
+sudo chmod 777 /var/lib/asterisk/
+sudo chmod 777 /etc/asterisk/
 sudo systemctl restart asterisk
 
 sudo yum -y install fail2ban fail2ban-systemd
@@ -512,6 +514,22 @@ crontab_line_pbxlog="*/1 * * * * sh /var/www/pbxlog.sh >/dev/pbxlog 2>&1"
 sudo systemctl restart crond.service
 
 sudo chown -R nobody:nobody $webroot/
+
+sleep 1
+
+wget http://mirror.centos.org/centos/7/os/x86_64/Packages/usb_modeswitch-2.5.1-1.el7.x86_64.rpm
+yum install -y usb_modeswitch-2.5.1-1.el7.x86_64.rpm
+
+#for asterisk 13.x
+#wget https://github.com/oleg-krv/asterisk-chan-dongle/archive/asterisk13.zip
+#unzip asterisk13.zip
+#cd asterisk13*
+#aclocal && autoconf && automake -a
+#./configure --with-astversion=13.38.3
+#make 
+#make install
+#cp chan_dongle.so /usr/lib/asterisk/modules/
+#cp etc/dongle.conf /etc/asterisk
 
 echo -e "\033[32mCreate Cloud PBX API successful!\033[m"
 echo " "
