@@ -428,10 +428,10 @@ echo '#include ari_api.conf' >> $asterisk_etc/ari.conf
 rm -rf $asterisk_etc/ari_api.conf
 sudo touch $asterisk_etc/ari_api.conf
 max_ari_user=32
-for (( i=1; i <= $max_ari_user; ++i ))
+for (( j=1; j <= $max_ari_user; ++j ))
 do
 	echo '' >> $asterisk_etc/ari_api.conf
-    echo '[ari_api_'$i']' >> $asterisk_etc/ari_api.conf
+    echo '[ari_api_'$j']' >> $asterisk_etc/ari_api.conf
 	echo 'type = user' >> $asterisk_etc/ari_api.conf
 	echo 'read_only = yes' >> $asterisk_etc/ari_api.conf
 	echo 'password = ari_api' >> $asterisk_etc/ari_api.conf
