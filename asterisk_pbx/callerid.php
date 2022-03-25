@@ -14,6 +14,23 @@ $agi = new AGI();
 $partnerId = '';
 $_id = (string)new \MongoDB\BSON\ObjectID;
 
+$prefixNetwork = [
+	'vinaphone' => ['088', '091', '094', '083', '084', '085', '081', '082'],
+	'viettel_mobile' => ['086', '096', '097', '098', '032', '033', '034', '035', '036', '037', '038', '039'],
+	'mobifone' => ['089', '090', '093', '070', '079', '077', '076', '078'],
+	'vietnamobile' => ['092', '056', '058'],
+	'gmobile' => ['099', '059'],
+	'itelecom' => ['087']
+];
+
+function floatArray($stringArray)
+{
+	return array_map(
+		function($value) { return (float)$value; },
+		$stringArray
+	);
+}
+
 //Start debug
 /*
 $debugFile = '/var/lib/asterisk/agi-bin/debug.txt';
@@ -63,14 +80,10 @@ $agi_uniqueid = $agi->request[agi_uniqueid];
 $USER_UID = $agi->get_variable("USER_UID", true);
 $CAMPAIGN_ID = $agi->get_variable("CAMPAIGN_ID", true);
 $CAMPAIGN_CONTACT_NUM = $agi->get_variable("CAMPAIGN_CONTACT_NUM", true);
+$CAMPAIGN_CONTACT_NAME = $agi->get_variable("CAMPAIGN_CONTACT_NAME", true);
+$CAMPAIGN_CONTACT_ID = $agi->get_variable("CAMPAIGN_CONTACT_ID", true);
 $AGI_TRUNK = $agi->get_variable("AGI_TRUNK", true);
 $AGI_CALL_TYPE = $agi->get_variable("AGI_CALL_TYPE", true);
-
-$AGI_OTP_NUMBER = $agi->get_variable("AGI_OTP_NUMBER", true);
-if(!empty($AGI_OTP_NUMBER))
-{
-	$agi->set_variable('AGI_OTP_NUMBER', $AGI_OTP_NUMBER);
-}
 
 if(!empty($CAMPAIGN_CONTACT_NUM))
 {
@@ -80,17 +93,20 @@ else
 {
 	$_CONTACT_NUM = $agi_extension;
 }
-$contextData = $mgdb->select('call_contexts', ['_id' => $agi_context]);
-if(!empty($contextData['data']['sip_trunk']))
-{
-	$AGI_TRUNK = $contextData['data']['sip_trunk'];
-	$agi->set_variable('AGI_TRUNK', $contextData['data']['sip_trunk']);
-}
-else
-{
-	$agi->set_variable('AGI_TRUNK', $AGI_TRUNK);
-}
 
+$_CONTACT_NUM_PREFIX = str_split((string)$_CONTACT_NUM, 3)[0];
+$network = '';
+foreach($prefixNetwork as $keyNetwork => $networkData)
+{
+	if(in_array($_CONTACT_NUM_PREFIX, $networkData))
+	{
+		$network = $keyNetwork;
+		break;
+	}
+}
+$agi->set_variable('AGI_CALLERID', $agi_callerid);
+$agi->set_variable('AGI_NETWORK', $network);
+$contextData = $mgdb->select('call_contexts', ['_id' => $agi_context]);
 if(!empty($contextData['data']['forward_trunks']) && !empty($contextData['data']['forward_phones']))
 {
 	$debugFwTrunk = '/var/lib/asterisk/agi-bin/caches/forward_context_'.$agi_context.'.txt';
@@ -195,6 +211,169 @@ if(isset($contextData['data']['callback']) && $contextData['data']['callback'] =
 {
 	$callback = $contextData['data']['callback'];
 }
+//type: internal / outbound / inbound
+
+$extData = $mgdb->select('call_sip_account', ['_id' => (float)$_CONTACT_NUM]);
+if(empty($extData['data']['_id']))
+{
+	$trunkData = $mgdb->select('call_sip_trunk', ['_id' => (float)$_CONTACT_NUM]);
+	if(empty($trunkData['data']['_id']))
+	{
+		if(!empty($AGI_CALL_TYPE))
+		{
+			$agi->set_variable('AGI_CALL_TYPE', $AGI_CALL_TYPE);
+		}
+		else
+		{
+			$callType = 'outbound';
+			$AGI_CALL_TYPE = $callType;
+			$agi->set_variable('AGI_CALL_TYPE', 'outbound');
+		}
+		$trunkData = $mgdb->select('call_sip_trunk', ['_id' => (float)$contextData['data']['sip_trunk']]);
+
+		if(isset($trunkData['data']['prefix']))
+		{
+			$agi->set_variable('AGI_CALL_NUMBER', $trunkData['data']['prefix'].$_CONTACT_NUM);
+		}
+		else
+		{
+			$agi->set_variable('AGI_CALL_NUMBER', $_CONTACT_NUM);
+		}
+	}
+	else
+	{
+		if(!empty($AGI_CALL_TYPE))
+		{
+			$agi->set_variable('AGI_CALL_TYPE', $AGI_CALL_TYPE);
+		}
+		else
+		{
+			$AGI_CALL_TYPE = 'inbound';
+			$agi->set_variable('AGI_CALL_TYPE', 'inbound');
+		}
+		$agi->set_variable('AGI_CALL_NUMBER', $agi_callerid);
+	}
+}
+else
+{
+	$agi->set_variable('AGI_CALL_NUMBER', $_CONTACT_NUM);
+	if(!empty($AGI_CALL_TYPE))
+	{
+		$agi->set_variable('AGI_CALL_TYPE', $AGI_CALL_TYPE);
+	}
+	else
+	{
+		$AGI_CALL_TYPE = 'internal';
+		$agi->set_variable('AGI_CALL_TYPE', $AGI_CALL_TYPE);
+	}
+}
+
+$AGI_CALL_PREFIX = '';
+if($AGI_CALL_TYPE == 'outbound')
+{
+	if(!empty($contextData['data']['sip_trunk']))
+	{
+		if(count($contextData['data']['sip_trunk']) > 1)
+		{
+			$trunksData = $mgdb->selects('call_sip_trunk', ['network' => $network, '_id' => ['$in' => floatArray($contextData['data']['sip_trunk'])]], []);
+			
+			//$agi->set_variable('AGI_TRUNK_BY_NETWORK', json_encode(floatArray($contextData['data']['sip_trunk'])));
+			if($trunksData['status'] == true && !empty($trunksData['data']))
+			{
+				//check trunk live
+				$checkTrunkStatus = false;
+				foreach($trunksData['data'] as $trunkD)
+				{
+					$trunkCheck = $trunkD['_id'];
+					$callsLogByTrunk = $mgdb->select('call_log', ['Trunk' => (string)$trunkCheck, 'cause_txt' => ['$exists' => false]]);
+					if(empty($callsLogByTrunk['data']['_id']))
+					{
+						
+						
+						$AGI_CALL_PREFIX = $trunkD['prefix'];
+						$AGI_TRUNK = $trunkCheck;
+						$checkTrunkStatus = true;
+						break;
+					}
+				}
+				
+				if($checkTrunkStatus == false)
+				{
+					$checkTrunkStatus2 = false;
+					foreach($contextData['data']['sip_trunk'] as $trunkId)
+					{
+						$callsLogByTrunk2 = $mgdb->select('call_log', ['Trunk' => (string)$trunkId, 'cause_txt' => ['$exists' => false]]);
+						if(empty($callsLogByTrunk2['data']['_id']))
+						{
+							$AGI_TRUNK = $trunkId;
+							$checkTrunkStatus2 = true;
+							break;
+						}
+					}
+					if($checkTrunkStatus2 = false)
+					{
+						$agi->hangup();
+					}
+				}
+			}
+			else
+			{
+				$debugTrunk = '/var/lib/asterisk/agi-bin/caches/context_'.$agi_context.'.txt';
+				if(file_exists($debugTrunk))
+				{
+					$getCacheT = file($debugTrunk);
+					if(count($getCacheT) == count($contextData['data']['sip_trunk']))
+					{
+						$lastTrunk = $getCacheT[0];
+						unset($getCacheT[0]);
+						
+						$AGI_TRUNK = $lastTrunk;
+						file_put_contents($debugTrunk, "\n".$AGI_TRUNK, FILE_APPEND | LOCK_EX);
+					}
+					else
+					{
+						foreach($contextData['data']['sip_trunk'] as $sipTrunk)
+						{
+							if(!in_array($sipTrunk, $getCacheT))
+							{
+								$AGI_TRUNK = $sipTrunk;
+								file_put_contents($debugTrunk, "\n".$AGI_TRUNK, FILE_APPEND | LOCK_EX);
+								break;
+							}
+						}
+					}
+				}
+				else
+				{
+					$AGI_TRUNK = $contextData['data']['sip_trunk'][0];
+					file_put_contents($debugTrunk, $AGI_TRUNK, FILE_APPEND | LOCK_EX);
+				}
+			}
+		}
+		else
+		{
+			$AGI_TRUNK = $contextData['data']['sip_trunk'][0];
+		}
+		$agi->set_variable('AGI_TRUNK', (int)$AGI_TRUNK);
+	}
+	else
+	{
+		$agi->set_variable('AGI_TRUNK', (int)$AGI_TRUNK);
+	}
+}
+else
+{
+	$agi->set_variable('AGI_TRUNK', (int)$AGI_TRUNK);
+}
+if(!empty($AGI_TRUNK) && empty($AGI_CALL_PREFIX))
+{
+	$trunkDataPrefix = $mgdb->select('call_sip_trunk', ['_id' => (float)$AGI_TRUNK], []);
+	if(!empty($trunkDataPrefix['data']['prefix']))
+	{
+		$AGI_CALL_PREFIX = $trunkDataPrefix['data']['prefix'];
+	}
+}
+$agi->set_variable('AGI_CALL_PREFIX', $AGI_CALL_PREFIX);
 
 if(!empty($agi_callerid) && !empty($agi_extension))
 {
@@ -220,70 +399,24 @@ if(!empty($agi_callerid) && !empty($agi_extension))
 	
 	$mgdb->update('call_log', ['_id' => (float)$agi_uniqueid], $updateCallLog);
 	
-	if(!empty($AGI_TRUNK) && !empty($CAMPAIGN_CONTACT_NUM))
+	if(!empty($AGI_TRUNK) && !empty($CAMPAIGN_CONTACT_NUM) && !empty($CAMPAIGN_CONTACT_ID))
 	{
 		if(!empty($AGI_FORWARD_NUMBER) && !empty($AGI_FORWARD_TRUNK))
 		{
+			$updateCamContactCrm = ['$set' => [$CAMPAIGN_ID.'.TrunkFw' => $AGI_FORWARD_TRUNK, $CAMPAIGN_ID.'.ExtenFw' => $AGI_FORWARD_NUMBER, $CAMPAIGN_ID.'.agent' => $AGI_FORWARD_NUMBER, $CAMPAIGN_ID.'.Trunk' => $AGI_TRUNK, $CAMPAIGN_ID.'.t_dial' => (float)$agi_uniqueid]];
 			$updateCamContact = ['$set' => ['TrunkFw' => $AGI_FORWARD_TRUNK, 'ExtenFw' => $AGI_FORWARD_NUMBER, 'agent' => $AGI_FORWARD_NUMBER, 'Trunk' => $AGI_TRUNK]];
 		}
 		else
 		{
+			$updateCamContactCrm = ['$set' => [$CAMPAIGN_ID.'.Trunk' => $AGI_TRUNK, $CAMPAIGN_ID.'.t_dial' => (float)$agi_uniqueid]];
 			$updateCamContact = ['$set' => ['Trunk' => $AGI_TRUNK]];
 		}
-		$mgdb->update('call_campaign_contacts', ['phone' => $CAMPAIGN_CONTACT_NUM], $updateCamContact);
-	}
-}
-//type: internal / outbound / inbound
-
-$extData = $mgdb->select('call_sip_account', ['_id' => (float)$_CONTACT_NUM]);
-if(empty($extData['data']['_id']))
-{
-	$trunkData = $mgdb->select('call_sip_trunk', ['_id' => (float)$_CONTACT_NUM]);
-	if(empty($trunkData['data']['_id']))
-	{
-		if(!empty($AGI_CALL_TYPE))
+		
+		if(!empty($CAMPAIGN_CONTACT_ID))
 		{
-			$agi->set_variable('AGI_CALL_TYPE', $AGI_CALL_TYPE);
+			$mgdb->update('call_crm_customers', ['_id' => $CAMPAIGN_CONTACT_ID], $updateCamContactCrm);
+			$mgdb->update('call_campaign_contacts', ['_id' => $CAMPAIGN_CONTACT_ID], $updateCamContact);
 		}
-		else
-		{
-			$callType = 'outbound';
-			$agi->set_variable('AGI_CALL_TYPE', 'outbound');
-		}
-		$trunkData = $mgdb->select('call_sip_trunk', ['_id' => (float)$contextData['data']['sip_trunk']]);
-
-		if(isset($trunkData['data']['prefix']))
-		{
-			$agi->set_variable('AGI_CALL_NUMBER', $trunkData['data']['prefix'].$_CONTACT_NUM);
-		}
-		else
-		{
-			$agi->set_variable('AGI_CALL_NUMBER', $_CONTACT_NUM);
-		}
-	}
-	else
-	{
-		if(!empty($AGI_CALL_TYPE))
-		{
-			$agi->set_variable('AGI_CALL_TYPE', $AGI_CALL_TYPE);
-		}
-		else
-		{
-			$agi->set_variable('AGI_CALL_TYPE', 'inbound');
-		}
-		$agi->set_variable('AGI_CALL_NUMBER', $_CONTACT_NUM);
-	}
-}
-else
-{
-	$agi->set_variable('AGI_CALL_NUMBER', $_CONTACT_NUM);
-	if(!empty($AGI_CALL_TYPE))
-	{
-		$agi->set_variable('AGI_CALL_TYPE', $AGI_CALL_TYPE);
-	}
-	else
-	{
-		$agi->set_variable('AGI_CALL_TYPE', 'internal');
 	}
 }
 

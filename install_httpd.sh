@@ -435,6 +435,7 @@ sudo touch $asterisk_etc/sip_account.conf
 echo ';sip_account.conf' >> $asterisk_etc/sip_account.conf
 echo '#include sip_account.conf' >> $asterisk_etc/sip.conf
 sudo chmod 777 $asterisk_etc/sip_account.conf
+sudo chmod 777 $asterisk_etc/sip.conf
 
 sudo touch $asterisk_etc/sip_trunk.conf
 echo ';sip_trunk.conf' >> $asterisk_etc/sip_trunk.conf
@@ -502,9 +503,11 @@ sudo systemctl daemon-reload
 sudo systemctl enable pbxlog.service
 sudo systemctl start pbxlog.service
 
+sleep 1
+
 sudo touch $usr_dir/radiopbx.service
 echo '[Unit]' >> $usr_dir/radiopbx.service
-echo 'Description=PBX log service' >> $usr_dir/radiopbx.service
+echo 'Description=PBX radio service' >> $usr_dir/radiopbx.service
 echo 'After=network.target' >> $usr_dir/radiopbx.service
 echo '' >> $usr_dir/radiopbx.service
 echo '[Service]' >> $usr_dir/radiopbx.service
@@ -524,7 +527,58 @@ sudo systemctl daemon-reload
 sudo systemctl enable radiopbx.service
 sudo systemctl start radiopbx.service
 
-sleep 0.5
+sleep 1
+
+httpdCmdFile=/var/www/httpdcmd.sh
+sudo rm -rf $httpdCmdFile
+sudo touch $httpdCmdFile
+echo '#!/bin/sh' >> $httpdCmdFile
+echo 'while true ; do' >> $httpdCmdFile
+echo '	actions="$(cat /var/www/httpdcmd.log)"' >> $httpdCmdFile
+echo '	if [ -z "$actions" ] ' >> $httpdCmdFile
+echo '	then' >> $httpdCmdFile
+echo '		sleep 2' >> $httpdCmdFile
+echo '	else' >> $httpdCmdFile
+echo '		echo "CMD#$actions" >> /var/www/httpdcmd.out' >> $httpdCmdFile
+echo '		res="$($actions)"' >> $httpdCmdFile
+echo '		echo "CMD_response#start---------" >> /var/www/httpdcmd.out' >> $httpdCmdFile
+echo '		echo "$res" >> /var/www/httpdcmd.out' >> $httpdCmdFile
+echo '		echo "CMD_response#end---------" >> /var/www/httpdcmd.out' >> $httpdCmdFile
+echo '		echo " " >> /var/www/httpdcmd.out' >> $httpdCmdFile
+echo '		echo -n "" > /var/www/httpdcmd.log' >> $httpdCmdFile
+echo '	fi' >> $httpdCmdFile
+echo 'done' >> $httpdCmdFile
+sudo touch /var/www/httpdcmd.log
+echo ' ' >> /var/www/httpdcmd.log
+sudo touch /var/www/httpdcmd.out
+echo ' ' >> /var/www/httpdcmd.out
+
+sleep 1
+
+sudo rm -rf $usr_dir/httpdcmd.service
+sudo touch $usr_dir/httpdcmd.service
+echo '[Unit]' >> $usr_dir/httpdcmd.service
+echo 'Description=httpd cmd service' >> $usr_dir/httpdcmd.service
+echo 'After=network.target' >> $usr_dir/httpdcmd.service
+echo '' >> $usr_dir/radiopbx.service
+echo '[Service]' >> $usr_dir/radiopbx.service
+echo 'ExecStart=nohup /var/www/httpdcmd.sh >> /var/www/httpdcmd.out &' >> $usr_dir/httpdcmd.service
+echo 'Restart=always' >> $usr_dir/httpdcmd.service
+echo 'User=nobody' >> $usr_dir/httpdcmd.service
+echo '' >> $usr_dir/httpdcmd.service
+echo '[Install]' >> $usr_dir/httpdcmd.service
+echo 'WantedBy=multi-user.target' >> $usr_dir/httpdcmd.service
+sudo chmod 644 $usr_dir/httpdcmd.service
+
+sudo ln -s $usr_dir/httpdcmd.service $system_dir/
+sudo ls -l $usr_dir/httpdcmd.service
+
+sudo systemd-analyze verify httpdcmd.service 
+sudo systemctl daemon-reload
+sudo systemctl enable httpdcmd.service
+sudo systemctl start httpdcmd.service
+
+sleep 1
 
 sudo yum -y install fail2ban fail2ban-systemd
 sudo cp -pf /etc/fail2ban/jail.conf /etc/fail2ban/jail.local

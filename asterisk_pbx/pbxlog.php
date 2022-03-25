@@ -46,9 +46,9 @@ else
 		{
 			//$res = json_decode(json_encode($res), true);
 
-			if(isset($res['Uniqueid']))
+			if(isset($res['Linkedid']))
 			{
-				$_id = $res['Uniqueid'];
+				$_id = $res['Linkedid'];
 			}
 			elseif(isset($res['DestUniqueid']))
 			{
@@ -194,6 +194,21 @@ else
 							}
 						}
 					}
+					else
+					{
+						if(!empty($res['DialString']))
+						{
+							$dialData = explode("/", $res['DialString']);
+							$MemberName = empty($dialData[1]) ? $dialData[0] : $dialData[1];
+							$update = $mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['MemberName' => $MemberName]], []);
+							if($update['status'] == false)
+							{
+								$res['Error'] = 'Update DialBegin MemberName';
+								$res['Msg'] = $update['data']['msg'];
+								$app->callLogSave($res);
+							}
+						}
+					}
 				}
 				elseif($res['Event'] == 'AgentCalled')
 				{
@@ -220,6 +235,12 @@ else
 						$app->callLogSave($res);
 					}
 					$mgdb->update('call_campaign_contacts', ['t_dial' => (float)$_id], ['$set' => ['t_end' => $t_end, 'DialStatus' => $res['DialStatus']]], []);
+					
+					$DataCRMCustomer = $mgdb->select('call_crm_customers', ['t_dial' => (float)$_id]);
+					if(!empty($DataCRMCustomer['data']['_id']))
+					{
+						$mgdb->update('call_crm_customers', ['_id' => $DataCRMCustomer['data']['_id']], ['$set' => [$DataCRMCustomer['data']['campaign'].'.DialStatus' => $res['DialStatus']]], []);
+					}
 				}
 				elseif($res['Event'] == 'AgentConnect')
 				{
@@ -237,7 +258,12 @@ else
 						$resCache[$channel]['t_up_sub'] = $t_up_sub;
 					}
 					$mgdb->update('call_campaign_contacts', ['t_dial' => (float)$_id], ['$set' => ['agent' => $res['MemberName']]], []);
-					$mgdb->update('call_contacts', ['t_dial' => (float)$_id], ['$set' => ['agent' => $res['MemberName']]], []);
+					
+					$DataCRMCustomer = $mgdb->select('call_crm_customers', ['t_dial' => (float)$_id]);
+					if(!empty($DataCRMCustomer['data']['_id']))
+					{
+						$mgdb->update('call_crm_customers', ['_id' => $DataCRMCustomer['data']['_id']], ['$set' => [$DataCRMCustomer['data']['campaign'].'.agent' => $res['MemberName']]], []);
+					}
 				}
 				elseif($res['Event'] == 'AgentComplete')
 				{
@@ -258,6 +284,7 @@ else
 				}
 				elseif($res['Event'] == 'Hangup')
 				{
+
 					$t_hangup = microtime(true);
 					if(!empty($resCache[$_id]['t_up_sub']))
 					{
@@ -278,7 +305,13 @@ else
 					
 					if(isset($updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_CONTACT_ID']) && !empty($resCache[$_id]['t_up']))
 					{
-                        $mgdb->update('call_campaign_contacts', ['_id' => $updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_CONTACT_ID']['Value']], ['$set' => ['t_answer' => (float)round($t_hangup - $resCache[$_id]['t_up'])]], []);
+						$DataCRMCustomer = $mgdb->select('call_crm_customers', ['t_dial' => (float)$_id]);
+						if(!empty($DataCRMCustomer['data']['_id']))
+						{
+							$mgdb->update('call_crm_customers', ['_id' => $DataCRMCustomer['data']['_id']], ['$set' => [$DataCRMCustomer['data']['campaign'].'.t_answer' => (float)round($t_hangup - $resCache[$_id]['t_up'])]], []);
+						}
+						
+						$mgdb->update('call_campaign_contacts', ['_id' => $updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_CONTACT_ID']['Value']], ['$set' => ['t_answer' => (float)round($t_hangup - $resCache[$_id]['t_up'])]], []);
 					}
 					
 					if($update['status'] == false)
@@ -294,11 +327,6 @@ else
 						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['campaign_contact_id' => (string)$updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_CONTACT_ID']['Value']]], []);
 					}
 					
-					if(isset($updateVariableData[$_id]['$set']['Variable']['CONTACT_ID']))
-					{
-						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['contact_id' => (string)$updateVariableData[$_id]['$set']['Variable']['CONTACT_ID']['Value']]], []);
-					}
-					
 					if(isset($updateVariableData[$_id]['$set']['Variable']['RINGTIME']))
 					{
 						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['t_ring' => $updateVariableData[$_id]['$set']['Variable']['RINGTIME']['Value']]], []);
@@ -312,11 +340,23 @@ else
 					if(isset($updateVariableData[$_id]['$set']['Variable']['ANSWEREDTIME']) && isset($updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_CONTACT_ID']))
 					{
                         $mgdb->update('call_campaign_contacts', ['_id' => $updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_CONTACT_ID']['Value']], ['$set' => ['t_answer' => (float)$updateVariableData[$_id]['$set']['Variable']['ANSWEREDTIME']['Value']]], []);
+						
+						$DataCRMCustomer = $mgdb->select('call_crm_customers', ['t_dial' => (float)$_id]);
+						if(!empty($DataCRMCustomer['data']['_id']))
+						{
+							$mgdb->update('call_crm_customers', ['_id' => $DataCRMCustomer['data']['_id']], ['$set' => [$DataCRMCustomer['data']['campaign'].'.t_answer' => (float)$updateVariableData[$_id]['$set']['Variable']['ANSWEREDTIME']['Value']]], []);
+						}
 					}
 					
 					if(isset($updateVariableData[$_id]['$set']['Variable']['DIALSTATUS']) && isset($updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_CONTACT_ID']))
 					{
 						$mgdb->update('call_campaign_contacts', ['_id' => $updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_CONTACT_ID']['Value']], ['$set' => ['DialStatus' => $updateVariableData[$_id]['$set']['Variable']['DIALSTATUS']['Value']]], []);
+						
+						$DataCRMCustomer = $mgdb->select('call_crm_customers', ['t_dial' => (float)$_id]);
+						if(!empty($DataCRMCustomer['data']['_id']))
+						{
+							$mgdb->update('call_crm_customers', ['_id' => $DataCRMCustomer['data']['_id']], ['$set' => [$DataCRMCustomer['data']['campaign'].'.DialStatus' => $updateVariableData[$_id]['$set']['Variable']['DIALSTATUS']['Value']]], []);
+						}
 					}
 					
 					if(isset($updateVariableData[$_id]['$set']['Variable']['KEYPAD']) || isset($updateVariableData[$_id]['$set']['Variable']['keypad']))
@@ -325,6 +365,12 @@ else
 						if(isset($updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_CONTACT_ID']['Value']))
 						{
 							$mgdb->update('call_campaign_contacts', ['_id' => $updateVariableData[$_id]['$set']['Variable']['CAMPAIGN_CONTACT_ID']['Value']], ['$set' => ['KEYPAD' => $keypadInsert]], []);
+							
+							$DataCRMCustomer = $mgdb->select('call_crm_customers', ['t_dial' => (float)$_id]);
+							if(!empty($DataCRMCustomer['data']['_id']))
+							{
+								$mgdb->update('call_crm_customers', ['_id' => $DataCRMCustomer['data']['_id']], ['$set' => [$DataCRMCustomer['data']['campaign'].'.KEYPAD' => $keypadInsert]], []);
+							}
 						}
 						
 						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['KEYPAD' => (array)$keypadInsert]], []);
@@ -349,18 +395,20 @@ else
 							$res['Msg'] = $update['data']['msg'];
 							$app->callLogSave($res);
 						}
-					}
-					
-					if(!empty($resCache[$_id]))
-					{
-						unset($resCache[$_id]);
-						unset($updateVariableData[$_id]);
+						if(!empty($resCache[$_id]))
+						{
+							unset($resCache[$_id]);
+						}
+						if(!empty($updateVariableData[$_id]))
+						{
+							unset($updateVariableData[$_id]);
+						}
 					}
 				}
 			}
 			else
 			{
-				$app->callLogSave($res);
+				//$app->callLogSave($res);
 				if(isset($res['Event']) && isset($res['Variable']) && $res['Event'] == 'VarSet' && isset($res['Value']))
 				{
 					$varNameUpdate = (string)$res['Variable'];
@@ -393,12 +441,12 @@ else
 					if($res['Variable'] == 'CAMPAIGN_CONTACT_ID')
 					{
 						$mgdb->update('call_campaign_contacts', ['_id' => $res['Value']], ['$set' => ['t_dial' => (float)$_id]], []);
+						$mgdb->update('call_crm_customers', ['_id' => $res['Value']], ['$set' => ['t_dial' => (float)$_id]], []);
 					}
 					
-					//update contact id
-					if($res['Variable'] == 'CONTACT_ID')
+					if($res['Variable'] == 'AGI_CALL_TYPE')
 					{
-						$mgdb->update('call_contacts', ['_id' => $res['Value']], ['$set' => ['t_dial' => (float)$_id]], []);
+						$mgdb->update($db_collection, ['_id' => (float)$_id], ['$set' => ['call_type' => $res['Value']]], []);
 					}
 				}
 				if(isset($res['Event']) && $res['Event'] == 'Cdr')
