@@ -458,6 +458,39 @@ echo ';tlscertfile=/etc/asterisk/keys/asterisk.pem' >> $asterisk_etc/http.conf
 echo 'tlscertfile=/etc/letsencrypt/live/'$pbx_domain'/fullchain.pem' >> $asterisk_etc/http.conf
 echo 'tlsprivatekey=/etc/letsencrypt/live/'$pbx_domain'/privkey.pem' >> $asterisk_etc/http.conf
 sudo chown -R asterisk:asterisk $asterisk_etc/http.conf
+
+rm -rf $asterisk_etc/ari.conf
+sudo touch $asterisk_etc/ari.conf
+echo '[general]' >> $asterisk_etc/ari.conf
+echo 'enabled = yes ; When set to no, ARI support is disabled.' >> $asterisk_etc/ari.conf
+echo ';pretty = no ; When set to yes, responses from ARI are formatted to be human readable.' >> $asterisk_etc/ari.conf
+echo ';allowed_origins = ; http://192.168.1.254,http://192.168.1.254:8080' >> $asterisk_etc/ari.conf
+echo ';auth_realm = ' >> $asterisk_etc/ari.conf
+echo ';websocket_write_timeout = 100' >> $asterisk_etc/ari.conf
+
+echo '[ari_api]' >> $asterisk_etc/ari.conf
+echo 'type = user' >> $asterisk_etc/ari.conf
+echo ';allowed_origins = ' >> $asterisk_etc/ari.conf
+echo 'read_only = yes' >> $asterisk_etc/ari.conf
+echo 'password = ari_api' >> $asterisk_etc/ari.conf
+echo 'password_format = plain' >> $asterisk_etc/ari.conf
+echo '' >> $asterisk_etc/ari.conf
+echo '#include ari_api.conf' >> $asterisk_etc/ari.conf
+
+rm -rf $asterisk_etc/ari_api.conf
+sudo touch $asterisk_etc/ari_api.conf
+max_ari_user=32
+for (( i=1; i <= $max_ari_user; ++i ))
+do
+	echo '' >> $asterisk_etc/ari_api.conf
+    echo '[ari_api_'$i']' >> $asterisk_etc/ari_api.conf
+	echo 'type = user' >> $asterisk_etc/ari_api.conf
+	echo 'read_only = yes' >> $asterisk_etc/ari_api.conf
+	echo 'password = ari_api' >> $asterisk_etc/ari_api.conf
+	echo 'password_format = plain' >> $asterisk_etc/ari_api.conf
+done
+sudo chown -R asterisk:asterisk $asterisk_etc/ari.conf
+sudo chmod 777 $asterisk_etc/ari_api.conf
 #sudo systemctl restart asterisk
 
 sudo touch $asterisk_etc/sip_account.conf
