@@ -72,6 +72,10 @@ else
 $timenow = strtotime('now');
 $agi_callerid = preg_replace("#[^0-9]#", "", $agi->request[agi_callerid]);
 $agi_calleridname = $agi->request[agi_calleridname];
+if(!empty($agi->request[agi_arg_2]))
+{
+	$agi_callerid = explode('@', $agi->request[agi_arg_2])[0];
+}
 $agi_channel = $agi->request[agi_channel];
 $agi_context = $agi->request[agi_context];
 $agi_extension = $agi->request[agi_extension];
@@ -104,9 +108,15 @@ foreach($prefixNetwork as $keyNetwork => $networkData)
 		break;
 	}
 }
-$agi->set_variable('AGI_CALLERID', $agi_callerid);
+$agi->set_variable('SOURCE_ID', (float)$agi_uniqueid);
 $agi->set_variable('AGI_NETWORK', $network);
+$agi->set_variable('AGI_CALLERID', $agi_callerid);
 $contextData = $mgdb->select('call_contexts', ['_id' => $agi_context]);
+
+if(empty($USER_UID))
+{
+	$agi->set_variable('USER_UID', implode(',', $contextData['data']['uid']));
+}
 if(!empty($contextData['data']['forward_trunks']) && !empty($contextData['data']['forward_phones']))
 {
 	$debugFwTrunk = '/var/lib/asterisk/agi-bin/caches/forward_context_'.$agi_context.'.txt';
@@ -114,7 +124,14 @@ if(!empty($contextData['data']['forward_trunks']) && !empty($contextData['data']
 	{
 		$AGI_FORWARD_TRUNK = $contextData['data']['forward_trunks'][0];
 		$agi->set_variable('AGI_FORWARD_TRUNK', $AGI_FORWARD_TRUNK);
-		file_put_contents($debugFwTrunk, $AGI_FORWARD_TRUNK, FILE_APPEND | LOCK_EX);
+		if(file_exists($debugFwTrunk))
+		{
+			file_put_contents($debugFwTrunk, "\n".$AGI_FORWARD_TRUNK, FILE_APPEND | LOCK_EX);
+		}
+		else
+		{
+			file_put_contents($debugFwTrunk, $AGI_FORWARD_TRUNK, FILE_APPEND | LOCK_EX);
+		}
 	}
 	else
 	{
@@ -148,18 +165,28 @@ if(!empty($contextData['data']['forward_trunks']) && !empty($contextData['data']
 		{
 			$AGI_FORWARD_TRUNK = $contextData['data']['forward_trunks'][0];
 			$agi->set_variable('AGI_FORWARD_TRUNK', $AGI_FORWARD_TRUNK);
+			
 			file_put_contents($debugFwTrunk, $AGI_FORWARD_TRUNK, FILE_APPEND | LOCK_EX);
 		}
 	}
 	
-	$trunkFwData = $mgdb->select('call_sip_trunk', ['_id' => (float)$AGI_FORWARD_TRUNK]);
+	$trunkFwData = $mgdb->select('call_sip_trunk', ['_id' => $AGI_FORWARD_TRUNK]);
+	
+	$agi->set_variable('AGI_FORWARD_TRUNK_TYPE', $trunkFwData['data']['type']);
 	
 	$debugFwNumber = '/var/lib/asterisk/agi-bin/caches/forward_number_'.$agi_context.'.txt';
 	if(count($contextData['data']['forward_phones']) == 1)
 	{
 		$AGI_FORWARD_NUMBER = $contextData['data']['forward_phones'][0];
 		$agi->set_variable('AGI_FORWARD_NUMBER', $trunkFwData['data']['prefix'].$AGI_FORWARD_NUMBER);
-		file_put_contents($debugFwNumber, $AGI_FORWARD_NUMBER, FILE_APPEND | LOCK_EX);
+		if(file_exists($debugFwNumber))
+		{
+			file_put_contents($debugFwNumber, "\n".$AGI_FORWARD_NUMBER, FILE_APPEND | LOCK_EX);
+		}
+		else
+		{
+			file_put_contents($debugFwNumber, $AGI_FORWARD_NUMBER, FILE_APPEND | LOCK_EX);
+		}
 	}
 	else
 	{
@@ -201,7 +228,7 @@ if(!empty($contextData['data']['forward_trunks']) && !empty($contextData['data']
 $recording = 'no';
 if(isset($contextData['data']['recording']) && $contextData['data']['recording'] == 'yes' && !empty($agi_callerid) && !empty($agi_extension))
 {
-    $agi_uniqueid_md5 = md5($agi_uniqueid);
+    $agi_uniqueid_md5 = md5((float)$agi_uniqueid);
 	$agi->exec("MixMonitor", "/var/spool/asterisk/monitor/$agi_uniqueid_md5.wav,b");
     $recording = $contextData['data']['recording'];
 }
@@ -216,7 +243,7 @@ if(isset($contextData['data']['callback']) && $contextData['data']['callback'] =
 $extData = $mgdb->select('call_sip_account', ['_id' => (float)$_CONTACT_NUM]);
 if(empty($extData['data']['_id']))
 {
-	$trunkData = $mgdb->select('call_sip_trunk', ['_id' => (float)$_CONTACT_NUM]);
+	$trunkData = $mgdb->select('call_sip_trunk', ['_id' => $_CONTACT_NUM]);
 	if(empty($trunkData['data']['_id']))
 	{
 		if(!empty($AGI_CALL_TYPE))
@@ -229,7 +256,7 @@ if(empty($extData['data']['_id']))
 			$AGI_CALL_TYPE = $callType;
 			$agi->set_variable('AGI_CALL_TYPE', 'outbound');
 		}
-		$trunkData = $mgdb->select('call_sip_trunk', ['_id' => (float)$contextData['data']['sip_trunk']]);
+		$trunkData = $mgdb->select('call_sip_trunk', ['_id' => $contextData['data']['sip_trunk']]);
 
 		if(isset($trunkData['data']['prefix']))
 		{
@@ -245,13 +272,15 @@ if(empty($extData['data']['_id']))
 		if(!empty($AGI_CALL_TYPE))
 		{
 			$agi->set_variable('AGI_CALL_TYPE', $AGI_CALL_TYPE);
+			$agi->set_variable('AGI_CALL_NUMBER', $agi_callerid);
 		}
 		else
 		{
 			$AGI_CALL_TYPE = 'inbound';
+			$agi->set_variable('AGI_CALL_NUMBER', $_CONTACT_NUM);
 			$agi->set_variable('AGI_CALL_TYPE', 'inbound');
 		}
-		$agi->set_variable('AGI_CALL_NUMBER', $agi_callerid);
+		
 	}
 }
 else
@@ -268,14 +297,33 @@ else
 	}
 }
 
+if($AGI_CALL_TYPE == 'inbound' && $callback == 'yes')
+{
+	//call_back
+	$callLogData = $mgdb->select('call_log', ['_id' => ['$gte' => (float)(time() - 7200)], 'Exten' => $_CONTACT_NUM, 'call_type' => 'outbound', 'Context' => $agi_context], ['sort' => ['_id' => -1]]);
+	if(!empty($callLogData['data']['_id']))
+	{
+		$agi->set_variable('AGI_CALL_BACK_NUM', $callLogData['data']['CallerIDNum']);
+	}
+	else
+	{
+		$agi->set_variable('AGI_CALL_BACK_NUM', '');
+	}
+}
+else
+{
+	$agi->set_variable('AGI_CALL_BACK_NUM', '');
+}
+
 $AGI_CALL_PREFIX = '';
+$AGI_TRUNK_TYPE = '';
 if($AGI_CALL_TYPE == 'outbound')
 {
 	if(!empty($contextData['data']['sip_trunk']))
 	{
 		if(count($contextData['data']['sip_trunk']) > 1)
 		{
-			$trunksData = $mgdb->selects('call_sip_trunk', ['network' => $network, '_id' => ['$in' => floatArray($contextData['data']['sip_trunk'])]], []);
+			$trunksData = $mgdb->selects('call_sip_trunk', ['network' => $network, '_id' => ['$in' => $contextData['data']['sip_trunk']]], []);
 			
 			//$agi->set_variable('AGI_TRUNK_BY_NETWORK', json_encode(floatArray($contextData['data']['sip_trunk'])));
 			if($trunksData['status'] == true && !empty($trunksData['data']))
@@ -288,9 +336,8 @@ if($AGI_CALL_TYPE == 'outbound')
 					$callsLogByTrunk = $mgdb->select('call_log', ['Trunk' => (string)$trunkCheck, 'cause_txt' => ['$exists' => false]]);
 					if(empty($callsLogByTrunk['data']['_id']))
 					{
-						
-						
 						$AGI_CALL_PREFIX = $trunkD['prefix'];
+						$AGI_TRUNK_TYPE = $trunkD['style'];
 						$AGI_TRUNK = $trunkCheck;
 						$checkTrunkStatus = true;
 						break;
@@ -306,6 +353,8 @@ if($AGI_CALL_TYPE == 'outbound')
 						if(empty($callsLogByTrunk2['data']['_id']))
 						{
 							$AGI_TRUNK = $trunkId;
+							$trunksData = $mgdb->select('call_sip_trunk', ['_id' => $AGI_TRUNK], []);
+							$AGI_TRUNK_TYPE = $trunksData['data']['style'];
 							$checkTrunkStatus2 = true;
 							break;
 						}
@@ -328,6 +377,8 @@ if($AGI_CALL_TYPE == 'outbound')
 						unset($getCacheT[0]);
 						
 						$AGI_TRUNK = $lastTrunk;
+						$trunksData = $mgdb->select('call_sip_trunk', ['_id' => $AGI_TRUNK], []);
+						$AGI_TRUNK_TYPE = $trunksData['data']['style'];
 						file_put_contents($debugTrunk, "\n".$AGI_TRUNK, FILE_APPEND | LOCK_EX);
 					}
 					else
@@ -337,6 +388,8 @@ if($AGI_CALL_TYPE == 'outbound')
 							if(!in_array($sipTrunk, $getCacheT))
 							{
 								$AGI_TRUNK = $sipTrunk;
+								$trunksData = $mgdb->select('call_sip_trunk', ['_id' => $AGI_TRUNK], []);
+								$AGI_TRUNK_TYPE = $trunksData['data']['style'];
 								file_put_contents($debugTrunk, "\n".$AGI_TRUNK, FILE_APPEND | LOCK_EX);
 								break;
 							}
@@ -346,28 +399,35 @@ if($AGI_CALL_TYPE == 'outbound')
 				else
 				{
 					$AGI_TRUNK = $contextData['data']['sip_trunk'][0];
+					$trunksData = $mgdb->select('call_sip_trunk', ['_id' => $AGI_TRUNK], []);
+					$AGI_TRUNK_TYPE = $trunksData['data']['style'];
 					file_put_contents($debugTrunk, $AGI_TRUNK, FILE_APPEND | LOCK_EX);
 				}
 			}
 		}
 		else
 		{
+			$trunksData = $mgdb->select('call_sip_trunk', ['_id' => $contextData['data']['sip_trunk'][0]], []);
+			$AGI_TRUNK_TYPE = $trunksData['data']['style'];
 			$AGI_TRUNK = $contextData['data']['sip_trunk'][0];
 		}
-		$agi->set_variable('AGI_TRUNK', (int)$AGI_TRUNK);
+		$agi->set_variable('AGI_TRUNK', $AGI_TRUNK);
 	}
 	else
 	{
-		$agi->set_variable('AGI_TRUNK', (int)$AGI_TRUNK);
+		$agi->set_variable('AGI_TRUNK', $AGI_TRUNK);
 	}
 }
 else
 {
-	$agi->set_variable('AGI_TRUNK', (int)$AGI_TRUNK);
+	$agi->set_variable('AGI_TRUNK', $AGI_TRUNK);
 }
+
+$agi->set_variable('AGI_TRUNK_TYPE', $AGI_TRUNK_TYPE);
+
 if(!empty($AGI_TRUNK) && empty($AGI_CALL_PREFIX))
 {
-	$trunkDataPrefix = $mgdb->select('call_sip_trunk', ['_id' => (float)$AGI_TRUNK], []);
+	$trunkDataPrefix = $mgdb->select('call_sip_trunk', ['_id' => $AGI_TRUNK], []);
 	if(!empty($trunkDataPrefix['data']['prefix']))
 	{
 		$AGI_CALL_PREFIX = $trunkDataPrefix['data']['prefix'];
@@ -387,30 +447,20 @@ if(!empty($agi_callerid) && !empty($agi_extension))
 		}
 		$uid = array_unique($uid, 0);
 	}
+
+	$updateCallLog = ['$set' => ['Callback' => $callback, 'Recording' => $recording, 'CallerIDNum' => $agi_callerid, 'Exten' => $_CONTACT_NUM, 'Trunk' => $AGI_TRUNK, 'uid' => $uid]];
 	
-	if(!empty($AGI_FORWARD_NUMBER) && !empty($AGI_FORWARD_TRUNK))
+	if($AGI_CALL_TYPE == 'autodial' || $AGI_CALL_TYPE == 'click2call')
 	{
-		$updateCallLog = ['$set' => ['TrunkFw' => $AGI_FORWARD_TRUNK, 'ExtenFw' => $AGI_FORWARD_NUMBER, 'MemberName' => $AGI_FORWARD_NUMBER, 'Callback' => $callback, 'Recording' => $recording, 'CallerIDNum' => $agi_callerid, 'Exten' => $_CONTACT_NUM, 'uid' => $uid]];
-	}
-	else
-	{
-		$updateCallLog = ['$set' => ['Callback' => $callback, 'Recording' => $recording, 'CallerIDNum' => $agi_callerid, 'Exten' => $_CONTACT_NUM, 'Trunk' => $AGI_TRUNK, 'uid' => $uid]];
+		$updateCallLog['$set']['DialStatus'] = 'ANSWER';
 	}
 	
 	$mgdb->update('call_log', ['_id' => (float)$agi_uniqueid], $updateCallLog);
 	
 	if(!empty($AGI_TRUNK) && !empty($CAMPAIGN_CONTACT_NUM) && !empty($CAMPAIGN_CONTACT_ID))
 	{
-		if(!empty($AGI_FORWARD_NUMBER) && !empty($AGI_FORWARD_TRUNK))
-		{
-			$updateCamContactCrm = ['$set' => [$CAMPAIGN_ID.'.TrunkFw' => $AGI_FORWARD_TRUNK, $CAMPAIGN_ID.'.ExtenFw' => $AGI_FORWARD_NUMBER, $CAMPAIGN_ID.'.agent' => $AGI_FORWARD_NUMBER, $CAMPAIGN_ID.'.Trunk' => $AGI_TRUNK, $CAMPAIGN_ID.'.t_dial' => (float)$agi_uniqueid]];
-			$updateCamContact = ['$set' => ['TrunkFw' => $AGI_FORWARD_TRUNK, 'ExtenFw' => $AGI_FORWARD_NUMBER, 'agent' => $AGI_FORWARD_NUMBER, 'Trunk' => $AGI_TRUNK]];
-		}
-		else
-		{
-			$updateCamContactCrm = ['$set' => [$CAMPAIGN_ID.'.Trunk' => $AGI_TRUNK, $CAMPAIGN_ID.'.t_dial' => (float)$agi_uniqueid]];
-			$updateCamContact = ['$set' => ['Trunk' => $AGI_TRUNK]];
-		}
+		$updateCamContactCrm = ['$set' => [$CAMPAIGN_ID.'.Trunk' => $AGI_TRUNK, $CAMPAIGN_ID.'.t_dial' => (float)$agi_uniqueid]];
+		$updateCamContact = ['$set' => ['Trunk' => $AGI_TRUNK]];
 		
 		if(!empty($CAMPAIGN_CONTACT_ID))
 		{
@@ -420,12 +470,20 @@ if(!empty($agi_callerid) && !empty($agi_extension))
 	}
 }
 
+$agi->set_variable('AGI_TIME', microtime(true));
+
 $agi->set_variable('PBX_AUTHOR', 'zetadmin.com');
 $agi->set_variable('PBX_AUTHOR_EMAIL', 'info@zetadmin.com;toandd.it@gmail.com');
 
 //CHECK UNAUTHORIZED
 if(!empty($callType) && $callType == 'outbound')
 {
+	$extCheckData = $mgdb->select('call_sip_account', ['_id' => (float)$agi_callerid]);
+	if(empty($extCheckData['data']['_id']))
+	{
+		$agi->hangup();
+	}
+	
 	$timezone = $contextData['data']['timezone'];
 	$option_time = $contextData['data']['option_time'];
 	if(!empty($option_time))
@@ -446,7 +504,7 @@ if(!empty($callType) && $callType == 'outbound')
 					}
 					break;
 				}
-				elseif($opt['date'] == $day_in_week && $opt['sip'] == $agi_callerid)
+				elseif($opt['date'] == $day_in_week && $opt['sip'] == $AGI_CALLERID)
 				{
 					if($opt['start'] > $continueTime || $opt['end'] < $continueTime)
 					{
