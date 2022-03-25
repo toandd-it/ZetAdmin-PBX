@@ -453,6 +453,33 @@ sudo chmod 777 /var/lib/asterisk/
 sudo chmod 777 /etc/asterisk/
 sudo systemctl restart asterisk
 
+sleep 1
+
+sudo rm -rf $usr_dir/httpdcmd.service
+sudo touch $usr_dir/httpdcmd.service
+echo '[Unit]' >> $usr_dir/httpdcmd.service
+echo 'Description=httpd cmd service' >> $usr_dir/httpdcmd.service
+echo 'After=network.target' >> $usr_dir/httpdcmd.service
+echo '' >> $usr_dir/radiopbx.service
+echo '[Service]' >> $usr_dir/radiopbx.service
+echo 'ExecStart=nohup /var/www/httpdcmd.sh >> /var/www/httpdcmd.out &' >> $usr_dir/httpdcmd.service
+echo 'Restart=always' >> $usr_dir/httpdcmd.service
+echo 'User=nobody' >> $usr_dir/httpdcmd.service
+echo '' >> $usr_dir/httpdcmd.service
+echo '[Install]' >> $usr_dir/httpdcmd.service
+echo 'WantedBy=multi-user.target' >> $usr_dir/httpdcmd.service
+sudo chmod 644 $usr_dir/httpdcmd.service
+
+sudo ln -s $usr_dir/httpdcmd.service $system_dir/
+sudo ls -l $usr_dir/httpdcmd.service
+
+sudo systemd-analyze verify httpdcmd.service 
+sudo systemctl daemon-reload
+sudo systemctl enable httpdcmd.service
+sudo systemctl start httpdcmd.service
+
+sleep 1
+
 sudo yum -y install fail2ban fail2ban-systemd
 sudo cp -pf /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
 
