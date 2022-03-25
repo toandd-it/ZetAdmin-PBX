@@ -276,7 +276,7 @@ echo '  map                     '$pbx_domain' '$pbx_domain'' >> $httpd_conf
 echo '}' >> $httpd_conf
 echo ' ' >> $httpd_conf
 sudo chown -R lsadm:nobody $httpd_conf
-sudo chmod 750 $httpd_conf
+sudo chmod 777 $httpd_conf
 
 #sudo sh /usr/local/lsws/admin/misc/admpass.sh
 
