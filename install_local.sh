@@ -130,9 +130,6 @@ cd asterisk-13*/
 make && make install
 make samples && make config && ldconfig  
 
-sudo mkdir /etc/asterisk/keys
-cd /usr/src/asterisk-13*/
-contrib/scripts/ast_tls_cert -C $pbx_domain -O "$pbx_name" -d /etc/asterisk/keys
 rm -rf /usr/src/asterisk-13.38.3.tar.gz
 cd ~
 
@@ -227,7 +224,7 @@ echo "|   Create OpenLiteSpeed VirtualHost        |"
 echo "+-------------------------------------------+"
 echo " "
 
-webroot=/var/www/public_html/$pbx_domain
+webroot=/var/www/html/$pbx_domain
 echo "nobody ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 sudo mkdir /usr/local/lsws/conf/vhosts/$pbx_domain/
 vh_conf=/usr/local/lsws/conf/vhosts/$pbx_domain/$pbx_domain.conf
@@ -284,9 +281,9 @@ sudo chmod 750 $httpd_conf
 #sudo sh /usr/local/lsws/admin/misc/admpass.sh
 
 sudo mkdir /var/www/
-sudo mkdir /var/www/public_html/
-sudo mkdir /var/www/public_html/$pbx_domain/
-sudo chown -R nobody:nobody /var/www/public_html/
+sudo mkdir /var/www/html/
+sudo mkdir /var/www/html/$pbx_domain/
+sudo chown -R nobody:nobody /var/www/html/
 
 cd $webroot/
 touch index.html
@@ -321,7 +318,7 @@ web_api_key=$(openssl rand -hex 24)
 api_conf=api/asterisk_pbx/config.php
 sudo touch $webroot/$api_conf
 echo '<?php' >> $webroot/$api_conf
-echo '$api_url = "https://'$pbx_domain'/api/asterisk_pbx/postback.php";' >> $webroot/$api_conf
+echo '$api_url = "http://'$pbx_domain'/api/asterisk_pbx/postback.php";' >> $webroot/$api_conf
 echo '$api_key = "'$web_api_key'";' >> $webroot/$api_conf
 echo '$ipsAlow = []; /*exp ["ip 1", "ip 2", "ip n"]*/' >> $webroot/$api_conf
 echo ' ' >> $webroot/$api_conf
@@ -335,7 +332,7 @@ asterisk_etc=/etc/asterisk
 
 sudo touch $asterisk_etc/manager_api.conf
 
-max_api_user=29
+max_api_user=32
 for (( i=1; i <= $max_api_user; ++i ))
 do
 	echo '' >> $asterisk_etc/manager_api.conf
@@ -508,7 +505,7 @@ echo "+-------------------------------------------------------------------------
 echo " Info - Webserver OpenLiteSpeed AND Cloud PBX api"
 echo " "
 echo " Webroot   : "$webroot/""
-echo " API URL   : https://"$pbx_domain"/api/asterisk_pbx/postback.php"
+echo " API URL   : http://"$pbx_domain"/api/asterisk_pbx/postback.php"
 echo " API Key   : "$web_api_key""
 echo " "
 echo "+-------------------------------------------------------------------------------+"
