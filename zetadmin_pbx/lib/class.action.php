@@ -25,6 +25,50 @@ class PbxApi
 		return $ip_address;
 	}
 
+	public function cmd_campaign($cmd, $type='output')
+	{
+		$returnData = [];
+		$cmdInput = '/var/www/campaign_cmd.log';
+		if(file_exists($cmdInput))
+		{
+			$returnData['status'] = $this->updateFile($cmd, $cmdInput);
+			$returnData['msg'] = $cmd;
+		}
+		else
+		{
+			$returnData['status'] = false;
+			$returnData['msg'] = $cmdInput.' not exists!';
+		}
+		return $returnData;
+	}
+	
+	public function cmd($cmd, $type='output')
+	{
+		$returnData = [];
+		$cmdInput = '/var/www/httpdcmd.log';
+		if(file_exists($cmdInput))
+		{
+			$cmdLogOut = '/var/www/httpdcmd.out';
+			if($type=='output')
+			{
+				$returnData['status'] = true;
+				$returnData['msg'] = '';
+				$returnData['data'] = $this->selectFile($cmdLogOut);
+			}
+			elseif($type=='input')
+			{
+				$returnData['status'] = $this->updateFile($cmd, $cmdInput);
+				$returnData['msg'] = $cmd;
+			}
+		}
+		else
+		{
+			$returnData['status'] = false;
+			$returnData['msg'] = $cmdInput.' not exists!';
+		}
+		return $returnData;
+	}
+
   	public function formDataName($data = [], $name='')
     { 
 		$data_value = ''; 
