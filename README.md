@@ -2,7 +2,7 @@
 Build a simple Cloud PBX server, manage and use via API. Easily integrate into your website, CRM or apps.
 
 **Software using:**
-  - CentOS 7 (Hardware MIN 1 core 2GB RAM)
+  - CentOS 7 & 8 (Hardware MIN 1 CORE, 2GB RAM)
   - PHP 7.3 & OpenLiteSpeed
   - MongoDB 4.4
   - Asterisk 13.x
