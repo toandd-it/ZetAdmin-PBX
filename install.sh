@@ -355,8 +355,8 @@ sudo mkdir $webroot/api/
 touch $webroot/api/index.html
 echo 'pageok!' >> $webroot/api/index.html
 
-asterisk_pbx_dir=$(find ~ -type d -name "asterisk_pbx")
-sudo cp -R $asterisk_pbx_dir $webroot/api/
+zetadmin_pbx_dir=$(find ~ -type d -name "zetadmin_pbx")
+sudo cp -R $zetadmin_pbx_dir $webroot/api/
 
 echo -e "\033[32mDownload and export API source code successful!\033[m"
 echo " "
@@ -365,10 +365,10 @@ sleep 0.5
 file_name=$(openssl rand -hex 16)
 web_api_id=$(openssl rand -hex 16)
 web_api_key=$(openssl rand -hex 24)
-api_conf=api/asterisk_pbx/config.php
+api_conf=api/zetadmin_pbx/config.php
 sudo touch $webroot/$api_conf
 echo '<?php' >> $webroot/$api_conf
-echo '$api_url = "https://'$pbx_domain'/api/asterisk_pbx/postback.php";' >> $webroot/$api_conf
+echo '$api_url = "https://'$pbx_domain'/api/zetadmin_pbx/postback.php";' >> $webroot/$api_conf
 echo '$api_key = "'$web_api_key'";' >> $webroot/$api_conf
 echo '$ipsAlow = []; /*exp ["ip 1", "ip 2", "ip n"]*/' >> $webroot/$api_conf
 echo ' ' >> $webroot/$api_conf
@@ -381,7 +381,7 @@ sleep 0.5
 asterisk_etc=/etc/asterisk
 
 sudo touch $asterisk_etc/manager_api.conf
-max_api_user=29
+max_api_user=32
 for (( i=1; i <= $max_api_user; ++i ))
 do
 	echo '' >> $asterisk_etc/manager_api.conf
@@ -486,15 +486,15 @@ echo '#include pjsip_trunk.conf' >> $asterisk_etc/pjsip.conf
 sudo chmod 777 $asterisk_etc/pjsip_trunk.conf
 
 agibin_dir=/var/lib/asterisk/agi-bin
-sudo mv $webroot/api/asterisk_pbx/phpagi.conf $asterisk_etc/phpagi.conf
-sudo mv $webroot/api/asterisk_pbx/pbxlog.php $webroot/api/asterisk_pbx/$file_name.php
-sudo mv $webroot/api/asterisk_pbx/callerid.php $agibin_dir/callerid.php
-sudo cp -pf $webroot/api/asterisk_pbx/phpagi.php $agibin_dir/phpagi.php
-sudo cp -pf $webroot/api/asterisk_pbx/phpagi-asmanager.php $agibin_dir/phpagi-asmanager.php
-sudo cp -pf $webroot/api/asterisk_pbx/phpagi-fastagi.php $agibin_dir/phpagi-fastagi.php
-sudo cp -pf $webroot/api/asterisk_pbx/lib/class.mongodb.php $agibin_dir/class.mongodb.php
-sudo cp -pf $webroot/api/asterisk_pbx/lib/class.action.php $agibin_dir/class.action.php
-sudo cp -pf $webroot/api/asterisk_pbx/config.php $agibin_dir/config.php
+sudo mv $webroot/api/zetadmin_pbx/phpagi.conf $asterisk_etc/phpagi.conf
+sudo mv $webroot/api/zetadmin_pbx/pbxlog.php $webroot/api/zetadmin_pbx/$file_name.php
+sudo mv $webroot/api/zetadmin_pbx/callerid.php $agibin_dir/callerid.php
+sudo cp -pf $webroot/api/zetadmin_pbx/phpagi.php $agibin_dir/phpagi.php
+sudo cp -pf $webroot/api/zetadmin_pbx/phpagi-asmanager.php $agibin_dir/phpagi-asmanager.php
+sudo cp -pf $webroot/api/zetadmin_pbx/phpagi-fastagi.php $agibin_dir/phpagi-fastagi.php
+sudo cp -pf $webroot/api/zetadmin_pbx/lib/class.mongodb.php $agibin_dir/class.mongodb.php
+sudo cp -pf $webroot/api/zetadmin_pbx/lib/class.action.php $agibin_dir/class.action.php
+sudo cp -pf $webroot/api/zetadmin_pbx/config.php $agibin_dir/config.php
 
 sudo chmod 777 $agibin_dir/*.php
 sudo chown -R asterisk:asterisk $asterisk_etc/phpagi.conf
@@ -508,7 +508,7 @@ echo 'Description=PBX log service' >> $usr_dir/pbxlog.service
 echo 'After=network.target' >> $usr_dir/pbxlog.service
 echo '' >> $usr_dir/pbxlog.service
 echo '[Service]' >> $usr_dir/pbxlog.service
-echo 'ExecStart=/usr/local/lsws/lsphp73/bin/php '$webroot'/api/asterisk_pbx/'$file_name'.php' >> $usr_dir/pbxlog.service
+echo 'ExecStart=/usr/local/lsws/lsphp73/bin/php '$webroot'/api/zetadmin_pbx/'$file_name'.php' >> $usr_dir/pbxlog.service
 echo 'Restart=always' >> $usr_dir/pbxlog.service
 echo 'User=nobody' >> $usr_dir/pbxlog.service
 echo '' >> $usr_dir/pbxlog.service
@@ -572,7 +572,7 @@ echo "+-------------------------------------------------------------------------
 echo " Info - Webserver OpenLiteSpeed AND Cloud PBX api"
 echo " "
 echo " Webroot   : "$webroot/""
-echo " API URL   : https://"$pbx_domain"/api/asterisk_pbx/postback.php"
+echo " API URL   : https://"$pbx_domain"/api/zetadmin_pbx/postback.php"
 echo " API Key   : "$web_api_key""
 echo " "
 echo "+-------------------------------------------------------------------------------+"
