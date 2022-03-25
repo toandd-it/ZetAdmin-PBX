@@ -25,7 +25,11 @@ if(empty($_POST))
 	$json = file_get_contents('php://input');
 	if(!empty($json))
 	{
-		$_POST = json_decode($json, true);
+		foreach(json_decode($json, true) as $name => $value)
+        {
+            if(is_array($value)){ $value = json_encode($value); }
+            $_POST[$name] = $value;
+        }
 	}
 }
 if(isset($_POST['action']) && !empty($_POST['action']) && !empty($_POST['api_id']) && !empty($_POST['api_key']))
