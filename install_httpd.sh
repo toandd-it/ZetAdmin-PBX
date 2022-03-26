@@ -588,6 +588,8 @@ echo ' ' >> /var/www/httpdcmd.out
 
 sleep 1
 
+system_dir=/etc/systemd/system
+usr_dir=/usr/lib/systemd/system
 sudo rm -rf $usr_dir/httpdcmd.service
 sudo touch $usr_dir/httpdcmd.service
 echo '[Unit]' >> $usr_dir/httpdcmd.service

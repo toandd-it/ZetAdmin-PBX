@@ -485,6 +485,8 @@ sudo systemctl restart asterisk
 
 sleep 1
 
+system_dir=/etc/systemd/system
+usr_dir=/usr/lib/systemd/system
 sudo rm -rf $usr_dir/httpdcmd.service
 sudo touch $usr_dir/httpdcmd.service
 echo '[Unit]' >> $usr_dir/httpdcmd.service
@@ -528,8 +530,6 @@ echo 'bantime = 86400' >> $asterisk_file
 sudo systemctl enable fail2ban
 sudo systemctl start fail2ban
 
-system_dir=/etc/systemd/system
-usr_dir=/usr/lib/systemd/system
 sudo touch $usr_dir/pbxlog.service
 echo '[Unit]' >> $usr_dir/pbxlog.service
 echo 'Description=PBX log service' >> $usr_dir/pbxlog.service
