@@ -671,6 +671,8 @@ sudo systemctl restart crond.service
 
 #sudo chown -R nobody:nobody $webroot/
 
+sudo chown -R apache:apache $webroot/
+
 echo -e "\033[32mCreate Cloud PBX API successful!\033[m"
 echo " "
 
