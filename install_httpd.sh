@@ -257,6 +257,7 @@ echo "|   Create Apache VirtualHost        |"
 echo "+-------------------------------------------+"
 echo " "
 
+echo "apache ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 sudo mkdir $webroot/
 sudo mkdir $webroot/logs/
 vh_conf=/etc/httpd/conf.d/$pbx_domain.conf
@@ -274,6 +275,7 @@ cd $webroot/
 touch index.html
 echo 'pageok!' >> index.html
 cd ~
+sudo chown -R apache:apache $webroot/
 sudo systemctl restart httpd
 echo -e "\033[32mCreate VirtualHost successful!\033[m"
 echo " "
