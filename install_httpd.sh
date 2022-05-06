@@ -150,11 +150,12 @@ echo "+------------------------------------+"
 echo "|      Install Asterisk-13           |"
 echo "+------------------------------------+"
 echo " "
-
+web_api_id=$(openssl rand -hex 16)
 cd /usr/src/
 wget https://downloads.asterisk.org/pub/telephony/asterisk/releases/asterisk-13.38.3.tar.gz
 tar xvfz asterisk-13.38.3.tar.gz
 cd asterisk-13*/
+echo '.'$web_api_id >> .version
 ./configure --libdir=/usr/lib64
 ./configure --with-jansson-bundled
 make && make install
@@ -324,7 +325,7 @@ echo " "
 sleep 0.5
 
 file_name=$(openssl rand -hex 16)
-web_api_id=$(openssl rand -hex 16)
+
 web_api_key=$(openssl rand -hex 24)
 api_conf=api/zetadmin_pbx/config.php
 sudo touch $webroot/$api_conf
