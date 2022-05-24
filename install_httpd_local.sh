@@ -147,7 +147,7 @@ cd /usr/src/
 wget https://downloads.asterisk.org/pub/telephony/asterisk/releases/asterisk-13.38.3.tar.gz
 tar xvfz asterisk-13.38.3.tar.gz
 cd asterisk-13*/
-echo '.'$web_api_id >> .version
+echo '.'$file_name >> .version
 ./configure --libdir=/usr/lib64
 ./configure --with-jansson-bundled
 make && make install
