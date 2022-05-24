@@ -13,7 +13,7 @@ Build a simple Cloud PBX server, manage and use via API. Easily integrate into y
 # sudo yum -y install wget unzip bind-utils
 # wget https://github.com/toandd-it/Cloud-PBX-API-for-SIP-Server-Asterisk-With-PHP/archive/refs/heads/main.zip
 # unzip main.zip
-# cd Cloud-PBX-API-for-SIP-Server-Asterisk-With-PHP-main
+# cd ZetAdmin-PBX-main
 # sh install.sh
 ```
 Waiting for complete ...
