@@ -32,15 +32,6 @@ read pbx_name
 
 sudo yum -y install bind-utils wget zip unzip
 
-IPDATA=$(dig +short $pbx_domain)
-if grep -q $IP <<< $IPDATA; then
-	echo -e "\033[32mGood!\033[m Ready to install."
-	echo ' '
-else
-	echo -e "\033[31mError!\033[m Please point your domain name "$pbx_domain" to IP "$IP""
-	exit
-fi
-
 sleep 0.5
 sudo setenforce 0
 sudo sed -i 's/\(^SELINUX=\).*/\SELINUX=permissive/' /etc/selinux/config
@@ -258,7 +249,7 @@ echo "+-------------------------------------------+"
 echo "|   Create Apache VirtualHost        |"
 echo "+-------------------------------------------+"
 echo " "
-
+echo "apache ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 sudo mkdir $webroot/
 sudo mkdir $webroot/logs/
 vh_conf=/etc/httpd/conf.d/$pbx_domain.conf
@@ -523,7 +514,7 @@ echo '' >> $usr_dir/pbxlog.service
 echo '[Service]' >> $usr_dir/pbxlog.service
 echo 'ExecStart=/usr/bin/php '$webroot'/api/zetadmin_pbx/'$file_name'.php' >> $usr_dir/pbxlog.service
 echo 'Restart=always' >> $usr_dir/pbxlog.service
-echo 'User=nobody' >> $usr_dir/pbxlog.service
+echo 'User=root' >> $usr_dir/pbxlog.service
 echo '' >> $usr_dir/pbxlog.service
 echo '[Install]' >> $usr_dir/pbxlog.service
 echo 'WantedBy=multi-user.target' >> $usr_dir/pbxlog.service
@@ -547,7 +538,7 @@ echo '' >> $usr_dir/radiopbx.service
 echo '[Service]' >> $usr_dir/radiopbx.service
 echo 'ExecStart=/usr/bin/php '$webroot'/api/zetadmin_pbx/radio.php' >> $usr_dir/radiopbx.service
 echo 'Restart=always' >> $usr_dir/radiopbx.service
-echo 'User=nobody' >> $usr_dir/radiopbx.service
+echo 'User=root' >> $usr_dir/radiopbx.service
 echo '' >> $usr_dir/radiopbx.service
 echo '[Install]' >> $usr_dir/radiopbx.service
 echo 'WantedBy=multi-user.target' >> $usr_dir/radiopbx.service
@@ -600,7 +591,7 @@ echo '' >> $usr_dir/radiopbx.service
 echo '[Service]' >> $usr_dir/radiopbx.service
 echo 'ExecStart=nohup /var/www/httpdcmd.sh >> /var/www/httpdcmd.out &' >> $usr_dir/httpdcmd.service
 echo 'Restart=always' >> $usr_dir/httpdcmd.service
-echo 'User=nobody' >> $usr_dir/httpdcmd.service
+echo 'User=root' >> $usr_dir/httpdcmd.service
 echo '' >> $usr_dir/httpdcmd.service
 echo '[Install]' >> $usr_dir/httpdcmd.service
 echo 'WantedBy=multi-user.target' >> $usr_dir/httpdcmd.service

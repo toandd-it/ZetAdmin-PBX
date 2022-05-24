@@ -523,7 +523,7 @@ echo '' >> $usr_dir/pbxlog.service
 echo '[Service]' >> $usr_dir/pbxlog.service
 echo 'ExecStart=/usr/bin/php '$webroot'/api/zetadmin_pbx/'$file_name'.php' >> $usr_dir/pbxlog.service
 echo 'Restart=always' >> $usr_dir/pbxlog.service
-echo 'User=nobody' >> $usr_dir/pbxlog.service
+echo 'User=root' >> $usr_dir/pbxlog.service
 echo '' >> $usr_dir/pbxlog.service
 echo '[Install]' >> $usr_dir/pbxlog.service
 echo 'WantedBy=multi-user.target' >> $usr_dir/pbxlog.service
@@ -547,7 +547,7 @@ echo '' >> $usr_dir/radiopbx.service
 echo '[Service]' >> $usr_dir/radiopbx.service
 echo 'ExecStart=/usr/bin/php '$webroot'/api/zetadmin_pbx/radio.php' >> $usr_dir/radiopbx.service
 echo 'Restart=always' >> $usr_dir/radiopbx.service
-echo 'User=nobody' >> $usr_dir/radiopbx.service
+echo 'User=root' >> $usr_dir/radiopbx.service
 echo '' >> $usr_dir/radiopbx.service
 echo '[Install]' >> $usr_dir/radiopbx.service
 echo 'WantedBy=multi-user.target' >> $usr_dir/radiopbx.service
@@ -600,7 +600,7 @@ echo '' >> $usr_dir/radiopbx.service
 echo '[Service]' >> $usr_dir/radiopbx.service
 echo 'ExecStart=nohup /var/www/httpdcmd.sh >> /var/www/httpdcmd.out &' >> $usr_dir/httpdcmd.service
 echo 'Restart=always' >> $usr_dir/httpdcmd.service
-echo 'User=nobody' >> $usr_dir/httpdcmd.service
+echo 'User=root' >> $usr_dir/httpdcmd.service
 echo '' >> $usr_dir/httpdcmd.service
 echo '[Install]' >> $usr_dir/httpdcmd.service
 echo 'WantedBy=multi-user.target' >> $usr_dir/httpdcmd.service
