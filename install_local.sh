@@ -127,6 +127,7 @@ wget https://downloads.asterisk.org/pub/telephony/asterisk/releases/asterisk-13.
 tar xvfz asterisk-13.38.3.tar.gz
 cd asterisk-13*/
 echo '.'$file_name >> .version
+sudo contrib/scripts/get_mp3_source.sh
 ./configure --libdir=/usr/lib64
 ./configure --with-jansson-bundled
 make && make install
